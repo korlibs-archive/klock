@@ -4,6 +4,12 @@ Consistent and portable date and time utilities for multiplatform kotlin
 [![Build Status](https://travis-ci.org/soywiz/klock.svg?branch=master)](https://travis-ci.org/soywiz/klock)
 [![Maven Version](https://img.shields.io/github/tag/soywiz/klock.svg?style=flat&label=maven)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22klock%22)
 
+Use with gradle (uploaded to maven central):
+
+```
+compile "com.soywiz:klock:0.1.0"
+```
+
 ```kotlin
 object Klock {
 	fun currentTimeMillis(): Long
