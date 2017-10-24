@@ -186,7 +186,6 @@ class OffsetDateTime private constructor(
 	fun toString(format: String): String = SimplerDateFormat(format).format(this)
 }
 
-// From .NET DateTime
 class UtcDateTime internal constructor(internal val internalMillis: Long, dummy: Boolean) : DateTime {
 	companion object {
 		private const val DATE_PART_YEAR = 0
