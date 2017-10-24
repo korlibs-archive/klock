@@ -120,6 +120,7 @@ interface DateTime {
 
 	operator fun plus(delta: TimeDistance): DateTime = this.add(delta.years * 12 + delta.months, (delta.days * MILLIS_PER_DAY + delta.hours * MILLIS_PER_HOUR + delta.minutes * MILLIS_PER_MINUTE + delta.seconds * MILLIS_PER_SECOND + delta.milliseconds).toLong())
 	operator fun minus(delta: TimeDistance): DateTime = this + -delta
+	fun toString(format: String): String = SimplerDateFormat(format).format(this)
 
 	companion object {
 		val EPOCH by lazy { DateTime(1970, 1, 1, 0, 0, 0) as UtcDateTime }
@@ -183,7 +184,6 @@ class OffsetDateTime private constructor(
 		OffsetDateTime(utc.add(deltaMonths, deltaMilliseconds), offset)
 
 	override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
-	fun toString(format: String): String = SimplerDateFormat(format).format(this)
 }
 
 class UtcDateTime internal constructor(internal val internalMillis: Long, dummy: Boolean) : DateTime {
@@ -275,7 +275,6 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 	override fun hashCode(): Int = internalMillis.hashCode()
 	override fun equals(other: Any?): Boolean = this.unix == (other as? DateTime?)?.unix
 	override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
-	fun toString(format: String): String = SimplerDateFormat(format).format(this)
 }
 
 data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Double = 0.0, val hours: Double = 0.0, val minutes: Double = 0.0, val seconds: Double = 0.0, val milliseconds: Double = 0.0) {
