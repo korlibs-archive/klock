@@ -1,0 +1,4 @@
+apply plugin: 'kotlin-platform-common'
+
+dependencies {
+}
