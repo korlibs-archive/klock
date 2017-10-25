@@ -8,6 +8,7 @@ Use with gradle (uploaded to maven central):
 
 ```
 compile "com.soywiz:klock:0.1.0"
+compile "com.soywiz:klock-js:0.1.0"
 ```
 
 ```kotlin
