@@ -1,6 +1,6 @@
 # klock
 
-![](/assets/klock_128.png)
+![](/assets/klock_256.png)
 
 Consistent and portable date and time utilities for multiplatform kotlin (JVM, JS and COMMON)
 
