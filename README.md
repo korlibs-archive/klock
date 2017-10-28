@@ -1,4 +1,7 @@
 # klock
+
+![](/docs/klock_128.png)
+
 Consistent and portable date and time utilities for multiplatform kotlin
 
 [![Build Status](https://travis-ci.org/soywiz/klock.svg?branch=master)](https://travis-ci.org/soywiz/klock)
