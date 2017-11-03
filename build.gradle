@@ -29,6 +29,12 @@ allprojects {
 	group 'com.soywiz'
 	version '0.2.0-SNAPSHOT'
 
+	if (project == rootProject) {
+		new File(rootProject.rootDir, "klock/common/src/main/kotlin/com/soywiz/klock/KlockVersion.kt").write(
+				"package com.soywiz.klock\n\nval KLOCK_VERSION = \"$version\""
+		)
+	}
+
 	apply plugin: 'java'
 	apply plugin: 'maven'
 	apply plugin: 'signing'
