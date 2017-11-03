@@ -8,9 +8,9 @@ Consistent and portable date and time utilities for multiplatform kotlin (JVM, J
 Use with gradle (uploaded to maven central):
 
 ```
-compile "com.soywiz:klock:0.1.0" // jvm/android
-compile "com.soywiz:klock-js:0.1.0" // js
-compile "com.soywiz:klock-common:0.1.0" // common (just expect 2 decls in Klock)
+compile "com.soywiz:klock:0.2.0" // jvm/android
+compile "com.soywiz:klock-js:0.2.0" // js
+compile "com.soywiz:klock-common:0.2.0" // common (just expect 2 decls in Klock)
 ```
 
 ```kotlin

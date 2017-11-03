@@ -1,11 +1,10 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 buildscript {
-	ext.kotlinVersion = '1.2.0-beta-88'
+	ext.kotlinVersion = '1.2.0-rc-39'
 	ext.compilerVersion = ext.kotlinVersion
 	ext.librariesVersion = ext.kotlinVersion
 	ext.eapChannel = 'http://dl.bintray.com/kotlin/kotlin-eap-1.2'
-	ext.serializationPluginVersion = '0.1'
 
 	repositories {
 		jcenter()
