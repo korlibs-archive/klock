@@ -1,3 +1,3 @@
 package com.soywiz.klock
 
-val KLOCK_VERSION = "0.2.0"
+val KLOCK_VERSION = "0.2.1-SNAPSHOT"

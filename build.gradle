@@ -27,7 +27,7 @@ allprojects {
 	}
 
 	group 'com.soywiz'
-	version '0.2.0'
+	version '0.2.1-SNAPSHOT'
 
 	if (project == rootProject) {
 		new File(rootProject.rootDir, "klock/common/src/main/kotlin/com/soywiz/klock/KlockVersion.kt").write(
