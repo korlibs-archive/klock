@@ -1,6 +1,8 @@
 package com.soywiz.klock
 
 actual object Klock {
+	actual val VERSION: String = KLOCK_VERSION
+
 	actual fun currentTimeMillis(): Long = js("Date.now()").unsafeCast<Double>().toLong()
 	actual fun currentTimeMillisDouble(): Double = js("Date.now()").unsafeCast<Double>()
 
