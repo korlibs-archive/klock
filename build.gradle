@@ -167,13 +167,13 @@ allprojects {
 						name "${project.name}"
 						packaging 'jar'
 						description 'Klock: Consistent and portable date and time utilities for multiplatform kotlin'
-						url 'https://github.com/soywiz/klock/'
+						url 'https://github.com/korlibs/klock/'
 						inceptionYear '2016'
 
 						scm {
-							url 'scm:git@github.com:soywiz/klock.git'
-							connection 'scm:git@github.com:soywiz/klock.git'
-							developerConnection 'scm:git@github.com:soywiz/klock.git'
+							url 'scm:git@github.com:korlibs/klock.git'
+							connection 'scm:git@github.com:korlibs/klock.git'
+							developerConnection 'scm:git@github.com:korlibs/klock.git'
 						}
 
 						licenses {

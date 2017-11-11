@@ -2,8 +2,8 @@
 
 Consistent and portable date and time utilities for multiplatform kotlin (JVM, JS and COMMON)
 
-[![Build Status](https://travis-ci.org/soywiz/klock.svg?branch=master)](https://travis-ci.org/soywiz/klock)
-[![Maven Version](https://img.shields.io/github/tag/soywiz/klock.svg?style=flat&label=maven)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22klock%22)
+[![Build Status](https://travis-ci.org/korlibs/klock.svg?branch=master)](https://travis-ci.org/korlibs/klock)
+[![Maven Version](https://img.shields.io/github/tag/korlibs/klock.svg?style=flat&label=maven)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22klock%22)
 
 Use with gradle (uploaded to maven central):
 
