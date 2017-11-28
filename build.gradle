@@ -1,20 +1,16 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 buildscript {
-	ext.kotlinVersion = '1.2.0-rc-39'
-	ext.compilerVersion = ext.kotlinVersion
-	ext.librariesVersion = ext.kotlinVersion
-	ext.eapChannel = 'http://dl.bintray.com/kotlin/kotlin-eap-1.2'
+	ext.kotlinVersion = '1.2.0'
 
 	repositories {
 		jcenter()
-		maven { url eapChannel }
 		maven { url "https://plugins.gradle.org/m2/" }
 		mavenLocal()
 	}
 
 	dependencies {
-		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$compilerVersion"
+		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 	}
 }
 
@@ -22,7 +18,6 @@ allprojects {
 	repositories {
 		mavenLocal()
 		jcenter()
-		maven { url eapChannel }
 		mavenLocal()
 	}
 
@@ -44,9 +39,9 @@ allprojects {
 	it.afterEvaluate {
 		if (it.plugins.hasPlugin("kotlin-platform-common")) {
 			dependencies {
-				compile "org.jetbrains.kotlin:kotlin-stdlib-common:$librariesVersion"
-				testCompile "org.jetbrains.kotlin:kotlin-test-common:$librariesVersion"
-				testCompile "org.jetbrains.kotlin:kotlin-test-annotations-common:$librariesVersion"
+				compile "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlinVersion"
+				testCompile "org.jetbrains.kotlin:kotlin-test-common:$kotlinVersion"
+				testCompile "org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlinVersion"
 			}
 
 			kotlin {
@@ -55,9 +50,9 @@ allprojects {
 		}
 		if (it.plugins.hasPlugin("kotlin-platform-jvm") || it.plugins.hasPlugin("kotlin")) {
 			dependencies {
-				compile "org.jetbrains.kotlin:kotlin-stdlib:$librariesVersion"
-				testCompile "org.jetbrains.kotlin:kotlin-test:$librariesVersion"
-				testCompile "org.jetbrains.kotlin:kotlin-test-junit:$librariesVersion"
+				compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+				testCompile "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+				testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 				testCompile "junit:junit:4.12"
 			}
 
@@ -76,8 +71,8 @@ allprojects {
 		// https://github.com/JetBrains/kotlin-examples/blob/5e883a6d67afc8b8aeb8991af6a7b6183be2213f/gradle/js-tests/mocha/build.gradle
 		if (it.plugins.hasPlugin("kotlin-platform-js") || it.plugins.hasPlugin("kotlin2js")) {
 			dependencies {
-				compile "org.jetbrains.kotlin:kotlin-stdlib-js:$librariesVersion"
-				testCompile "org.jetbrains.kotlin:kotlin-test-js:$librariesVersion"
+				compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
+				testCompile "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
 			}
 
 			kotlin {
