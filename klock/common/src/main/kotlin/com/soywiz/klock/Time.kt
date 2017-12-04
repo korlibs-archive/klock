@@ -120,7 +120,8 @@ interface DateTime {
 
 	operator fun plus(delta: TimeDistance): DateTime = this.add(delta.years * 12 + delta.months, (delta.days * MILLIS_PER_DAY + delta.hours * MILLIS_PER_HOUR + delta.minutes * MILLIS_PER_MINUTE + delta.seconds * MILLIS_PER_SECOND + delta.milliseconds).toLong())
 	operator fun minus(delta: TimeDistance): DateTime = this + -delta
-	fun toString(format: String): String = SimplerDateFormat(format).format(this)
+	fun toString(format: String): String = toString(SimplerDateFormat(format))
+	fun toString(format: SimplerDateFormat): String = format.format(this)
 
 	companion object {
 		val EPOCH by lazy { DateTime(1970, 1, 1, 0, 0, 0) as UtcDateTime }
@@ -131,6 +132,9 @@ interface DateTime {
 		}
 
 		operator fun invoke(time: Long) = fromUnix(time)
+
+		fun fromString(str: String) = SimplerDateFormat.parse(str)
+		fun parse(str: String) = SimplerDateFormat.parse(str)
 
 		fun fromUnix(time: Long): DateTime = UtcDateTime(EPOCH_INTERNAL_MILLIS + time, true)
 		fun fromUnixLocal(time: Long): DateTime = UtcDateTime(EPOCH_INTERNAL_MILLIS + time, true).toLocal()
@@ -339,7 +343,7 @@ inline val Number.seconds get() = TimeSpan.fromMilliseconds((this.toDouble() * 1
 
 class SimplerDateFormat(val format: String) {
 	companion object {
-		private val rx = Regex("[\\w]+")
+		private val rx = Regex("('[\\w]+'|[\\w]+)")
 		private val englishDaysOfWeek = listOf(
 			"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
 		)
@@ -350,6 +354,21 @@ class SimplerDateFormat(val format: String) {
 		private val englishMonths3 = englishMonths.map { it.substr(0, 3) }
 
 		val DEFAULT_FORMAT by lazy { SimplerDateFormat("EEE, dd MMM yyyy HH:mm:ss z") }
+		val FORMAT1 by lazy { SimplerDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'") }
+
+		val FORMATS = listOf(DEFAULT_FORMAT, FORMAT1)
+
+		fun parse(str: String): DateTime {
+			var lastError: Throwable? = null
+			for (format in FORMATS) {
+				try {
+					return format.parseDate(str)
+				} catch (e: Throwable) {
+					lastError = e
+				}
+			}
+			throw lastError!!
+		}
 	}
 
 	private val parts = arrayListOf<String>()
@@ -357,8 +376,13 @@ class SimplerDateFormat(val format: String) {
 	private val escapedFormat = Regex.escapeReplacement(format)
 
 	private val rx2: Regex = Regex("^" + escapedFormat.replace(rx) { result ->
-		parts += result.groupValues[0]
-		"([\\w\\+\\-]+)"
+		val v = result.groupValues[0]
+		parts += v
+		if (v.startsWith("'")) {
+			"(" + Regex.escapeReplacement(v.trim('\'')) + ")"
+		} else {
+			"([\\w\\+\\-]+)"
+		}
 	} + "$")
 
 	private val parts2 = escapedFormat.splitKeep(rx)
@@ -370,7 +394,8 @@ class SimplerDateFormat(val format: String) {
 
 	fun format(dd: DateTime): String {
 		var out = ""
-		for (name in parts2) {
+		for (name2 in parts2) {
+			val name = name2.trim('\'')
 			out += when (name) {
 				"EEE" -> englishDaysOfWeek[dd.dayOfWeek.index].substr(0, 3).capitalize()
 				"z", "zzz" -> dd.timeZone
@@ -392,13 +417,17 @@ class SimplerDateFormat(val format: String) {
 	fun parse(str: String): Long = parseDate(str).unix
 
 	fun parseDate(str: String): DateTime {
+		return tryParseDate(str) ?: throw RuntimeException("Not a valid format: '$str' for '$format'")
+	}
+
+	fun tryParseDate(str: String): DateTime? {
 		var second = 0
 		var minute = 0
 		var hour = 0
 		var day = 1
 		var month = 1
 		var fullYear = 1970
-		val result = rx2.find(str) ?: throw RuntimeException("Not a valid format: '$str' for '$format'")
+		val result = rx2.find(str) ?: return null
 		for ((name, value) in parts.zip(result.groupValues.drop(1))) {
 			when (name) {
 				"EEE" -> Unit // day of week (Sun)
@@ -415,7 +444,7 @@ class SimplerDateFormat(val format: String) {
 				}
 			}
 		}
-		return DateTime(fullYear, month, day, hour, minute, second)
+		return DateTime.createAdjusted(fullYear, month, day, hour, minute, second)
 	}
 }
 
