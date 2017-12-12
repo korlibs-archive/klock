@@ -11,14 +11,11 @@ enum class DayOfWeek(val index: Int) {
 	}
 }
 
-class Year(val year: Int) {
+data class Year(val year: Int) {
 	companion object {
-		fun check(year: Int) = run { if (year !in 1..9999) throw DateException("Year $year not in 1..9999") }
-
-		fun isLeap(year: Int): Boolean {
-			check(year)
-			return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
-		}
+		fun checked(year: Int) = year.apply { if (year !in 1..9999) throw DateException("Year $year not in 1..9999") }
+		fun isLeapChecked(year: Int): Boolean = isLeap(checked(year))
+		fun isLeap(year: Int): Boolean = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
 	}
 }
 
@@ -48,7 +45,8 @@ enum class Month(val index: Int) {
 
 	companion object {
 		val BY_INDEX0 = values()
-		operator fun get(index1: Int) = BY_INDEX0[index1 - 1]
+		operator fun invoke(index1: Int) = BY_INDEX0[(index1 - 1) umod 12]
+		operator fun get(index1: Int) = BY_INDEX0[(index1 - 1) umod 12]
 
 		fun check(month: Int): Int {
 			if (month !in 1..12) throw DateException("Month $month not in 1..12")
@@ -83,6 +81,7 @@ private const val MILLIS_PER_SECOND = 1000
 private const val MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60
 private const val MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60
 private const val MILLIS_PER_DAY = MILLIS_PER_HOUR * 24
+private const val MILLIS_PER_WEEK = MILLIS_PER_DAY * 7
 
 private const val DAYS_PER_YEAR = 365
 private const val DAYS_PER_4_YEARS = DAYS_PER_YEAR * 4 + 1
@@ -117,6 +116,7 @@ interface DateTime {
 	fun addYears(delta: Int): DateTime = add(delta * 12, 0L)
 	fun addMonths(delta: Int): DateTime = add(delta, 0L)
 	fun addDays(delta: Double): DateTime = add(0, (delta * MILLIS_PER_DAY).toLong())
+	fun addWeeks(delta: Double): DateTime = add(0, (delta * MILLIS_PER_WEEK).toLong())
 	fun addHours(delta: Double): DateTime = add(0, (delta * MILLIS_PER_HOUR).toLong())
 	fun addMinutes(delta: Double): DateTime = add(0, (delta * MILLIS_PER_MINUTE).toLong())
 	fun addSeconds(delta: Double): DateTime = add(0, (delta * MILLIS_PER_SECOND).toLong())
@@ -158,10 +158,7 @@ interface DateTime {
 			return DateTime(dy, dm, dd, th, tm, ts, milliseconds)
 		}
 
-		fun isLeapYear(year: Int): Boolean {
-			Year.check(year)
-			return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
-		}
+		fun isLeapYear(year: Int): Boolean = Year.isLeap(year)
 
 		fun daysInMonth(month: Int, isLeap: Boolean): Int = Month.days(month, isLeap)
 		fun daysInMonth(month: Int, year: Int): Int = daysInMonth(month, isLeapYear(year))
@@ -203,7 +200,7 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 		private const val DATE_PART_DAY = 3
 
 		internal fun dateToMillis(year: Int, month: Int, day: Int): Long {
-			Year.check(year)
+			Year.checked(year)
 			Month.check(month)
 			if (day !in 1..Month.days(month, year)) throw DateException("Day $day not valid for year=$year and month=$month")
 			val y = year - 1
@@ -272,7 +269,7 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 				month = 12 + (i + 1) % 12
 				year += (i - 11) / 12
 			}
-			Year.check(year)
+			Year.checked(year)
 			val days = Month.days(month, year)
 			if (day > days) day = days
 
@@ -301,6 +298,8 @@ data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Doubl
 		milliseconds + other.milliseconds
 	)
 
+	inline operator fun times(times: Number) = times(times.toDouble())
+
 	operator fun times(times: Double) = TimeDistance(
 		(years * times).toInt(),
 		(months * times).toInt(),
@@ -315,6 +314,7 @@ data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Doubl
 inline val Int.years get() = TimeDistance(years = this)
 inline val Int.months get() = TimeDistance(months = this)
 inline val Number.days get() = TimeDistance(days = this.toDouble())
+inline val Number.weeks get() = TimeDistance(days = this.toDouble() * 7)
 inline val Number.hours get() = TimeDistance(hours = this.toDouble())
 inline val Number.minutes get() = TimeDistance(minutes = this.toDouble())
 //inline val Number.seconds get() = TimeAdd(seconds = this.toDouble())

@@ -1,6 +1,7 @@
 package com.klock
 
 import com.soywiz.klock.Month
+import com.soywiz.klock.Month.*
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -29,6 +30,11 @@ class MonthTest {
 				31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 			),
 			listOf(false, true).map { leap -> (1..12).map { Month.days(it, isLeap = leap) } }.flatMap { it }
+		)
+
+		assertEquals(
+			listOf(January, February, March, April, May, June, July, August, September, October, November, December),
+			(1..12).map { Month(it) }
 		)
 	}
 }
