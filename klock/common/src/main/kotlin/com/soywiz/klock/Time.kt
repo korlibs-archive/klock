@@ -124,7 +124,10 @@ interface DateTime {
 	fun addMilliseconds(delta: Double): DateTime = if (delta == 0.0) this else add(0, delta.toLong())
 	fun addMilliseconds(delta: Long): DateTime = if (delta == 0L) this else add(0, delta)
 
-	operator fun plus(delta: TimeDistance): DateTime = this.add(delta.years * 12 + delta.months, (delta.days * MILLIS_PER_DAY + delta.hours * MILLIS_PER_HOUR + delta.minutes * MILLIS_PER_MINUTE + delta.seconds * MILLIS_PER_SECOND + delta.milliseconds).toLong())
+	operator fun plus(delta: TimeDistance): DateTime = this.add(
+		delta.years * 12 + delta.months,
+		(delta.days * MILLIS_PER_DAY + delta.hours * MILLIS_PER_HOUR + delta.minutes * MILLIS_PER_MINUTE + delta.seconds * MILLIS_PER_SECOND + delta.milliseconds).toLong()
+	)
 	operator fun minus(delta: TimeDistance): DateTime = this + -delta
 	fun toString(format: String): String = toString(SimplerDateFormat(format))
 	fun toString(format: SimplerDateFormat): String = format.format(this)
@@ -317,7 +320,7 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 			val days = Month.days(month, year)
 			if (day > days) day = days
 
-			UtcDateTime(timeToMillisUnchecked(year, month, day) + (internalMillis % MILLIS_PER_DAY) + deltaMilliseconds, true)
+			UtcDateTime(dateToMillisUnchecked(year, month, day) + (internalMillis % MILLIS_PER_DAY) + deltaMilliseconds, true)
 		}
 	}
 
