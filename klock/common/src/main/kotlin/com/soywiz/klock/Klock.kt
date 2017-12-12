@@ -7,3 +7,6 @@ expect object Klock {
 	fun getLocalTimezoneOffset(unix: Long): Int
 }
 
+object KlockExt {
+	val VERSION = KLOCK_VERSION
+}
