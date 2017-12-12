@@ -50,16 +50,21 @@ enum class Month(val index: Int) {
 		val BY_INDEX0 = values()
 		operator fun get(index1: Int) = BY_INDEX0[index1 - 1]
 
-		fun check(month: Int) = run { if (month !in 1..12) throw DateException("Month $month not in 1..12") }
+		fun check(month: Int): Int {
+			if (month !in 1..12) throw DateException("Month $month not in 1..12")
+			return month
+		}
+		fun normalize(month: Int) = ((month - 1) umod 12) + 1
 
 		fun days(month: Int, isLeap: Boolean): Int {
-			Month.check(month)
+			//val nmonth = check(month)
+			val nmonth = normalize(month)
 			val days = DAYS_TO_MONTH(isLeap)
-			return days[month] - days[month - 1]
+			return days[nmonth] - days[nmonth - 1]
 		}
 
-		fun daysToStart(month: Int, isLeap: Boolean): Int = DAYS_TO_MONTH(isLeap)[month - 1]
-		fun daysToEnd(month: Int, isLeap: Boolean): Int = DAYS_TO_MONTH(isLeap)[month]
+		fun daysToStart(month: Int, isLeap: Boolean): Int = DAYS_TO_MONTH(isLeap)[(month - 1) umod 13]
+		fun daysToEnd(month: Int, isLeap: Boolean): Int = DAYS_TO_MONTH(isLeap)[month umod 13]
 
 		fun days(month: Int, year: Int): Int = days(month, Year.isLeap(year))
 		fun daysToStart(month: Int, year: Int): Int = daysToStart(month, Year.isLeap(year))
@@ -526,4 +531,10 @@ private fun String.splitKeep(regex: Regex): List<String> {
 	return out
 }
 
-
+private infix fun Int.umod(that: Int): Int {
+	val remainder = this % that
+	return when {
+		remainder < 0 -> remainder + that
+		else -> remainder
+	}
+}
