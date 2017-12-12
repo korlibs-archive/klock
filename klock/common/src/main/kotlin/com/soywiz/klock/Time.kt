@@ -52,6 +52,7 @@ enum class Month(val index: Int) {
 			if (month !in 1..12) throw DateException("Month $month not in 1..12")
 			return month
 		}
+
 		fun normalize(month: Int) = ((month - 1) umod 12) + 1
 
 		fun days(month: Int, isLeap: Boolean): Int {
@@ -148,6 +149,20 @@ interface DateTime {
 		fun nowUnix() = Klock.currentTimeMillis()
 		fun now() = fromUnix(nowUnix())
 		fun nowLocal() = fromUnix(nowUnix()).toLocal()
+
+		// Can't produce errors on invalid dates and tries to adjust it to a valid date.
+		fun createClamped(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0, milliseconds: Int = 0): DateTime {
+			val clampedMonth = month.clamp(1, 12)
+			return createUnchecked(
+				year = year,
+				month = clampedMonth,
+				day = day.clamp(1, daysInMonth(clampedMonth, year)),
+				hour = hour.clamp(0, 23),
+				minute = minute.clamp(0, 59),
+				second = minute.clamp(0, 59),
+				milliseconds = milliseconds
+			)
+		}
 
 		// Can't produce errors on invalid dates and tries to adjust it to a valid date.
 		fun createAdjusted(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0, milliseconds: Int = 0): DateTime {
