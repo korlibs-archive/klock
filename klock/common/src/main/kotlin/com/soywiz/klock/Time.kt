@@ -248,7 +248,7 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 		}
 
 		internal fun dateToMillis(year: Int, month: Int, day: Int): Long {
-			Year.checked(year)
+			//Year.checked(year)
 			Month.check(month)
 			if (day !in 1..Month.days(month, year)) throw DateException("Day $day not valid for year=$year and month=$month")
 			return dateToMillisUnchecked(year, month, day)
@@ -317,7 +317,7 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 			val days = Month.days(month, year)
 			if (day > days) day = days
 
-			UtcDateTime(dateToMillis(year, month, day) + (internalMillis % MILLIS_PER_DAY) + deltaMilliseconds, true)
+			UtcDateTime(timeToMillisUnchecked(year, month, day) + (internalMillis % MILLIS_PER_DAY) + deltaMilliseconds, true)
 		}
 	}
 
