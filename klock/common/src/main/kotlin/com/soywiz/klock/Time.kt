@@ -132,6 +132,7 @@ interface DateTime {
 		val EPOCH by lazy { DateTime(1970, 1, 1, 0, 0, 0) as UtcDateTime }
 		internal val EPOCH_INTERNAL_MILLIS by lazy { EPOCH.internalMillis }
 
+		// Can produce errors on invalid dates
 		operator fun invoke(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0, milliseconds: Int = 0): DateTime {
 			return UtcDateTime(UtcDateTime.dateToMillis(year, month, day) + UtcDateTime.timeToMillis(hour, minute, second) + milliseconds, true)
 		}
@@ -148,18 +149,39 @@ interface DateTime {
 		fun now() = fromUnix(nowUnix())
 		fun nowLocal() = fromUnix(nowUnix()).toLocal()
 
+		// Can't produce errors on invalid dates and tries to adjust it to a valid date.
 		fun createAdjusted(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0, milliseconds: Int = 0): DateTime {
-			val dy = year.clamp(1, 9999)
-			val dm = month.clamp(1, 12)
-			val dd = day.clamp(1, daysInMonth(dm, dy))
-			val th = hour.clamp(0, 23)
-			val tm = minute.clamp(0, 59)
-			val ts = second.clamp(0, 59)
-			return DateTime(dy, dm, dd, th, tm, ts, milliseconds)
+			var dy = year
+			var dm = month
+			var dd = day
+			var th = hour
+			var tm = minute
+			var ts = second
+
+			ts = ts.cycle(0, 59); tm += ts.cycleSteps(0, 59) // Adjust seconds, adding minutes
+			tm = tm.cycle(0, 59); th += tm.cycleSteps(0, 59) // Adjust minutes, adding hours
+			th = th.cycle(0, 23); dd += th.cycleSteps(0, 23) // Adjust hours, adding days
+
+			while (true) {
+				val dup = daysInMonth(dm, dy)
+				dd = dd.cycle(1, dup); dm += dd.cycleSteps(1, dup) // Adjust days, adding months
+				dm = dm.cycle(1, 12); dy += dd.cycleSteps(1, 12) // Adjust months, adding years
+
+				// We already have found a day that is valid for the adjusted month!
+				if (dd.cycle(1, daysInMonth(dm, dy)) == dd) {
+					break
+				}
+			}
+
+			return createUnchecked(dy, dm, dd, th, tm, ts, milliseconds)
+		}
+
+		// Can't produce errors on invalid dates
+		fun createUnchecked(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0, milliseconds: Int = 0): DateTime {
+			return UtcDateTime(UtcDateTime.dateToMillisUnchecked(year, month, day) + UtcDateTime.timeToMillisUnchecked(hour, minute, second) + milliseconds, true)
 		}
 
 		fun isLeapYear(year: Int): Boolean = Year.isLeap(year)
-
 		fun daysInMonth(month: Int, isLeap: Boolean): Int = Month.days(month, isLeap)
 		fun daysInMonth(month: Int, year: Int): Int = daysInMonth(month, isLeapYear(year))
 	}
@@ -199,22 +221,29 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 		private const val DATE_PART_MONTH = 2
 		private const val DATE_PART_DAY = 3
 
-		internal fun dateToMillis(year: Int, month: Int, day: Int): Long {
-			Year.checked(year)
-			Month.check(month)
-			if (day !in 1..Month.days(month, year)) throw DateException("Day $day not valid for year=$year and month=$month")
+		internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Long {
 			val y = year - 1
 			Month.daysToStart(month, year)
 			val n = y * 365 + y / 4 - y / 100 + y / 400 + Month.daysToStart(month, year) + day - 1
 			return n.toLong() * MILLIS_PER_DAY.toLong()
 		}
 
+		internal fun timeToMillisUnchecked(hour: Int, minute: Int, second: Int): Long {
+			return (hour.toLong() * 3600 + minute.toLong() * 60 + second.toLong()) * MILLIS_PER_SECOND
+		}
+
+		internal fun dateToMillis(year: Int, month: Int, day: Int): Long {
+			Year.checked(year)
+			Month.check(month)
+			if (day !in 1..Month.days(month, year)) throw DateException("Day $day not valid for year=$year and month=$month")
+			return dateToMillisUnchecked(year, month, day)
+		}
+
 		internal fun timeToMillis(hour: Int, minute: Int, second: Int): Long {
 			if (hour !in 0..23) throw DateException("Hour $hour not in 0..23")
 			if (minute !in 0..59) throw DateException("Minute $minute not in 0..59")
 			if (second !in 0..59) throw DateException("Second $second not in 0..59")
-			val totalSeconds = hour.toLong() * 3600 + minute.toLong() * 60 + second.toLong()
-			return totalSeconds * MILLIS_PER_SECOND
+			return timeToMillisUnchecked(hour, minute, second)
 		}
 
 		internal fun getDatePart(millis: Long, part: Int): Int {
@@ -269,7 +298,7 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 				month = 12 + (i + 1) % 12
 				year += (i - 11) / 12
 			}
-			Year.checked(year)
+			//Year.checked(year)
 			val days = Month.days(month, year)
 			if (day > days) day = days
 
@@ -512,6 +541,14 @@ private fun String.substr(start: Int, length: Int): String {
 }
 
 private fun Int.clamp(min: Int, max: Int): Int = if (this < min) min else if (this > max) max else this
+
+private fun Int.cycle(min: Int, max: Int): Int {
+	return ((this - min) umod (max - min + 1)) + min
+}
+
+private fun Int.cycleSteps(min: Int, max: Int): Int {
+	return (this - min) / (max - min + 1)
+}
 
 private fun String.splitKeep(regex: Regex): List<String> {
 	val str = this
