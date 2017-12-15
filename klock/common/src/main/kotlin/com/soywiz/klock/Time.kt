@@ -367,7 +367,6 @@ inline val Number.minutes get() = TimeDistance(minutes = this.toDouble())
 //inline val Number.seconds get() = TimeAdd(seconds = this.toDouble())
 
 @Suppress("DataClassPrivateConstructor")
-//data class TimeSpan private constructor(val ms: Int) : Comparable<TimeSpan>, Interpolable<TimeSpan> {
 data class TimeSpan private constructor(val ms: Int) : Comparable<TimeSpan> {
 	val milliseconds: Int get() = this.ms
 	val seconds: Double get() = this.ms.toDouble() / 1000.0
@@ -378,6 +377,32 @@ data class TimeSpan private constructor(val ms: Int) : Comparable<TimeSpan> {
 			0 -> ZERO
 			else -> TimeSpan(ms)
 		}
+
+		private val timeSteps = listOf(60, 60, 24)
+		private fun toTimeStringRaw(totalMilliseconds: Int, components: Int = 3): String {
+			var timeUnit = totalMilliseconds / 1000
+
+			val out = arrayListOf<String>()
+
+			for (n in 0 until components) {
+				if (n == components - 1) {
+					out += "%02d".format(timeUnit)
+					break
+				}
+				val step = timeSteps?.getOrNull(n) ?: throw RuntimeException("Just supported ${timeSteps.size} steps")
+				val cunit = timeUnit % step
+				timeUnit /= step
+				out += "%02d".format(cunit)
+			}
+
+			return out.reversed().joinToString(":")
+		}
+
+		fun toTimeString(totalMilliseconds: Int, components: Int = 3, addMilliseconds: Boolean = false): String {
+			val milliseconds = totalMilliseconds % 1000
+			val out = toTimeStringRaw(totalMilliseconds, components)
+			return if (addMilliseconds) "$out.$milliseconds" else out
+		}
 	}
 
 	override fun compareTo(other: TimeSpan): Int = this.ms.compareTo(other.ms)
@@ -387,7 +412,7 @@ data class TimeSpan private constructor(val ms: Int) : Comparable<TimeSpan> {
 	operator fun times(scale: Int): TimeSpan = TimeSpan(this.ms * scale)
 	operator fun times(scale: Double): TimeSpan = TimeSpan((this.ms * scale).toInt())
 
-	//override fun interpolateWith(other: TimeSpan, ratio: Double): TimeSpan = TimeSpan(ratio.interpolate(this.ms, other.ms))
+	fun toTimeString(components: Int = 3, addMilliseconds: Boolean = false): String = toTimeString(milliseconds, components, addMilliseconds)
 }
 
 inline val Number.milliseconds get() = TimeSpan.fromMilliseconds(this.toInt())
