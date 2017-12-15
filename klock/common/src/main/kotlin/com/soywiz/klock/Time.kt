@@ -162,7 +162,7 @@ interface DateTime {
 				day = day.clamp(1, daysInMonth(clampedMonth, year)),
 				hour = hour.clamp(0, 23),
 				minute = minute.clamp(0, 59),
-				second = minute.clamp(0, 59),
+				second = second.clamp(0, 59),
 				milliseconds = milliseconds
 			)
 		}
@@ -176,14 +176,15 @@ interface DateTime {
 			var tm = minute
 			var ts = second
 
-			ts = ts.cycle(0, 59); tm += ts.cycleSteps(0, 59) // Adjust seconds, adding minutes
-			tm = tm.cycle(0, 59); th += tm.cycleSteps(0, 59) // Adjust minutes, adding hours
-			th = th.cycle(0, 23); dd += th.cycleSteps(0, 23) // Adjust hours, adding days
+			tm += ts.cycleSteps(0, 59); ts = ts.cycle(0, 59) // Adjust seconds, adding minutes
+			th += tm.cycleSteps(0, 59); tm = tm.cycle(0, 59) // Adjust minutes, adding hours
+			dd += th.cycleSteps(0, 23); th = th.cycle(0, 23) // Adjust hours, adding days
 
 			while (true) {
 				val dup = daysInMonth(dm, dy)
-				dd = dd.cycle(1, dup); dm += dd.cycleSteps(1, dup) // Adjust days, adding months
-				dm = dm.cycle(1, 12); dy += dd.cycleSteps(1, 12) // Adjust months, adding years
+
+				dm += dd.cycleSteps(1, dup); dd = dd.cycle(1, dup) // Adjust days, adding months
+				dy += dm.cycleSteps(1, 12); dm = dm.cycle(1, 12) // Adjust months, adding years
 
 				// We already have found a day that is valid for the adjusted month!
 				if (dd.cycle(1, daysInMonth(dm, dy)) == dd) {
@@ -521,6 +522,7 @@ class SimplerDateFormat(val format: String) {
 				}
 			}
 		}
+		//return DateTime.createClamped(fullYear, month, day, hour, minute, second)
 		return DateTime.createAdjusted(fullYear, month, day, hour, minute, second)
 	}
 }
