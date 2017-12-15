@@ -1,5 +1,5 @@
 buildscript {
-	ext.projectVersion = '0.4.1-SNAPSHOT'
+	ext.projectVersion = '0.4.2'
 	ext.projectName = 'klock'
 	ext.projectGroup = 'com.soywiz'
 	ext.projectDesc = 'Klock: Consistent and portable date and time utilities for multiplatform kotlin'
