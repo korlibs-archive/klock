@@ -1,3 +1,3 @@
 package com.soywiz.klock
 
-internal val KLOCK_VERSION = "0.4.3"
+internal const val KLOCK_VERSION = "0.4.4-SNAPSHOT"
