@@ -20,7 +20,7 @@ buildscript {
 
 	dependencies {
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-		classpath "gradle.plugin.com.soywiz:korlibs-build-gradle-plugin:0.1.3"
+		classpath "gradle.plugin.com.soywiz:korlibs-build-gradle-plugin:0.1.5"
 	}
 }
 
