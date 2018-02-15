@@ -130,7 +130,9 @@ interface DateTime : Comparable<DateTime> {
 		delta.totalMonths,
 		delta.totalMilliseconds
 	)
+    operator fun plus(delta: TimeSpan): DateTime = addMilliseconds(delta.milliseconds.toDouble())
 	operator fun minus(delta: TimeDistance): DateTime = this + -delta
+    operator fun minus(delta: TimeSpan): DateTime = addMilliseconds(-delta.milliseconds.toDouble())
 	fun toString(format: String): String = toString(SimplerDateFormat(format))
 	fun toString(format: SimplerDateFormat): String = format.format(this)
 
@@ -312,7 +314,8 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 			var month = this.month
 			var day = this.dayOfMonth
 			val i = month - 1 + deltaMonths
-			if (i >= 0) {
+
+            if (i >= 0) {
 				month = i % 12 + 1
 				year += i / 12
 			} else {
@@ -370,13 +373,23 @@ data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Doubl
 	}
 }
 
+// @TODO: Bug in Kotlin Native 0.6 : https://github.com/JetBrains/kotlin-native/issues/1332
+/*
 inline val Int.years get() = TimeDistance(years = this)
 inline val Int.months get() = TimeDistance(months = this)
 inline val Number.days get() = TimeDistance(days = this.toDouble())
 inline val Number.weeks get() = TimeDistance(days = this.toDouble() * 7)
 inline val Number.hours get() = TimeDistance(hours = this.toDouble())
 inline val Number.minutes get() = TimeDistance(minutes = this.toDouble())
-//inline val Number.seconds get() = TimeAdd(seconds = this.toDouble())
+*/
+
+// Workaround for Kotlin Native 0.6
+inline val Int.years get() = TimeDistance(years = this)
+inline val Int.months get() = TimeDistance(years = 0, months = this)
+inline val Number.days get() = TimeDistance(years = 0, months = 0, days = this.toDouble())
+inline val Number.weeks get() = TimeDistance(years = 0, months = 0, days = this.toDouble() * 7)
+inline val Number.hours get() = TimeDistance(years = 0, months = 0, days = 0.0, hours = this.toDouble())
+inline val Number.minutes get() = TimeDistance(years = 0, months = 0, days = 0.0, hours = 0.0, minutes = this.toDouble())
 
 @Suppress("DataClassPrivateConstructor")
 data class TimeSpan private constructor(val ms: Int) : Comparable<TimeSpan> {
@@ -401,7 +414,7 @@ data class TimeSpan private constructor(val ms: Int) : Comparable<TimeSpan> {
 					out += "%02d".format(timeUnit)
 					break
 				}
-				val step = timeSteps?.getOrNull(n) ?: throw RuntimeException("Just supported ${timeSteps.size} steps")
+				val step = timeSteps.getOrNull(n) ?: throw RuntimeException("Just supported ${timeSteps.size} steps")
 				val cunit = timeUnit % step
 				timeUnit /= step
 				out += "%02d".format(cunit)
@@ -538,7 +551,11 @@ class SimplerDateFormat(val format: String) {
 	}
 }
 
-private val formatRegex = Regex("%([-]?\\d+)?(\\w)")
+// @TODO: Kotlin Native crash on start
+//private val formatRegex = Regex("%([-]?\\d+)?(\\w)")
+
+//private val formatRegex get() = Regex("%([-]?\\d+)?(\\w)")
+private val formatRegex by lazy { Regex("%([-]?\\d+)?(\\w)") }
 
 private fun String.format(vararg params: Any): String {
 	var paramIndex = 0

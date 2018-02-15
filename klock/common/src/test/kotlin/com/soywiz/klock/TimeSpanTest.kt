@@ -1,7 +1,6 @@
 package com.soywiz.klock
 
-import org.junit.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 class TimeSpanTest {
 	@Test

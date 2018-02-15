@@ -1,17 +1,17 @@
 rootProject.name = 'klock-root'
 
-
-
 include(
 		'klock-common',
 		'klock',
 		'klock-js',
+		'klock-native',
 )
 
 def register(String base) {
 	findProject(":$base-common")?.projectDir = file("$base/common")
 	findProject(":$base")?.projectDir = file("$base/jvm")
 	findProject(":$base-js")?.projectDir = file("$base/js")
+	findProject(":$base-native")?.projectDir = file("$base/native")
 }
 
 register('klock')
