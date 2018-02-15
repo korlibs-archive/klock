@@ -1,6 +1,6 @@
 # ![Klock](/assets/klock_256.png)
 
-Consistent and portable date and time utilities for multiplatform kotlin (JVM, JS and COMMON)
+Consistent and portable date and time utilities for multiplatform kotlin (JVM, JS, Native (posix) and COMMON)
 
 [![Build Status](https://travis-ci.org/korlibs/klock.svg?branch=master)](https://travis-ci.org/korlibs/klock)
 [![Maven Version](https://img.shields.io/github/tag/korlibs/klock.svg?style=flat&label=maven)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22klock%22)
