@@ -2,8 +2,7 @@ package com.klock
 
 import com.soywiz.klock.DateTime
 import com.soywiz.klock.months
-import org.junit.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 class TimeDistanceTest {
 	@Test

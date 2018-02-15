@@ -14,7 +14,7 @@ install:
 script:
   - jdk_switcher use oraclejdk8
   #- ./gradlew -s -i check install distJs
-  - ./gradlew -s -i check install
+  - ./gradlew -s -i check test install :klock-native:run
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock

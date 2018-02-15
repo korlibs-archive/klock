@@ -538,7 +538,11 @@ class SimplerDateFormat(val format: String) {
 	}
 }
 
-private val formatRegex = Regex("%([-]?\\d+)?(\\w)")
+// @TODO: Kotlin Native crash on start
+//private val formatRegex = Regex("%([-]?\\d+)?(\\w)")
+
+//private val formatRegex get() = Regex("%([-]?\\d+)?(\\w)")
+private val formatRegex by lazy { Regex("%([-]?\\d+)?(\\w)") }
 
 private fun String.format(vararg params: Any): String {
 	var paramIndex = 0

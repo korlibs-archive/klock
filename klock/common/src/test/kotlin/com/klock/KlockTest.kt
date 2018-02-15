@@ -1,11 +1,11 @@
 package com.klock
 
 import com.soywiz.klock.Klock
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class KlockTest {
 	//@Test
-	@org.junit.Test
+	@Test
 	fun testTimeAdvances() {
 		val time1 = Klock.currentTimeMillis()
 		assertTrue(time1 >= 1508887000000)
@@ -16,7 +16,7 @@ class KlockTest {
 		}
 	}
 
-	@org.junit.Test
+	@Test
 	fun testThatLocalTimezoneOffsetRuns() {
 		assertTrue(Klock.getLocalTimezoneOffset(0L) != -1)
 	}

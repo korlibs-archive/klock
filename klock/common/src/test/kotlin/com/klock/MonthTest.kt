@@ -2,8 +2,7 @@ package com.klock
 
 import com.soywiz.klock.Month
 import com.soywiz.klock.Month.*
-import org.junit.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 class MonthTest {
 	@Test

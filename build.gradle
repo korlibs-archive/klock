@@ -11,17 +11,29 @@ buildscript {
 	ext.projectInceptionYear = 2017
 
 	ext.kotlinVersion = '1.2.20'
+	ext.kotlinNativeVersion = '0.6'
 
 	repositories {
 		jcenter()
 		maven { url "https://plugins.gradle.org/m2/" }
+		maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
 		mavenLocal()
 	}
 
 	dependencies {
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+		classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:$kotlinNativeVersion"
 		classpath "gradle.plugin.com.soywiz:korlibs-build-gradle-plugin:0.1.6"
 	}
 }
 
 apply plugin: 'com.soywiz.korlibs-build-gradle-plugin'
+
+allprojects {
+	tasks.withType(Test) {
+		testLogging {
+			showStandardStreams = true
+			events "passed", "failed"
+		}
+	}
+}
