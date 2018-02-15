@@ -414,7 +414,7 @@ data class TimeSpan private constructor(val ms: Int) : Comparable<TimeSpan> {
 					out += "%02d".format(timeUnit)
 					break
 				}
-				val step = timeSteps?.getOrNull(n) ?: throw RuntimeException("Just supported ${timeSteps.size} steps")
+				val step = timeSteps.getOrNull(n) ?: throw RuntimeException("Just supported ${timeSteps.size} steps")
 				val cunit = timeUnit % step
 				timeUnit /= step
 				out += "%02d".format(cunit)
