@@ -11,12 +11,14 @@ enum class DayOfWeek(val index: Int) {
 	}
 }
 
-data class Year(val year: Int) {
+data class Year(val year: Int) : Comparable<Year> {
 	companion object {
 		fun checked(year: Int) = year.apply { if (year !in 1..9999) throw DateException("Year $year not in 1..9999") }
 		fun isLeapChecked(year: Int): Boolean = isLeap(checked(year))
 		fun isLeap(year: Int): Boolean = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
 	}
+
+	override fun compareTo(other: Year): Int = this.year.compareTo(other.year)
 }
 
 enum class Month(val index: Int) {
@@ -89,7 +91,7 @@ private const val DAYS_PER_4_YEARS = DAYS_PER_YEAR * 4 + 1
 private const val DAYS_PER_100_YEARS = DAYS_PER_4_YEARS * 25 - 1
 private const val DAYS_PER_400_YEARS = DAYS_PER_100_YEARS * 4 + 1
 
-interface DateTime {
+interface DateTime : Comparable<DateTime> {
 	val year: Int
 	val month: Int
 	val dayOfWeekInt: Int
@@ -125,8 +127,8 @@ interface DateTime {
 	fun addMilliseconds(delta: Long): DateTime = if (delta == 0L) this else add(0, delta)
 
 	operator fun plus(delta: TimeDistance): DateTime = this.add(
-		delta.years * 12 + delta.months,
-		(delta.days * MILLIS_PER_DAY + delta.hours * MILLIS_PER_HOUR + delta.minutes * MILLIS_PER_MINUTE + delta.seconds * MILLIS_PER_SECOND + delta.milliseconds).toLong()
+		delta.totalMonths,
+		delta.totalMilliseconds
 	)
 	operator fun minus(delta: TimeDistance): DateTime = this + -delta
 	fun toString(format: String): String = toString(SimplerDateFormat(format))
@@ -325,13 +327,13 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, dummy:
 		}
 	}
 
-	operator fun compareTo(other: DateTime): Int = this.unix.compareTo(other.unix)
+	override operator fun compareTo(other: DateTime): Int = this.unix.compareTo(other.unix)
 	override fun hashCode(): Int = internalMillis.hashCode()
 	override fun equals(other: Any?): Boolean = this.unix == (other as? DateTime?)?.unix
 	override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
 }
 
-data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Double = 0.0, val hours: Double = 0.0, val minutes: Double = 0.0, val seconds: Double = 0.0, val milliseconds: Double = 0.0) {
+data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Double = 0.0, val hours: Double = 0.0, val minutes: Double = 0.0, val seconds: Double = 0.0, val milliseconds: Double = 0.0) : Comparable<TimeDistance> {
 	operator fun unaryMinus() = TimeDistance(-years, -months, -days, -hours, -minutes, -seconds, -milliseconds)
 
 	operator fun minus(other: TimeDistance) = this + -other
@@ -357,6 +359,15 @@ data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Doubl
 		seconds * times,
 		milliseconds * times
 	)
+
+	val totalMonths get() = years * 12 + months
+	val totalMilliseconds: Long by lazy { (days * MILLIS_PER_DAY + hours * MILLIS_PER_HOUR + minutes * MILLIS_PER_MINUTE + seconds * MILLIS_PER_SECOND + milliseconds).toLong() }
+
+	// @TODO: If milliseconds overflow months this could not be exactly true. But probably will work in most cases.
+	override fun compareTo(other: TimeDistance): Int {
+		if (this.totalMonths != other.totalMonths) return this.totalMonths.compareTo(other.totalMonths)
+		return this.totalMilliseconds.compareTo(other.totalMilliseconds)
+	}
 }
 
 inline val Int.years get() = TimeDistance(years = this)
