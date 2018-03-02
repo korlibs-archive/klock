@@ -1,15 +1,33 @@
 apply plugin: 'konan'
 
+//konan.targets = ['iphone', 'iphone_sim', 'macbook', 'linux', 'raspberrypi', 'android_arm32', 'android_arm64', 'wasm32']
+//konan.targets = ['macbook']
+konan.targets = ['iphone', 'iphone_sim', 'macbook', 'linux', 'raspberrypi', 'android_arm32', 'android_arm64']
+
 konanArtifacts {
-	library('native') {
+    interop('mytest') {
+        defFile 'src/main/c_interop/mytest.def'
+    }
+
+	library('klock') {
 		enableMultiplatform true
+
+        libraries {
+            artifact 'mytest'
+        }
+
+		target('linux') {
+		}
+
+		target('macbook') {
+		}
 	}
 
-	program('native-test') {
+	program('klock-native-test') {
 		srcDir 'src/test/kotlin'
 		commonSourceSet 'test'
 		libraries {
-			artifact 'native'
+			artifact 'klock'
 		}
 		extraOpts '-tr'
 	}

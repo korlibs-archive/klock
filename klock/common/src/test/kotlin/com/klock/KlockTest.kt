@@ -8,10 +8,10 @@ class KlockTest {
 	@Test
 	fun testTimeAdvances() {
 		val time1 = Klock.currentTimeMillis()
-		assertTrue(time1 >= 1508887000000)
+		assertTrue("Time is provided in milliseconds from EPOCH") { time1 >= 1508887000000 }
 		while (true) {
 			val time2 = Klock.currentTimeMillis()
-			assertTrue(time2 >= time1)
+			assertTrue("Time advances") { time2 >= time1 }
 			if (time2 > time1) break
 		}
 	}

@@ -10,8 +10,8 @@ buildscript {
 	ext.projectDevelName = 'Carlos Ballesteros Velasco'
 	ext.projectInceptionYear = 2017
 
-	ext.kotlinVersion = '1.2.21'
-	ext.kotlinNativeVersion = '0.6'
+	ext.kotlinVersion = '1.2.30'
+	ext.kotlinNativeVersion = '0.6.1'
 
 	repositories {
 		jcenter()

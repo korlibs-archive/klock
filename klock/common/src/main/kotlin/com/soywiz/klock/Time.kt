@@ -237,7 +237,7 @@ class OffsetDateTime private constructor(
 	override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
 }
 
-class UtcDateTime internal constructor(internal val internalMillis: Long, dummy: Boolean) : DateTime {
+class UtcDateTime internal constructor(internal val internalMillis: Long, @Suppress("UNUSED_PARAMETER") dummy: Boolean) : DateTime {
 	companion object {
 		private const val DATE_PART_YEAR = 0
 		private const val DATE_PART_DAY_OF_YEAR = 1
@@ -351,6 +351,7 @@ data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Doubl
 		milliseconds + other.milliseconds
 	)
 
+	@Suppress("NOTHING_TO_INLINE")
 	inline operator fun times(times: Number) = times(times.toDouble())
 
 	operator fun times(times: Double) = TimeDistance(
@@ -373,23 +374,12 @@ data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Doubl
 	}
 }
 
-// @TODO: Bug in Kotlin Native 0.6 : https://github.com/JetBrains/kotlin-native/issues/1332
-/*
 inline val Int.years get() = TimeDistance(years = this)
 inline val Int.months get() = TimeDistance(months = this)
 inline val Number.days get() = TimeDistance(days = this.toDouble())
 inline val Number.weeks get() = TimeDistance(days = this.toDouble() * 7)
 inline val Number.hours get() = TimeDistance(hours = this.toDouble())
 inline val Number.minutes get() = TimeDistance(minutes = this.toDouble())
-*/
-
-// Workaround for Kotlin Native 0.6
-inline val Int.years get() = TimeDistance(years = this)
-inline val Int.months get() = TimeDistance(years = 0, months = this)
-inline val Number.days get() = TimeDistance(years = 0, months = 0, days = this.toDouble())
-inline val Number.weeks get() = TimeDistance(years = 0, months = 0, days = this.toDouble() * 7)
-inline val Number.hours get() = TimeDistance(years = 0, months = 0, days = 0.0, hours = this.toDouble())
-inline val Number.minutes get() = TimeDistance(years = 0, months = 0, days = 0.0, hours = 0.0, minutes = this.toDouble())
 
 @Suppress("DataClassPrivateConstructor")
 data class TimeSpan private constructor(val ms: Int) : Comparable<TimeSpan> {
@@ -551,11 +541,7 @@ class SimplerDateFormat(val format: String) {
 	}
 }
 
-// @TODO: Kotlin Native crash on start
-//private val formatRegex = Regex("%([-]?\\d+)?(\\w)")
-
-//private val formatRegex get() = Regex("%([-]?\\d+)?(\\w)")
-private val formatRegex by lazy { Regex("%([-]?\\d+)?(\\w)") }
+private val formatRegex = Regex("%([-]?\\d+)?(\\w)")
 
 private fun String.format(vararg params: Any): String {
 	var paramIndex = 0
