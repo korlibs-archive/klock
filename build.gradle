@@ -1,5 +1,5 @@
 buildscript {
-	ext.projectVersion = '0.5.1-SNAPSHOT'
+	ext.projectVersion = '0.21.0'
 	ext.projectName = 'klock'
 	ext.projectGroup = 'com.soywiz'
 	ext.projectDesc = 'Klock: Consistent and portable date and time utilities for multiplatform kotlin'
@@ -23,7 +23,7 @@ buildscript {
 	dependencies {
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 		classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:$kotlinNativeVersion"
-		classpath "gradle.plugin.com.soywiz:korlibs-build-gradle-plugin:0.1.6"
+		classpath "gradle.plugin.com.soywiz:korlibs-build-gradle-plugin:0.1.7"
 	}
 }
 
