@@ -493,6 +493,7 @@ class SimplerDateFormat(val format: String) {
 			val name = name2.trim('\'')
 			out += when (name) {
 				"EEE" -> englishDaysOfWeek[dd.dayOfWeek.index].substr(0, 3).capitalize()
+				"EEEE" -> englishDaysOfWeek[dd.dayOfWeek.index].capitalize()
 				"z", "zzz" -> dd.timeZone
 				"d" -> "%d".format(dd.dayOfMonth)
 				"dd" -> "%02d".format(dd.dayOfMonth)
@@ -525,7 +526,7 @@ class SimplerDateFormat(val format: String) {
 		val result = rx2.find(str) ?: return null
 		for ((name, value) in parts.zip(result.groupValues.drop(1))) {
 			when (name) {
-				"EEE" -> Unit // day of week (Sun)
+				"EEE", "EEEE" -> Unit // day of week (Sun | Sunday)
 				"z", "zzz" -> Unit // timezone (GMT)
 				"d", "dd" -> day = value.toInt()
 				"MM" -> month = value.toInt()
