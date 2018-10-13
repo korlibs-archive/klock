@@ -1,9 +1,0 @@
-package = mytest
-headers =
-headerFilter = TEST*
-linkerOpts =
----
-
-int getLocalTimezoneOffsetMinutes() {
-    return 0;
-}

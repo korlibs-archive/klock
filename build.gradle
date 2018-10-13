@@ -1,39 +1,25 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 buildscript {
-	ext.projectVersion = '0.21.0'
-	ext.projectName = 'klock'
-	ext.projectGroup = 'com.soywiz'
-	ext.projectDesc = 'Klock: Consistent and portable date and time utilities for multiplatform kotlin'
-	ext.projectHost = 'github'
-	ext.projectOrg = 'korlibs'
-	ext.projectLicense = 'MIT'
-	ext.projectDevelNick = 'soywiz'
-	ext.projectDevelName = 'Carlos Ballesteros Velasco'
-	ext.projectInceptionYear = 2017
-
-	ext.kotlinVersion = '1.2.30'
-	ext.kotlinNativeVersion = '0.6.1'
-
-	repositories {
-		jcenter()
-		maven { url "https://plugins.gradle.org/m2/" }
-		maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
-		mavenLocal()
-	}
-
-	dependencies {
-		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-		classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:$kotlinNativeVersion"
-		classpath "gradle.plugin.com.soywiz:korlibs-build-gradle-plugin:0.1.7"
+	ext.genTargets = ['jvm', 'js', 'macosX64']
+	if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+		ext.genTargets += 'mingwX64'
 	}
 }
 
-apply plugin: 'com.soywiz.korlibs-build-gradle-plugin'
-
-allprojects {
-	tasks.withType(Test) {
-		testLogging {
-			showStandardStreams = true
-			events "passed", "failed"
-		}
-	}
+plugins {
+	id 'kotlin-multiplatform' version '1.3.0-rc-146'
 }
+
+repositories {
+	mavenLocal()
+	jcenter()
+	maven { url "https://dl.bintray.com/soywiz/soywiz" }
+	maven { url "https://dl.bintray.com/kotlin/kotlin-eap" }
+}
+
+apply from: "$rootProject.rootDir/gradle/tools.gradle"
+
+apply plugin: 'kotlin-multiplatform'
+
+handleMpp(genTargets, [])

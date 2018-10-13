@@ -1,0 +1,175 @@
+// SUFFIX = all have suffix
+// NSUFFIX = (new) common doesn't have suffix
+// JSUFFIX = java doesn't have suffix
+
+project.ext.handleMpp = { List<String> mypresets = [], List<String> mydeps = [], List<String> mydepsApi = [], List<String> projectDeps = [] ->
+    //println('handleMpp')
+    //println(mypresets)
+    kotlin {
+        targets {
+            mypresets.each { mypreset ->
+                fromPreset(presets[mypreset], mypreset)
+            }
+            
+            if (mypresets.contains('jvm')) {
+                configure([jvm]) {
+                    [tasks.getByName(compilations.main.compileKotlinTaskName), tasks.getByName(compilations.test.compileKotlinTaskName)]*.kotlinOptions {
+                        //freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
+                        languageVersion = "1.3"
+                    }
+                }
+            }
+
+            if (mypresets.contains('js')) {
+                configure([js]) {
+                    [tasks.getByName(compilations.main.compileKotlinTaskName), tasks.getByName(compilations.test.compileKotlinTaskName)]*.kotlinOptions {
+                        languageVersion = "1.3"
+                        moduleKind = "umd"
+                        sourceMap = true
+                        metaInfo = true
+                    }
+                }
+            }
+        }
+
+        sourceSets {
+            commonMain {
+                dependencies {
+                    implementation 'org.jetbrains.kotlin:kotlin-stdlib-common'
+                    for (dep in mydeps) implementation dep.replace('{SUFFIX}', '-common').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-common')
+					for (dep in mydepsApi) api dep.replace('{SUFFIX}', '-common').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-common')
+					for (dep in projectDeps) api project(dep)
+                }
+            }
+            commonTest {
+                dependencies {
+                    implementation 'org.jetbrains.kotlin:kotlin-test-common'
+                    implementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
+                }
+            }
+            if (mypresets.contains('jvm')) {
+                jvmMain {
+                    dependencies {
+                        implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+                        implementation "org.jetbrains.kotlin:kotlin-reflect"
+                        for (dep in mydeps) implementation dep.replace('{SUFFIX}', '-jvm').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '')
+						for (dep in mydepsApi) api dep.replace('{SUFFIX}', '-jvm').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '')
+						for (dep in projectDeps) api project(dep)
+                    }
+                }
+                jvmTest {
+                    dependencies {
+                        implementation 'org.jetbrains.kotlin:kotlin-test'
+                        implementation 'org.jetbrains.kotlin:kotlin-test-junit'
+                        implementation 'junit:junit:4.12'
+                    }
+                }
+            }
+            if (mypresets.contains('js')) {
+                jsMain {
+                    dependencies {
+                        implementation 'org.jetbrains.kotlin:kotlin-stdlib-js'
+                        for (dep in mydeps) implementation dep.replace('{SUFFIX}', '-js').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-js')
+						for (dep in mydepsApi) api dep.replace('{SUFFIX}', '-js').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-js')
+						for (dep in projectDeps) api project(dep)
+                    }
+                }
+                jsTest {
+                    dependencies {
+                        implementation 'org.jetbrains.kotlin:kotlin-test-js'
+                    }
+                }
+            }
+			if (mypresets.contains('macosX64')) {
+				macosX64Main {
+					dependencies {
+						//implementation 'org.jetbrains.kotlin:kotlin-stdlib-native'
+						//for (dep in mydeps) implementation dep.replace('{SUFFIX}', '-native_macos_x64').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-native_macos_x64')
+						//for (dep in mydeps) implementation dep.replace('{SUFFIX}', '-native_debug_macos_x64').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-native_debug_macos_x64')
+						//for (dep in mydeps) implementation dep.replace('{SUFFIX}', '-native_release_macos_x64').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-native_release_macos_x64')
+						for (dep in mydeps) implementation dep.replace('{SUFFIX}', '-macos64').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-native')
+						for (dep in mydepsApi) api dep.replace('{SUFFIX}', '-macos64').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-native')
+						//for (dep in mydeps) implementation dep.replace('{SUFFIX}', '-native').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-native')
+						for (dep in projectDeps) api project(dep)
+					}
+				}
+				macosX64Test {
+					dependencies {
+						//implementation 'org.jetbrains.kotlin:kotlin-test-native'
+					}
+				}
+			}
+        }
+    }
+
+    // Include resources into JS JAR file when publishing
+    if (mypresets.contains('js')) {
+        kotlin.sourceSets.jsMain.resources.srcDirs += kotlin.sourceSets.commonMain.resources.srcDirs
+        kotlin.sourceSets.jsTest.resources.srcDirs += kotlin.sourceSets.commonTest.resources.srcDirs
+
+        //task copyJsResources(type: Copy) {
+        //    from kotlin.sourceSets.jsMain.resources.srcDirs
+        //    into "$buildDir/jsResources/main"
+        //}
+        //
+        //task copyJsTestResources(type: Copy) {
+        //    from kotlin.sourceSets.jsTest.resources.srcDirs
+        //    into "$buildDir/jsResources/test"
+        //}
+
+        //processResources.finalizedBy(copyJsResources)
+        //processTestResources.finalizedBy(copyJsTestResources)
+
+        if (project.hasProperty("processResources")) {
+            jsJar.dependsOn(project.processResources)
+        }
+        jsJar {
+            //from "$buildDir/jsResources/main"
+            from kotlin.sourceSets.jsMain.resources.srcDirs
+        }
+    }
+
+	List<String> allNativeTargets = ['mingwX64', 'macosX64']
+	def nativeTargets = allNativeTargets.findAll { mypresets.contains(it) }
+	def hasNative = nativeTargets.size() > 0
+
+	//println("allNativeTargets:$allNativeTargets")
+	//println("nativeTargets:$nativeTargets")
+
+	if (hasNative) {
+		kotlin {
+			sourceSets {
+				nativeCommonMain {}
+				nativePosixMain {}
+
+				//configure(nativeTargets) {
+				//	dependsOn nativeCommonMain
+				//}
+			}
+		}
+
+		for (target in nativeTargets) {
+			def targetIsPosix = target != "mingwX64"
+			//println("target:$target")
+			try {
+				kotlin.sourceSets["${target}Main"].kotlin.srcDirs += kotlin.sourceSets.nativeCommonMain.kotlin.srcDirs
+				if (targetIsPosix) {
+					kotlin.sourceSets["${target}Main"].kotlin.srcDirs += kotlin.sourceSets.nativePosixMain.kotlin.srcDirs
+				}
+			} catch (e) {
+
+			}
+			try {
+				kotlin.sourceSets["${target}Test"].kotlin.srcDirs += kotlin.sourceSets.nativeCommonTest.kotlin.srcDirs
+				if (targetIsPosix) {
+					kotlin.sourceSets["${target}Test"].kotlin.srcDirs += kotlin.sourceSets.nativePosixMain.kotlin.srcDirs
+				}
+			} catch (e) {
+
+			}
+		}
+
+		//kotlin.sourceSets.each { println "$it: " + it.kotlin.srcDirs }
+
+	}
+}

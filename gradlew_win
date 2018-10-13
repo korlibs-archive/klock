@@ -1,0 +1,11 @@
+#!/bin/bash
+HOME=`echo ~`
+
+docker run -it \
+	-e "build_kotlin_native=true" \
+	"-v$PWD:/work" \
+	"-v$HOME/.gradle-win:/root/.wine/drive_c/users/root/.gradle" \
+	"-v$HOME/.m2:/root/.wine/drive_c/users/root/.m2" \
+	"-v$HOME/.konan:/root/.wine/drive_c/users/root/.konan" \
+	soywiz/kotlin-native-win \
+	winecmd gradlew.bat $*

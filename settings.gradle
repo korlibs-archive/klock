@@ -1,17 +1,18 @@
-rootProject.name = 'klock-root'
+pluginManagement {
+	resolutionStrategy {
+		eachPlugin {
+			if (requested.id.id == "kotlin-multiplatform") {
+				useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
+			}
+		}
+	}
 
-include(
-		'klock-common',
-		'klock',
-		'klock-js',
-		'klock-native',
-)
-
-def register(String base) {
-	findProject(":$base-common")?.projectDir = file("$base/common")
-	findProject(":$base")?.projectDir = file("$base/jvm")
-	findProject(":$base-js")?.projectDir = file("$base/js")
-	findProject(":$base-native")?.projectDir = file("$base/native")
+	repositories {
+		mavenLocal()
+		maven { url 'http://dl.bintray.com/kotlin/kotlin-eap' }
+		mavenCentral()
+		maven { url 'https://plugins.gradle.org/m2/' }
+	}
 }
 
-register('klock')
+rootProject.name = 'klock'
