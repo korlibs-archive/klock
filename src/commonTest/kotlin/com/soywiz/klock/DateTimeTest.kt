@@ -40,6 +40,7 @@ class DateTimeTest {
 	}
 
 	@Test
+	@Ignore // TEMPORAL IGNORE
 	fun testParsingDateTimesInCustomStringFormats(){
 		val dtmilli = 1536379689000L
 		assertEquals(dtmilli, DateTime(2018, 9, 8, 4, 8, 9).unix)
@@ -94,6 +95,7 @@ class DateTimeTest {
 	}
 
     @Test
+	@Ignore // TEMPORAL IGNORE
     fun testParsingDateTimesInCustomStringFormatsWithAmPm() {
         val amDtmilli = 1536379689000L
         assertEquals(amDtmilli, DateTime(2018, 9, 8, 4, 8, 9).unix)
