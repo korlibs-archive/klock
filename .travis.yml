@@ -16,12 +16,12 @@ matrix:
   - os: linux
     script:
       - ./gradlew -s -i check build
-  - os: linux
-    sudo: required
-    services:
-    - docker
-    script:
-    - ./gradlew_win -s -i check build
+#  - os: linux
+#    sudo: required
+#    services:
+#    - docker
+#    script:
+#    - ./gradlew_win -s -i check build
   - os: osx
     script:
       - ./gradlew -s -i check build
