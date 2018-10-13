@@ -1,17 +1,5 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
 buildscript {
-	ext.genTargets = ['jvm', 'js']
-	if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-		ext.genTargets += 'mingwX64'
-	} else if (Os.isFamily(Os.FAMILY_MAC)) {
-		ext.genTargets += 'macosX64'
-		ext.genTargets += 'iosArm32'
-		ext.genTargets += 'iosArm64'
-		ext.genTargets += 'iosX64'
-	} else {
-		ext.genTargets += 'linuxX64'
-	}
+    ext.genTargets = ['jvm', 'js', 'macosX64', 'mingwX64']
 }
 
 plugins {
