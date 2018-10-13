@@ -1,30 +1,33 @@
 language: java
 
 jdk:
-  - oraclejdk8
+- oraclejdk8
 
 install:
-  - nvm install 8
-  - nvm use 8
-  - node --version
-  - npm -g install mocha
-  - which node
-  - which mocha
+- nvm install 8
+- nvm use 8
+- node --version
+- npm -g install mocha
+- which node
+- which mocha
 
 matrix:
   include:
   - os: linux
+    env: KBUILD=linux
     script:
-      - ./gradlew -s -i check build
-#  - os: linux
-#    sudo: required
-#    services:
-#    - docker
-#    script:
-#    - ./gradlew_win -s -i check build
+    - ./gradlew -s -i check build
+  - os: linux
+    env: KBUILD=windows
+    sudo: required
+    services:
+    - docker
+    script:
+    - ./gradlew_win_travis -s -i check build
   - os: osx
+    env: KBUILD=macos
     script:
-      - ./gradlew -s -i check build
+    - ./gradlew -s -i check build
 
 #before_cache:
 #  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock

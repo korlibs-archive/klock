@@ -1,2 +1,2 @@
 #!/bin/bash
-WINEDEBUG=-all build_kotlin_native=true wine cmd /c gradlew.bat $*
+WINEDEBUG=-all wine cmd /c gradlew.bat $*

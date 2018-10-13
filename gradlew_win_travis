@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#./gradlew_win $*
+
+HOME=`echo ~`
+
+docker run -it \
+	"-v$PWD:/work" \
+	soywiz/kotlin-native-win \
+	winecmd gradlew.bat $*

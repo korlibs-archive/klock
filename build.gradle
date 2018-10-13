@@ -134,7 +134,7 @@ def generatePom = { pom ->
     pom.withXml {
         def root = it.asNode()
         root.appendNode('name', project.name)
-        root.appendNode('description', 'Consistent and portable date and time utilities for multiplatform kotlin (JVM, JS, Native (posix) and COMMON)')
+        root.appendNode('description', 'Consistent and portable date and time utilities for multiplatform kotlin (JVM, JS, Native and COMMON)')
         root.appendNode('url', 'https://github.com/korlibs/klock')
         root.children().last() + pomBaseData
     }
