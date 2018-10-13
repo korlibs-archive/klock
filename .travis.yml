@@ -1,5 +1,13 @@
 language: java
 
+os:
+  - osx
+
+sudo: required
+
+services:
+  - docker
+
 jdk:
   - oraclejdk8
 
@@ -12,9 +20,9 @@ install:
   - which mocha
 
 script:
-  - jdk_switcher use oraclejdk8
-  #- ./gradlew -s -i check install distJs
-  - ./gradlew -s -i check test install :klock-native:run
+  - ./gradlew -s -i check
+  - ./gradlew_win -s -i check
+  - ./gradlew_linux -s -i check
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
