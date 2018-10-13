@@ -23,7 +23,7 @@ matrix:
     services:
     - docker
     script:
-    - ./gradlew_win_travis -s -i check build
+    - ./gradlew_win_travis -s -i mingwX64Test
   - os: osx
     env: KBUILD=macos
     script:
