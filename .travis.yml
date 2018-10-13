@@ -14,14 +14,17 @@ install:
 matrix:
   include:
   - os: linux
+    script:
+      - ./gradlew -s -i check build
+  - os: linux
     sudo: required
     services:
-      - docker
+    - docker
     script:
-      - ./gradlew -s -i check && ./gradlew_win -s -i check
+    - ./gradlew_win -s -i check build
   - os: osx
     script:
-      - ./gradlew -s -i check
+      - ./gradlew -s -i check build
 
 #before_cache:
 #  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
