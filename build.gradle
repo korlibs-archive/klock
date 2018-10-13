@@ -10,8 +10,6 @@ repositories {
     maven { url "https://dl.bintray.com/kotlin/kotlin-eap" }
 }
 
-apply plugin: 'kotlin-multiplatform'
-
 kotlin {
     targets {
         fromPreset(presets.iosX64, 'iosX64')
@@ -112,5 +110,49 @@ repositories.whenObjectAdded {
         metadataSources {
             artifact()
         }
+    }
+}
+
+// Publishing
+group 'com.soywiz'
+version '0.2.0'
+apply plugin: 'maven-publish'
+
+def pomBaseData = {
+    licenses {
+        license {
+            name "MIT License"
+            url "https://raw.githubusercontent.com/korlibs/klock/master/LICENSE"
+        }
+    }
+    scm {
+        url "https://github.com/korlibs/klock"
+    }
+}
+
+def generatePom = { pom ->
+    pom.withXml {
+        def root = it.asNode()
+        root.appendNode('name', project.name)
+        root.appendNode('description', 'Consistent and portable date and time utilities for multiplatform kotlin (JVM, JS, Native (posix) and COMMON)')
+        root.appendNode('url', 'https://github.com/korlibs/klock')
+        root.children().last() + pomBaseData
+    }
+}
+
+ext.generatePom = generatePom
+
+publishing {
+    repositories {
+        maven {
+            credentials {
+                username project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+                password project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+            }
+            url 'https://api.bintray.com/maven/soywiz/soywiz/klock/'
+        }
+    }
+    configure(publications) {
+        generatePom(pom)
     }
 }
