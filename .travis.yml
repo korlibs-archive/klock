@@ -24,12 +24,13 @@ matrix:
     script:
       - ./gradlew -s -i check
 
-before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-
-cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-    - $HOME/.konan
-    
+#before_cache:
+#  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+#  - rm -f $HOME/.gradle-linux/caches/modules-2/modules-2.lock
+#  - rm -f $HOME/.gradle-win/caches/modules-2/modules-2.lock
+#
+#cache:
+#  directories:
+#    - $HOME/.gradle/caches/
+#    - $HOME/.gradle/wrapper/
+#    - $HOME/.konan

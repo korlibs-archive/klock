@@ -6,6 +6,9 @@ buildscript {
 		ext.genTargets += 'mingwX64'
 	} else if (Os.isFamily(Os.FAMILY_MAC)) {
 		ext.genTargets += 'macosX64'
+		ext.genTargets += 'iosArm32'
+		ext.genTargets += 'iosArm64'
+		ext.genTargets += 'iosX64'
 	} else {
 		ext.genTargets += 'linuxX64'
 	}
@@ -25,5 +28,13 @@ repositories {
 apply from: "$rootProject.rootDir/gradle/tools.gradle"
 
 apply plugin: 'kotlin-multiplatform'
+apply plugin: 'idea'
 
 handleMpp(genTargets, [])
+
+
+idea {
+	module {
+		excludeDirs = [file(".gradle"), file(".idea"), file("assets"), file("gradle/wrapper")]
+	}
+}

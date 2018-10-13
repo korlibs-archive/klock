@@ -3,7 +3,7 @@ package com.soywiz.klock
 
 class SimplerDateFormat(val format: String) {
 	companion object {
-		private val rx = Regex("('[\\w]+'|[\\w]+\\B[^X]|[X]{1,3}|[\\w]+)")
+		private val rx = Regex("('[\\w]+'|[\\w]+\\B[^Xx]|[Xx]{1,3}|[\\w]+)")
 		private val englishDaysOfWeek = listOf(
 			"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
 		)
@@ -40,10 +40,10 @@ class SimplerDateFormat(val format: String) {
 		parts += v
 		if (v.startsWith("'")) {
 			"(" + Regex.escapeReplacement(v.trim('\'')) + ")"
-		} else if (v.startsWith("X")) {
+		} else if (v.startsWith("X", ignoreCase = true)) {
 			"([Z]|[+-]\\d\\d|[+-]\\d\\d\\d\\d|[+-]\\d\\d:\\d\\d)?"
 		} else {
-			"([\\w\\+\\-]+?[^Z^+^-])"
+			"([\\w\\+\\-]*[^Z+-])"
 		}
 	} + "$")
 
@@ -81,15 +81,18 @@ class SimplerDateFormat(val format: String) {
 				"mm" -> dd.minutes.padded(2)
 				"s" -> dd.seconds.padded(1)
 				"ss" -> dd.seconds.padded(2)
-				"X", "XX", "XXX" -> {
-					val p = if (dd.offset >= 0) "+" else "-"
-					val hours = dd.offset / 60
-					val minutes = dd.offset % 60
-					when (name) {
-						"X" -> "$p${hours.padded(2)}"
-						"XX" -> "$p${hours.padded(2)}${minutes.padded(2)}"
-						"XXX" -> "$p${hours.padded(2)}:${minutes.padded(2)}"
-						else -> name
+				"X", "XX", "XXX", "x", "xx", "xxx" -> when {
+					name.startsWith("X") && dd.offset == 0 -> "Z"
+					else -> {
+						val p = if (dd.offset >= 0) "+" else "-"
+						val hours = dd.offset / 60
+						val minutes = dd.offset % 60
+						when (name) {
+							"X", "x" -> "$p${hours.padded(2)}"
+							"XX", "xx" -> "$p${hours.padded(2)}${minutes.padded(2)}"
+							"XXX", "xxx" -> "$p${hours.padded(2)}:${minutes.padded(2)}"
+							else -> name
+						}
 					}
 				}
 				"a" -> if (dd.hours<12) "am" else "pm"
@@ -134,9 +137,12 @@ class SimplerDateFormat(val format: String) {
 				"H", "HH" -> hour = value.toInt()
 				"m", "mm" -> minute = value.toInt()
 				"s", "ss" -> second = value.toInt()
-				"X", "XX", "XXX" -> when {
-					value.first() == 'Z' -> offset = 0
-					else -> {
+				"X", "XX", "XXX", "x", "xx", "xxx" -> when {
+					name.startsWith("X") && value.first() == 'Z' -> offset = 0
+					name.startsWith("x") && value.first() == 'Z' -> {
+						throw RuntimeException("Zulu Time Zone is only accepted with X-XXX formats.")
+					}
+					value.first() != 'Z' -> {
 						val hours = value.drop(1).substringBefore(':').toInt()
 						val minutes = value.substringAfter(':', "0").toInt()
 						offset = (hours * 60) + minutes
@@ -167,4 +173,3 @@ class SimplerDateFormat(val format: String) {
 		}
 	}
 }
-

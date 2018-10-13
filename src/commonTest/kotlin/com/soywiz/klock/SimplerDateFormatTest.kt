@@ -22,8 +22,8 @@ class SimplerDateFormatTest {
 		assertEquals(dateStr, format.format(format.parse(dateStr)))
 	}
 
-	class ISO8601 {
-		val format = SimplerDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+	class StrictOffset {
+		val format = SimplerDateFormat("yyyy-MM-dd'T'HH:mm:ssxxx")
 
 		@Test
 		fun testParseUtc() {
@@ -60,10 +60,43 @@ class SimplerDateFormatTest {
 		}
 
 		@Test
-		fun testParseWithZulu() {
+		fun testParseWithZuluFails() {
 			val dateStr = "2016-05-04T19:29:34Z"
-			val expected = "2016-05-04T19:29:34+00:00"
-			assertEquals(format.parse(expected), format.parse(dateStr))
+			assertFailsWith(RuntimeException::class, "Zulu Time Zone is only accepted with X-XXX formats.") {
+				format.parse(dateStr)
+			}
+		}
+	}
+
+	class ZuluCapableOffset {
+		val format = SimplerDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+
+		@Test
+		fun testParseUtc() {
+			assertEquals(1462390174000, format.parse("2016-05-04T19:29:34+00:00"))
+		}
+
+		@Test
+		fun testParseZulu() {
+			assertEquals(1462390174000, format.parse("2016-05-04T19:29:34Z"))
+		}
+
+		@Test
+		fun testFormatUtc() {
+			assertEquals("2016-05-04T19:29:34Z", format.format(1462390174000))
+		}
+
+		@Test
+		fun testParseWithUtcOffsetFormatsWithZulu() {
+			val dateStr = "2016-05-04T19:29:34+00:00"
+			val expectedStr = "2016-05-04T19:29:34Z"
+			assertEquals(expectedStr, format.format(format.parse(dateStr)))
+		}
+
+		@Test
+		fun testParseWithZuluFormatsWithZulu() {
+			val dateStr = "2016-05-04T19:29:34Z"
+			assertEquals(dateStr, format.format(format.parse(dateStr)))
 		}
 	}
 }
