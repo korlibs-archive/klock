@@ -18,8 +18,7 @@ matrix:
     services:
       - docker
     script:
-      - ./gradlew -s -i check
-      - ./gradlew_linux -s -i check
+      - ./gradlew -s -i check && ./gradlew_win -s -i check
   - os: osx
     script:
       - ./gradlew -s -i check
