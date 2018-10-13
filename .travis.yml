@@ -1,13 +1,5 @@
 language: java
 
-os:
-  - osx
-
-sudo: required
-
-services:
-  - docker
-
 jdk:
   - oraclejdk8
 
@@ -19,10 +11,18 @@ install:
   - which node
   - which mocha
 
-script:
-  - ./gradlew -s -i check
-  - ./gradlew_win -s -i check
-  - ./gradlew_linux -s -i check
+matrix:
+  include:
+  - os: linux
+    sudo: required
+    services:
+      - docker
+    script:
+      - ./gradlew -s -i check
+      - ./gradlew_linux -s -i check
+  - os: osx
+    script:
+      - ./gradlew -s -i check
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
