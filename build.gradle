@@ -79,7 +79,7 @@ task addYarnDeps(type: YarnTask) {
     doFirst {
         mkdir "$buildDir/yarn"
     }
-    args = ["add", "qunit@2.6.2"]
+    args = ["add", "mocha@5.2.0"]
 }
 
 task populateNodeModules {
@@ -97,12 +97,12 @@ task populateNodeModules {
     }
 }
 
-task runQunit(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, addYarnDeps, populateNodeModules]) {
-    script = file("$buildDir/node_modules/qunit/bin/qunit")
+task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, addYarnDeps, populateNodeModules]) {
+    script = file("$buildDir/node_modules/mocha/bin/mocha")
     args = [relativePath("${jsCompilations.test.output.first()}/klock_test.js")]
 }
 
-jsTest.dependsOn runQunit
+jsTest.dependsOn runMocha
 
 // Fix for https://github.com/srs/gradle-node-plugin/issues/301
 repositories.whenObjectAdded {
