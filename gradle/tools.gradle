@@ -99,6 +99,20 @@ project.ext.handleMpp = { List<String> mypresets = [], List<String> mydeps = [],
 					}
 				}
 			}
+            if (mypresets.contains('linuxX64')) {
+                linuxX64Main {
+                    dependencies {
+                        for (dep in mydeps) implementation dep.replace('{SUFFIX}', '-linux64').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-native')
+                        for (dep in mydepsApi) api dep.replace('{SUFFIX}', '-linux64').replace('{NSUFFIX}', '').replace('{JSUFFIX}', '-native')
+                        for (dep in projectDeps) api project(dep)
+                    }
+                }
+                linuxX64Test {
+                    dependencies {
+                        //implementation 'org.jetbrains.kotlin:kotlin-test-native'
+                    }
+                }
+            }
         }
     }
 
@@ -129,7 +143,7 @@ project.ext.handleMpp = { List<String> mypresets = [], List<String> mydeps = [],
         }
     }
 
-	List<String> allNativeTargets = ['mingwX64', 'macosX64']
+	List<String> allNativeTargets = ['mingwX64', 'macosX64', 'linuxX64']
 	def nativeTargets = allNativeTargets.findAll { mypresets.contains(it) }
 	def hasNative = nativeTargets.size() > 0
 
