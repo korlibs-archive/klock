@@ -5,17 +5,31 @@ Consistent and portable date and time utilities for multiplatform kotlin (JVM, J
 [![Build Status](https://travis-ci.org/korlibs/klock.svg?branch=master)](https://travis-ci.org/korlibs/klock)
 [![Maven Version](https://img.shields.io/github/tag/korlibs/klock.svg?style=flat&label=maven)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22klock%22)
 
-Use with gradle (uploaded to maven central):
+Use with gradle (uploaded to bintray and synchronized to jcenter):
 
 ```
-compile "com.soywiz:klock:0.2.0" // jvm/android
-compile "com.soywiz:klock-js:0.2.0" // js
-compile "com.soywiz:klock-common:0.2.0" // common (just expect 2 decls in Klock)
+def klockVersion = "1.0.0-alpha-1"
+
+repositories {
+    maven { url "https://dl.bintray.com/soywiz/soywiz" }
+}
+
+compile "com.soywiz:klock-jvm:$klockVersion"      // JVM/Android
+compile "com.soywiz:klock-js:$klockVersion"       // JavaScript
+compile "com.soywiz:klock-iosarm32:$klockVersion" // Older iOS devices
+compile "com.soywiz:klock-iosarm64:$klockVersion" // New iOS devices
+compile "com.soywiz:klock-iosx64:$klockVersion"   // Simulator
+compile "com.soywiz:klock-linuxx64:$klockVersion" // Linux x64
+compile "com.soywiz:klock-macosx64:$klockVersion" // MacOS
+compile "com.soywiz:klock-mingwx64:$klockVersion" // Windows x64
+compile "com.soywiz:klock-common:$klockVersion"   // Common (just expect 2 decls in Klock)
 ```
 
 ```kotlin
 object Klock {
 	fun currentTimeMillis(): Long
+	fun currentTimeMillisDouble(): Double
+	fun microClock(): Double
 	fun getLocalTimezoneOffset(unix: Long): Int
 }
 
@@ -38,13 +52,21 @@ enum class Month {
 	fun daysToEnd(year: Int): Int
 }
 
-object Year {
-    fun isLeap(year: Int): Boolean
+inline class Year(val year: Int) : Comparable<Year> {
+	companion object {
+		fun checked(year: Int): Year
+		fun isLeapChecked(year: Int): Boolean
+		fun isLeap(year: Int): Boolean
+	}
+
+	override fun compareTo(other: Year): Int
 }
+
 
 interface DateTime {
 	companion object {
 		val EPOCH: DateTime
+		
 		operator fun invoke(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0, milliseconds: Int = 0): DateTime
 		operator fun invoke(time: Long): DateTime
 
@@ -106,7 +128,7 @@ data class TimeDistance(val years: Int = 0, val months: Int = 0, val days: Doubl
 	operator fun times(times: Double): TimeDistance
 }
 
-data class TimeSpan {
+inline class TimeSpan {
 	val milliseconds: Int
 	val seconds: Double
 
@@ -131,7 +153,10 @@ inline val Number.milliseconds: TimeSpan
 
 class SimplerDateFormat(val format: String) {
 	companion object {
-		val DEFAULT_FORMAT: SimplerDateFormat // "EEE, dd MMM yyyy HH:mm:ss z"
+        val DEFAULT_FORMAT = SimplerDateFormat("EEE, dd MMM yyyy HH:mm:ss z")
+        val FORMAT1 = SimplerDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        val FORMATS = listOf(DEFAULT_FORMAT, FORMAT1)
+        fun parse(str: String): DateTime
 	}
 
 	fun format(date: Long): String

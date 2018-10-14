@@ -1,6 +1,5 @@
 package com.soywiz.klock
 
-
 class SimplerDateFormat(val format: String) {
 	companion object {
 		private val rx = Regex("('[\\w]+'|[\\w]+\\B[^Xx]|[Xx]{1,3}|[\\w]+)")
