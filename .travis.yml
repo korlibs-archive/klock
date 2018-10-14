@@ -17,13 +17,10 @@ matrix:
     env: KBUILD=linux
     script:
     - ./gradlew -s -i check build
-#  - os: linux
-#    env: KBUILD=windows
-#    sudo: required
-#    services:
-#    - docker
-#    script:
-#    - ./gradlew_win_travis -s -i mingwX64Test
+  - os: linux
+    env: KBUILD=windows
+    script:
+    - ./gradlew_win_travis -s -i mingwX64Test
   - os: osx
     env: KBUILD=macos
     script:
