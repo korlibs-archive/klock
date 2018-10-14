@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#./gradlew_win $*
+set -e
 
 HOME=`echo ~`
 
@@ -9,7 +9,7 @@ export WINEDEBUG=-all
 export DEBIAN_FRONTEND=noninteractive
 export GRADLE_VERSION=4.9
 
-pushd
+pushd .
 
 # Install wine and tools, and initialize wine
 dpkg --add-architecture i386 && \

@@ -18,6 +18,7 @@ matrix:
     script:
     - ./gradlew -s -i check build
   - os: linux
+    sudo: required
     env: KBUILD=windows
     script:
     - ./gradlew_win_travis -s -i mingwX64Test
