@@ -1,11 +1,14 @@
 REM free some space
 dir
+dir c:\
+dir "c:\Program Files"
+dir "c:\Program Files (x86)"
 
 REM dir /s C:\ProgramData\chocolatey
 
 REM choco uninstall all
 
-choco uninstall -y -f cmake cmake.install DotNet4.5 DotNet4.6 windows-sdk-10.0 winscp winscp.install ruby microsoft-build-tools visualstudio2017-installer visualstudio2017-workload-netcorebuildtools visualstudio2017-workload-vctools visualstudio2017-workload-webbuildtools visualstudio2017buildtools
+choco uninstall -y -f cmake cmake.install DotNet4.5 DotNet4.6 windows-sdk-10.0 winscp winscp.install ruby microsoft-build-tools visualstudio2017-workload-netcorebuildtools visualstudio2017-workload-vctools visualstudio2017-workload-webbuildtools visualstudio2017buildtools
 
 dir
 
