@@ -18,6 +18,7 @@ matrix:
     env: KBUILD=windows
     language: shell # java is not supported but jdk is installed
     script:
+    - choco install -y jdk10 -params "source=false"
     - powershell -Command "cmd /c gradlew.bat -s -i mingwX64Test"
 #  - os: osx
 #    env: KBUILD=macos
