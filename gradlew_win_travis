@@ -12,7 +12,7 @@ export GRADLE_VERSION=4.9
 pushd .
 
 # Install wine and tools, and initialize wine
-dpkg --add-architecture i386 && \
+sudo dpkg --add-architecture i386 && \
 	apt-get update && \
 	apt-get install -y wine wine32 wine64 unzip wget curl nano libtinfo-dev libtinfo5 && \
 	wine wineboot --init && \
