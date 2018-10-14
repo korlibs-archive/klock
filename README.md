@@ -4,6 +4,7 @@ Consistent and portable date and time utilities for multiplatform kotlin (JVM, J
 
 [![Build Status](https://travis-ci.org/korlibs/klock.svg?branch=master)](https://travis-ci.org/korlibs/klock)
 [![Maven Version](https://img.shields.io/github/tag/korlibs/klock.svg?style=flat&label=maven)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22klock%22)
+[![Gitter](https://img.shields.io/gitter/room/korlibs/korlibs.svg)](https://gitter.im/korlibs/Lobby)
 
 Use with gradle (uploaded to bintray and synchronized to jcenter):
 
