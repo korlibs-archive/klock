@@ -21,9 +21,9 @@ dpkg --add-architecture i386 && \
 
 mkdir -p $HOME/.wine/drive_c/dev/ && \
 	cd $HOME/.wine/drive_c/dev/ && \
-	wget --quiet https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-all.zip && \
-	unzip gradle-$GRADLE_VERSION-all.zip && \
-	rm -f gradle-$GRADLE_VERSION-all.zip && \
+	wget --quiet https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip && \
+	unzip -q gradle-$GRADLE_VERSION-bin.zip && \
+	rm -f gradle-$GRADLE_VERSION-bin.zip && \
 	mv gradle-$GRADLE_VERSION gradle
 
 mkdir -p $HOME/.wine/drive_c/dev/ && \
