@@ -13,19 +13,18 @@ install:
 
 matrix:
   include:
-  - os: linux
-    env: KBUILD=linux
-    script:
-    - ./gradlew -s -i check build
-  - os: linux
-    sudo: required
+#  - os: linux
+#    env: KBUILD=linux
+#    script:
+#    - ./gradlew -s -i check build
+  - os: windows
     env: KBUILD=windows
     script:
-    - ./gradlew_win_travis -s -i mingwX64Test
-  - os: osx
-    env: KBUILD=macos
-    script:
-    - ./gradlew -s -i check build
+    - gradlew.bat -s -i mingwX64Test
+#  - os: osx
+#    env: KBUILD=macos
+#    script:
+#    - ./gradlew -s -i check build
 
 #before_cache:
 #  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
