@@ -16,9 +16,9 @@ matrix:
 #    - ./gradlew -s -i check build
   - os: windows
     env: KBUILD=windows
-    language: rust # java is not supported but jdk is installed
+    language: shell # java is not supported but jdk is installed
     script:
-    - gradlew.bat -s -i mingwX64Test
+    - powershell gradlew.bat -s -i mingwX64Test
 #  - os: osx
 #    env: KBUILD=macos
 #    language: java
