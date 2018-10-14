@@ -5,11 +5,11 @@ dir /s C:\ProgramData\chocolatey
 
 REM choco uninstall all
 
-choco uninstall cmake cmake.install
-choco uninstall DotNet4.5 DotNet4.6
-choco uninstall windows-sdk-10.0
-choco uninstall winscp winscp.install
-choco uninstall ruby
+choco uninstall -y -f cmake cmake.install
+choco uninstall -y -f DotNet4.5 DotNet4.6
+choco uninstall -y -f windows-sdk-10.0
+choco uninstall -y -f winscp winscp.install
+choco uninstall -y -f ruby
 
 choco list --local-only
 choco install jdk8 -y -params "installdir=c:\\java8"
