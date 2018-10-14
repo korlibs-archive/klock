@@ -18,8 +18,7 @@ matrix:
     env: KBUILD=windows
     language: shell # java is not supported but jdk is installed
     script:
-    - powershell -Command "cmd /c choco install -y jdk8 -params 'source=false installdir=c:\\java8'"
-    - powershell -Command "cmd /c set JAVA_HOME=c:\\java8; gradlew.bat -s -i mingwX64Test"
+    - powershell -Command "cmd /c travis_win.bat"
 #  - os: osx
 #    env: KBUILD=macos
 #    language: java
