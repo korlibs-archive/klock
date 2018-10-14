@@ -1,8 +1,10 @@
 REM free some space
+
 dir
-dir c:\
-dir "c:\Program Files"
-dir "c:\Program Files (x86)"
+
+REM dir c:\
+REM dir "c:\Program Files"
+REM dir "c:\Program Files (x86)"
 
 REM dir /s C:\ProgramData\chocolatey
 REM choco uninstall all
