@@ -1,31 +1,34 @@
-language: java
-
-jdk:
-- oraclejdk8
-
-install:
-- nvm install 8
-- nvm use 8
-- node --version
-- npm -g install mocha
-- which node
-- which mocha
-
 matrix:
   include:
   - os: linux
+    language: java
+    jdk: oraclejdk8
     env: KBUILD=linux
+    install:
+    - nvm install 8
+    - nvm use 8
+    - node --version
+    - npm -g install mocha
+    - which node
+    - which mocha
     script:
     - ./gradlew -s -i check build
-#  - os: linux
-#    env: KBUILD=windows
-#    sudo: required
-#    services:
-#    - docker
-#    script:
-#    - ./gradlew_win_travis -s -i mingwX64Test
+  - os: windows
+    env: KBUILD=windows
+    language: shell # java is not supported but jdk is installed
+    script:
+    - powershell -Command "cmd /c travis_win.bat"
   - os: osx
     env: KBUILD=macos
+    language: java
+    jdk: oraclejdk8
+    install:
+    - nvm install 8
+    - nvm use 8
+    - node --version
+    - npm -g install mocha
+    - which node
+    - which mocha
     script:
     - ./gradlew -s -i check build
 
