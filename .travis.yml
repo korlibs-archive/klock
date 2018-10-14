@@ -1,12 +1,9 @@
-language: java
-
-jdk:
-- oraclejdk8
-
-
 matrix:
   include:
 #  - os: linux
+#    language: java
+#    jdk:
+#    - oraclejdk8
 #    env: KBUILD=linux
 #    install:
 #    - nvm install 8
@@ -24,6 +21,9 @@ matrix:
     - gradlew.bat -s -i mingwX64Test
 #  - os: osx
 #    env: KBUILD=macos
+#    language: java
+#    jdk:
+#    - oraclejdk8
 #    install:
 #    - nvm install 8
 #    - nvm use 8
