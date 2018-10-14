@@ -41,7 +41,7 @@ kotlin {
         mingwX64Main {
             dependsOn nativeCommonMain
         }
-        mingwX64Main {
+        mingwX64Test {
             dependsOn nativeCommonTest
         }
         configure([iosX64Main, iosArm32Main, iosArm64Main, macosX64Main, linuxX64Main]) {
