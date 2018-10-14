@@ -39,4 +39,5 @@ dir c:\java8\lib
 CALL refreshenv
 
 SET JAVA_HOME=c:\java8
-CALL gradlew.bat -s -i mingwX64Test
+CALL gradlew.bat --no-daemon -s -i mingwX64Test
+CALL gradlew.bat --stop
