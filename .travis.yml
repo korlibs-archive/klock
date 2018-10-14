@@ -1,3 +1,8 @@
+language: java
+
+jdk:
+- oraclejdk8
+
 install:
 - nvm install 8
 - nvm use 8
@@ -14,6 +19,7 @@ matrix:
 #    - ./gradlew -s -i check build
   - os: windows
     env: KBUILD=windows
+    language: go # java is not supported but jdk is installed
     script:
     - gradlew.bat -s -i mingwX64Test
 #  - os: osx
