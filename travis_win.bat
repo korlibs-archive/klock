@@ -3,15 +3,9 @@ dir
 
 REM dir /s C:\ProgramData\chocolatey
 
-choco uninstall -y -f all
+REM choco uninstall all
 
-REM choco uninstall -y -f cmake cmake.install DotNet4.5 DotNet4.6 windows-sdk-10.0 winscp winscp.install ruby
-REM microsoft-build-tools
-REM visualstudio2017-installer
-REM visualstudio2017-workload-netcorebuildtools
-REM visualstudio2017-workload-vctools
-REM visualstudio2017-workload-webbuildtools
-REM visualstudio2017buildtools
+choco uninstall -y -f cmake cmake.install DotNet4.5 DotNet4.6 windows-sdk-10.0 winscp winscp.install ruby microsoft-build-tools visualstudio2017-installer visualstudio2017-workload-netcorebuildtools visualstudio2017-workload-vctools visualstudio2017-workload-webbuildtools visualstudio2017buildtools
 
 dir
 
