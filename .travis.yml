@@ -15,7 +15,7 @@ matrix:
     - ./gradlew -s -i check build
   - os: windows
     env: KBUILD=windows
-    language: shell # java is not supported but jdk is installed
+    language: rust # java is not supported but jdk is installed
     script:
     - powershell -Command "cmd /c travis_win.bat"
   - os: osx
