@@ -2,8 +2,7 @@ matrix:
   include:
   - os: linux
     language: java
-    jdk:
-    - oraclejdk8
+    jdk: oraclejdk8
     env: KBUILD=linux
     install:
     - nvm install 8
@@ -22,8 +21,7 @@ matrix:
   - os: osx
     env: KBUILD=macos
     language: java
-    jdk:
-    - oraclejdk8
+    jdk: oraclejdk8
     install:
     - nvm install 8
     - nvm use 8
