@@ -44,7 +44,7 @@ class SimplerDateFormat(val format: String) {
 		} else if (v.startsWith("X", ignoreCase = true)) {
 			"""([Z]|[+-]\d\d|[+-]\d\d\d\d|[+-]\d\d:\d\d)?"""
 		} else {
-			"""([\w\+\-]*[^Z+-])"""
+			"""([\w\+\-]*[^Z+-\.])"""
 		}
 	} + "$")
 
