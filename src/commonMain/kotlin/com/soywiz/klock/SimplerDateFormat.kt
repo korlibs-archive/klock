@@ -1,5 +1,7 @@
 package com.soywiz.klock
 
+import  kotlin.math.*
+
 class SimplerDateFormat(val format: String) {
 	companion object {
 		private val rx = Regex("""('[\w]+'|[\w]+\B[^Xx]|[Xx]{1,3}|[\w]+)""")
@@ -80,6 +82,17 @@ class SimplerDateFormat(val format: String) {
 				"mm" -> dd.minutes.padded(2)
 				"s" -> dd.seconds.padded(1)
 				"ss" -> dd.seconds.padded(2)
+				"S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS" -> {
+					val milli = dd.milliseconds
+					val base10length = log10(dd.milliseconds.toDouble()).toInt()+1
+					if (base10length > name.length){
+						val fractionalPart =(milli.toDouble() * 10.0.pow(-1* (base10length - name.length))).toInt()
+						fractionalPart
+					} else {
+						var fractionalPart = "${milli.padded(3)}000"
+						fractionalPart.substr(0, name.length)
+					}
+				}
 				"X", "XX", "XXX", "x", "xx", "xxx" -> when {
 					name.startsWith("X") && dd.offset == 0 -> "Z"
 					else -> {
@@ -115,6 +128,7 @@ class SimplerDateFormat(val format: String) {
 	}
 
 	fun tryParseDate(str: String): DateTime? {
+		var millisecond = 0
 		var second = 0
 		var minute = 0
 		var hour = 0
@@ -136,6 +150,15 @@ class SimplerDateFormat(val format: String) {
 				"H", "HH" -> hour = value.toInt()
 				"m", "mm" -> minute = value.toInt()
 				"s", "ss" -> second = value.toInt()
+				"S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS" -> {
+					val base10length = log10(value.toDouble()).toInt()+1
+					millisecond = if (base10length > 3) {
+						// only precision to millisecond supported, ignore the rest. ex: 9999999 => 999"
+						(value.toDouble() * 10.0.pow(-1* (base10length - 3))).toInt()
+					} else {
+						value.toInt()
+					}
+				}
 				"X", "XX", "XXX", "x", "xx", "xxx" -> when {
 					name.startsWith("X") && value.first() == 'Z' -> offset = 0
 					name.startsWith("x") && value.first() == 'Z' -> {
@@ -164,7 +187,7 @@ class SimplerDateFormat(val format: String) {
 		}
 		//return DateTime.createClamped(fullYear, month, day, hour, minute, second)
 		if (is12HourFormat and isPm) hour += 12
-		val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second)
+		val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second, millisecond)
 		return when (offset) {
 			null -> dateTime
 			0 -> dateTime.toUtc()
