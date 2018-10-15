@@ -72,7 +72,10 @@ class SimplerDateFormat(val format: String) {
 				"MMM" -> englishMonths[dd.month0].substr(0, 3).capitalize()
 				"MMMM" -> englishMonths[dd.month0].capitalize()
 				"MMMMM" -> englishMonths[dd.month0].substr(0, 1).capitalize()
-				"y","yyyy" -> dd.year.padded(4)
+				"y", -> dd.year
+				"yy" -> (dd.year % 100).padded(2)
+				"yyy" -> (dd.year % 1000).padded(3)
+				"yyyy" -> dd.year.padded(4)
 				"YYYY" -> dd.year.padded(4)
 				"H" -> dd.hours.padded(1)
 				"HH" -> dd.hours.padded(2)
@@ -147,6 +150,8 @@ class SimplerDateFormat(val format: String) {
 				"M", "MM" -> month = value.toInt()
 				"MMM" -> month = englishMonths3.indexOf(value.toLowerCase()) + 1
 				"y", "yyyy", "YYYY" -> fullYear = value.toInt()
+				"yy" -> throw RuntimeException("Not guessing years from two digits.")
+				"yyy" -> fullYear = value.toInt() + if (value.toInt() < 800) 2000 else 1000 // guessing year...
 				"H", "HH" -> hour = value.toInt()
 				"m", "mm" -> minute = value.toInt()
 				"s", "ss" -> second = value.toInt()

@@ -27,7 +27,11 @@ class DateTimeTest {
 		assertEquals("Sat, 08 S 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMMMM yyyy HH:mm:ss z").format(dt).toString())
 
 		assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM y HH:mm:ss z").format(dt).toString())
-		assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM YYYY HH:mm:ss z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 18 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM yy HH:mm:ss z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM yyy HH:mm:ss z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(dt).toString())
+
+        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM YYYY HH:mm:ss z").format(dt).toString())
 
 		assertEquals("Sat, 08 Sep 2018 4:08:09 UTC", SimplerDateFormat("EEE, dd MMM yyyy H:mm:ss z").format(dt).toString())
 
@@ -98,6 +102,14 @@ class DateTimeTest {
         assertEquals(message = "Sat, 08 Sep 2018 04:08:09 UTC - y",
                 expected = dtmilli,
                 actual = SimplerDateFormat("EEE, dd MMM y HH:mm:ss z").parse("Sat, 08 Sep 2018 04:08:09 UTC"))
+        assertEquals(message = "Sat, 08 Sep 18 04:08:09 UTC - yy",
+                expected = null,
+                actual = SimplerDateFormat("EEE, dd MMM yy HH:mm:ss z").parseOrNull("Sat, 08 Sep 18 04:08:09 UTC"))
+        assertEquals(message = "Sat, 08 Sep 018 04:08:09 UTC - yyy",
+                expected = dtmilli,
+                actual = SimplerDateFormat("EEE, dd MMM yyy HH:mm:ss z").parse("Sat, 08 Sep 018 04:08:09 UTC"))
+
+
         assertEquals(message = "Sat, 08 Sep 2018 04:08:09 UTC - YYYY",
                 expected = dtmilli,
                 actual = SimplerDateFormat("EEE, dd MMM YYYY HH:mm:ss z").parse("Sat, 08 Sep 2018 04:08:09 UTC"))
