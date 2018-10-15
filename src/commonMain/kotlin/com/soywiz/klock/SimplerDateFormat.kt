@@ -72,7 +72,7 @@ class SimplerDateFormat(val format: String) {
 				"MMM" -> englishMonths[dd.month0].substr(0, 3).capitalize()
 				"MMMM" -> englishMonths[dd.month0].capitalize()
 				"MMMMM" -> englishMonths[dd.month0].substr(0, 1).capitalize()
-				"y", -> dd.year
+				"y" -> dd.year
 				"yy" -> (dd.year % 100).padded(2)
 				"yyy" -> (dd.year % 1000).padded(3)
 				"yyyy" -> dd.year.padded(4)
