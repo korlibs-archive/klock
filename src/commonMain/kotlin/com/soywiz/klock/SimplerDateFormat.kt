@@ -2,7 +2,7 @@ package com.soywiz.klock
 
 class SimplerDateFormat(val format: String) {
 	companion object {
-		private val rx = Regex("('[\\w]+'|[\\w]+\\B[^Xx]|[Xx]{1,3}|[\\w]+)")
+		private val rx = Regex("""('[\w]+'|[\w]+\B[^Xx]|[Xx]{1,3}|[\w]+)""")
 		private val englishDaysOfWeek = listOf(
 			"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
 		)
@@ -40,9 +40,9 @@ class SimplerDateFormat(val format: String) {
 		if (v.startsWith("'")) {
 			"(" + Regex.escapeReplacement(v.trim('\'')) + ")"
 		} else if (v.startsWith("X", ignoreCase = true)) {
-			"([Z]|[+-]\\d\\d|[+-]\\d\\d\\d\\d|[+-]\\d\\d:\\d\\d)?"
+			"""([Z]|[+-]\d\d|[+-]\d\d\d\d|[+-]\d\d:\d\d)?"""
 		} else {
-			"([\\w\\+\\-]*[^Z+-])"
+			"""([\w\+\-]*[^Z+-])"""
 		}
 	} + "$")
 
