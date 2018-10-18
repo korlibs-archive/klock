@@ -1,5 +1,5 @@
 plugins {
-    id 'kotlin-multiplatform' version '1.3.0-rc-146'
+    id 'kotlin-multiplatform' version '1.3.0-rc-190'
     id 'com.moowork.node' version '1.2.0'
 }
 
@@ -86,7 +86,7 @@ task populateNodeModules {
     doLast {
         copy {
             from "$buildDir/yarn/node_modules"
-            from jsCompilations.main.output.first()
+            from jsCompilations.main.output.allOutputs
             jsCompilations.test.runtimeDependencyFiles.each {
                 if (it.exists() && !it.isDirectory()) {
                     from zipTree(it.absolutePath).matching { include '*.js' }
@@ -97,9 +97,13 @@ task populateNodeModules {
     }
 }
 
+//def dump(obj) { obj.properties.each { println "$it.key : ${it.value.class.name}   ->   $it.value" } }
+//println("-------------")
+//dump(jsCompilations.test.output)
+
 task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, addYarnDeps, populateNodeModules]) {
     script = file("$buildDir/node_modules/mocha/bin/mocha")
-    args = [relativePath("${jsCompilations.test.output.first()}/klock_test.js")]
+    args = [relativePath("${jsCompilations.test.output.classesDirs.first()}/klock_test.js")]
 }
 
 jsTest.dependsOn runMocha
