@@ -37,16 +37,6 @@ interface DateTime {
     fun addOffset(offset: Int) = OffsetDateTime(this, this.offset + offset)
     fun toOffset(offset: Int) = OffsetDateTime(this, offset)
 
-    //fun addYears(delta: Int): DateTime = add(delta * 12, 0.0)
-    //fun addMonths(delta: Int): DateTime = add(delta, 0.0)
-    //fun addDays(delta: Double): DateTime = add(0, (delta * MILLIS_PER_DAY))
-    //fun addWeeks(delta: Double): DateTime = add(0, (delta * MILLIS_PER_WEEK))
-    //fun addHours(delta: Double): DateTime = add(0, (delta * MILLIS_PER_HOUR))
-    //fun addMinutes(delta: Double): DateTime = add(0, (delta * MILLIS_PER_MINUTE))
-    //fun addSeconds(delta: Double): DateTime = add(0, (delta * MILLIS_PER_SECOND))
-    //fun addMilliseconds(delta: Double): DateTime = if (delta == 0.0) this else add(0, delta)
-    //fun addMilliseconds(delta: Long): DateTime = if (delta == 0L) this else add(0, delta.toDouble())
-
     operator fun plus(delta: DateSpan): DateTime = this.add(delta.totalMonths, 0.0)
     operator fun plus(delta: DateTimeSpan): DateTime = this.add(delta.totalMonths, delta.totalMilliseconds)
     operator fun plus(delta: TimeSpan): DateTime = add(0, delta.milliseconds)
