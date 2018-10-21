@@ -43,9 +43,9 @@ interface DateTime : Comparable<DateTime> {
         delta.totalMilliseconds
     )
 
-    operator fun plus(delta: TimeSpan): DateTime = addMilliseconds(delta.milliseconds.toDouble())
+    operator fun plus(delta: TimeSpan): DateTime = addMilliseconds(delta.milliseconds)
     operator fun minus(delta: TimeDistance): DateTime = this + -delta
-    operator fun minus(delta: TimeSpan): DateTime = addMilliseconds(-delta.milliseconds.toDouble())
+    operator fun minus(delta: TimeSpan): DateTime = addMilliseconds(-delta.milliseconds)
     fun toString(format: String): String = toString(SimplerDateFormat(format))
     fun toString(format: SimplerDateFormat): String = format.format(this)
 

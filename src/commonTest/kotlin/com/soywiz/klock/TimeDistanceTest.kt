@@ -18,5 +18,6 @@ class TimeDistanceTest {
     @Test
     fun testToString() {
         assertEquals("1M 10W 10H", (1.months + 10.hours + 10.weeks).toString())
+        assertEquals("1M 11W 1D 10H", (1.months + 10.hours + 10.weeks + 8.days).toString())
     }
 }

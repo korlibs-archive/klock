@@ -92,4 +92,3 @@ inline class TimeSpan(private val ms: Double) : Comparable<TimeSpan> {
 
 fun TimeSpan.toTimeString(components: Int = 3, addMilliseconds: Boolean = false): String =
     TimeSpan.toTimeString(milliseconds, components, addMilliseconds)
-

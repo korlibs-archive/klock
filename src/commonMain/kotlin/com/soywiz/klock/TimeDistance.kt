@@ -36,18 +36,16 @@ data class TimeDistance(
 
     operator fun times(times: Double) = TimeDistance((totalMonths * times).toInt(), (totalTime * times))
 
-    class ComputedTime(val weeks: Int, val days: Int, val hours: Int, val minutes: Int, val seconds: Int, val milliseconds: Double) {
+    private class ComputedTime(val weeks: Int, val days: Int, val hours: Int, val minutes: Int, val seconds: Int, val milliseconds: Double) {
         companion object {
-            operator fun invoke(time: TimeSpan): ComputedTime {
-                return Moduler(time.milliseconds).run {
-                    val weeks = int(MILLIS_PER_WEEK)
-                    val days = int(MILLIS_PER_DAY)
-                    val hours = int(MILLIS_PER_HOUR)
-                    val minutes = int(MILLIS_PER_MINUTE)
-                    val seconds = int(MILLIS_PER_SECOND)
-                    val milliseconds = double(1)
-                    return ComputedTime(weeks, days, hours, minutes, seconds, milliseconds)
-                }
+            operator fun invoke(time: TimeSpan): ComputedTime = Moduler(time.milliseconds).run {
+                val weeks = int(MILLIS_PER_WEEK)
+                val days = int(MILLIS_PER_DAY)
+                val hours = int(MILLIS_PER_HOUR)
+                val minutes = int(MILLIS_PER_MINUTE)
+                val seconds = int(MILLIS_PER_SECOND)
+                val milliseconds = double(1)
+                return ComputedTime(weeks, days, hours, minutes, seconds, milliseconds)
             }
         }
     }

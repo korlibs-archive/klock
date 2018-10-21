@@ -54,7 +54,7 @@ internal infix fun Int.umod(that: Int): Int {
     }
 }
 
-class Moduler(var value: Double) {
+internal class Moduler(var value: Double) {
     fun double(count: Double): Double {
         val ret = (value / count)
         value %= count
