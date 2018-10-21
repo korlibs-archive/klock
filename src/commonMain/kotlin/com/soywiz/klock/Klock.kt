@@ -18,7 +18,7 @@ val Klock.currentTime: DateTime get() = DateTime(KlockInternal.currentTime)
  * Returns a performance counter measure in microseconds.
  */
 @Deprecated("", ReplaceWith("PerformanceCounter.microseconds"))
-val Klock.microClock: Double get() = PerformanceCounter.microseconds
+val Klock.microClock: Double get() = KlockInternal.microClock
 
 /**
  * Returns timezone offset as a [TimeSpan], for a specified [time].
@@ -33,12 +33,12 @@ fun Klock.localTimezoneOffsetMinutes(time: DateTime): TimeSpan = KlockInternal.l
  * The same as [currentTimeMillisLong] but as double. To prevent allocation on
  * targets without Long support.
  */
-val Klock.currentTimeMillisDouble get() = currentTime.unixDouble
+val Klock.currentTimeMillisDouble get() = KlockInternal.currentTime
 
 /**
  * Returns the total milliseconds since unix epoch.
  */
-val Klock.currentTimeMillisLong get() = currentTime.unixLong
+val Klock.currentTimeMillisLong get() = KlockInternal.currentTime.toLong()
 
 @Deprecated("", ReplaceWith("Klock.microClock", "com.soywiz.klock.Klock"))
 fun Klock.microClock(): Double = KlockInternal.microClock
