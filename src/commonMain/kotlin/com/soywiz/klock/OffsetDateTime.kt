@@ -30,5 +30,14 @@ class OffsetDateTime private constructor(
 
     override fun toUtc(): DateTime = utc
 
+    override fun hashCode(): Int = adjusted.hashCode()
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is DateTime) return false
+        val thisMs = this.utc.unixDouble + (this.offset * 1000 * 60)
+        val thatMs = other.utc.unixDouble + (other.offset * 1000 * 60)
+        return thisMs == thatMs
+    }
+
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
 }

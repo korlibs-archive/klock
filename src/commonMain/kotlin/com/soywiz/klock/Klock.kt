@@ -23,9 +23,16 @@ expect object Klock {
     fun microClock(): Double
 
     /**
-     * Returns timezone offset in minutes, from a specified [unix] epoch in milliseconds.
+     * Returns timezone offset in minutes, for a specified [unix] epoch in milliseconds.
      *
      * For example, GMT+01 would return 60.
      */
-    fun getLocalTimezoneOffset(unix: Long): Int
+    fun getLocalTimezoneOffsetMinutes(unix: Long): Int
 }
+
+/**
+ * Returns timezone offset as a [TimeSpan], for a specified [time].
+ *
+ * For example, GMT+01 would return 60.minutes.
+ */
+fun Klock.getLocalTimezoneOffset(time: UtcDateTime): TimeSpan = getLocalTimezoneOffsetMinutes(time.unix).minutes

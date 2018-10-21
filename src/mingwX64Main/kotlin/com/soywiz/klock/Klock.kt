@@ -22,5 +22,5 @@ actual object Klock {
 
     actual fun currentTimeMillisDouble(): Double = currentTimeMillis().toDouble()
 
-    actual fun getLocalTimezoneOffset(unix: Long): Int = 0
+    actual fun getLocalTimezoneOffsetMinutes(unix: Long): Int = 0
 }

@@ -3,17 +3,24 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
-inline val Number.microseconds get() = TimeSpan.fromMilliseconds(this.toDouble() / 1000.0)
+inline val Number.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
+inline val Number.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
 inline val Number.milliseconds get() = TimeSpan.fromMilliseconds(this.toDouble())
-inline val Number.seconds get() = TimeSpan.fromMilliseconds((this.toDouble() * 1000.0))
+inline val Number.seconds get() = TimeSpan.fromSeconds((this.toDouble()))
+inline val Number.minutes get() = TimeSpan.fromMinutes(this.toDouble())
+inline val Number.hours get() = TimeSpan.fromHours(this.toDouble())
+inline val Number.days get() = TimeSpan.fromDays(this.toDouble())
+inline val Number.weeks get() = TimeSpan.fromWeeks(this.toDouble())
 
 @Suppress("DataClassPrivateConstructor")
 inline class TimeSpan(private val ms: Double) : Comparable<TimeSpan> {
-    val microseconds: Double get() = this.ms * 1000.0
+    val nanoseconds: Double get() = this.ms * 1_000_000.0
+    val microseconds: Double get() = this.ms * 1_000.0
     val milliseconds: Double get() = this.ms
     val millisecondsLong: Long get() = this.ms.toLong()
     val millisecondsInt: Int get() = this.ms.toInt()
     val seconds: Double get() = this.ms / 1000.0
+    val minutes: Double get() = this.ms / 60_000.0
 
     companion object {
         /**
@@ -33,6 +40,14 @@ inline class TimeSpan(private val ms: Double) : Comparable<TimeSpan> {
             0.0 -> ZERO
             else -> TimeSpan(ms)
         }
+
+        @PublishedApi internal fun fromNanoseconds(s: Double) = fromMilliseconds(s * MILLIS_PER_NANOSECOND)
+        @PublishedApi internal fun fromMicroseconds(s: Double) = fromMilliseconds(s * MILLIS_PER_MICROSECOND)
+        @PublishedApi internal fun fromSeconds(s: Double) = fromMilliseconds(s * MILLIS_PER_SECOND)
+        @PublishedApi internal fun fromMinutes(s: Double) = fromMilliseconds(s * MILLIS_PER_MINUTE)
+        @PublishedApi internal fun fromHours(s: Double) = fromMilliseconds(s * MILLIS_PER_HOUR)
+        @PublishedApi internal fun fromDays(s: Double) = fromMilliseconds(s * MILLIS_PER_DAY)
+        @PublishedApi internal fun fromWeeks(s: Double) = fromMilliseconds(s * MILLIS_PER_WEEK)
 
         private val timeSteps = listOf(60, 60, 24)
         private fun toTimeStringRaw(totalMilliseconds: Double, components: Int = 3): String {
@@ -68,6 +83,7 @@ inline class TimeSpan(private val ms: Double) : Comparable<TimeSpan> {
 
     override fun compareTo(other: TimeSpan): Int = this.ms.compareTo(other.ms)
 
+    operator fun unaryMinus() = TimeSpan(-this.ms)
     operator fun plus(other: TimeSpan): TimeSpan = TimeSpan(this.ms + other.ms)
     operator fun minus(other: TimeSpan): TimeSpan = TimeSpan(this.ms - other.ms)
     operator fun times(scale: Int): TimeSpan = TimeSpan(this.ms * scale)

@@ -1,5 +1,10 @@
 package com.soywiz.klock.internal
 
+import kotlin.math.*
+
+internal const val MILLIS_PER_MICROSECOND = 1.0 / 1000.0
+internal const val MILLIS_PER_NANOSECOND = MILLIS_PER_MICROSECOND / 1000.0
+
 internal const val MILLIS_PER_SECOND = 1000
 internal const val MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60
 internal const val MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60
@@ -47,4 +52,15 @@ internal infix fun Int.umod(that: Int): Int {
         remainder < 0 -> remainder + that
         else -> remainder
     }
+}
+
+class Moduler(var value: Double) {
+    fun double(count: Double): Double {
+        val ret = (value / count)
+        value %= count
+        return floor(ret)
+    }
+
+    inline fun double(count: Number): Double = double(count.toDouble())
+    inline fun int(count: Number): Int = double(count.toDouble()).toInt()
 }

@@ -27,7 +27,7 @@ actual object Klock {
 
     actual fun currentTimeMillisDouble(): Double = currentTimeMillis().toDouble()
 
-    actual fun getLocalTimezoneOffset(unix: Long): Int = memScoped {
+    actual fun getLocalTimezoneOffsetMinutes(unix: Long): Int = memScoped {
         val t = alloc<time_tVar>()
         val tm = alloc<tm>()
         t.value = (unix / 1000L).convert()

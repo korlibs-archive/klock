@@ -197,7 +197,7 @@ class SimplerDateFormat(val format: String) {
         return when (offset) {
             null -> dateTime
             0 -> dateTime.toUtc()
-            else -> dateTime.minus(TimeDistance(minutes = (offset).toDouble())).toOffset(offset)
+            else -> dateTime.minus(offset.minutes).toOffset(offset)
         }
     }
 }

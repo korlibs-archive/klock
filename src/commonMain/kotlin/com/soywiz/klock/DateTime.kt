@@ -14,6 +14,7 @@ interface DateTime : Comparable<DateTime> {
     val milliseconds: Int
     val timeZone: String
     val unix: Long
+    val unixDouble: Double get() = unix.toDouble()
     val offset: Int
     val utc: UtcDateTime
     fun add(deltaMonths: Int, deltaMilliseconds: Long): DateTime
@@ -24,7 +25,7 @@ interface DateTime : Comparable<DateTime> {
     val monthEnum: Month get() = Month[month1]
 
     fun toUtc(): DateTime = utc
-    fun toLocal() = OffsetDateTime(this, Klock.getLocalTimezoneOffset(unix))
+    fun toLocal() = OffsetDateTime(this, Klock.getLocalTimezoneOffsetMinutes(unix))
     fun addOffset(offset: Int) = OffsetDateTime(this, this.offset + offset)
     fun toOffset(offset: Int) = OffsetDateTime(this, offset)
     fun addYears(delta: Int): DateTime = add(delta * 12, 0L)
@@ -48,8 +49,8 @@ interface DateTime : Comparable<DateTime> {
     fun toString(format: String): String = toString(SimplerDateFormat(format))
     fun toString(format: SimplerDateFormat): String = format.format(this)
 
-    override fun hashCode(): Int
-    override fun equals(other: Any?): Boolean
+    //override fun hashCode(): Int
+    //override fun equals(other: Any?): Boolean
 
     companion object {
         val EPOCH = DateTime(1970, 1, 1, 0, 0, 0) as UtcDateTime
@@ -70,7 +71,7 @@ interface DateTime : Comparable<DateTime> {
                     hour,
                     minute,
                     second
-                ) + milliseconds, true
+                ) + milliseconds
             )
         }
 
@@ -79,8 +80,8 @@ interface DateTime : Comparable<DateTime> {
         fun fromString(str: String) = SimplerDateFormat.parse(str)
         fun parse(str: String) = SimplerDateFormat.parse(str)
 
-        fun fromUnix(time: Long): DateTime = UtcDateTime(EPOCH_INTERNAL_MILLIS + time, true)
-        fun fromUnixLocal(time: Long): DateTime = UtcDateTime(EPOCH_INTERNAL_MILLIS + time, true).toLocal()
+        fun fromUnix(time: Long): UtcDateTime = UtcDateTime(EPOCH_INTERNAL_MILLIS + time)
+        fun fromUnixLocal(time: Long): OffsetDateTime = UtcDateTime(EPOCH_INTERNAL_MILLIS + time).toLocal()
 
         fun nowUnix() = Klock.currentTimeMillis()
         fun now() = fromUnix(nowUnix())
@@ -159,7 +160,7 @@ interface DateTime : Comparable<DateTime> {
                     hour,
                     minute,
                     second
-                ) + milliseconds, true
+                ) + milliseconds
             )
         }
 

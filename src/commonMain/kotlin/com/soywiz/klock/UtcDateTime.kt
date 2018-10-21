@@ -2,8 +2,7 @@ package com.soywiz.klock
 
 import com.soywiz.klock.internal.*
 
-class UtcDateTime internal constructor(internal val internalMillis: Long, @Suppress("UNUSED_PARAMETER") dummy: Boolean) :
-    DateTime {
+inline class UtcDateTime(val internalMillis: Long) : DateTime {
     companion object {
         private const val DATE_PART_YEAR = 0
         private const val DATE_PART_DAY_OF_YEAR = 1
@@ -24,11 +23,9 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, @Suppr
         internal fun dateToMillis(year: Int, month: Int, day: Int): Long {
             //Year.checked(year)
             Month.check(month)
-            if (day !in 1..Month.days(
-                    month,
-                    year
-                )
-            ) throw DateException("Day $day not valid for year=$year and month=$month")
+            if (day !in 1..Month.days(month, year)) {
+                throw DateException("Day $day not valid for year=$year and month=$month")
+            }
             return dateToMillisUnchecked(year, month, day)
         }
 
@@ -62,8 +59,8 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, @Suppr
 
     private fun getDatePart(part: Int): Int = Companion.getDatePart(internalMillis, part)
 
-    override val offset: Int = 0
-    override val utc: UtcDateTime = this
+    override val offset: Int get() = 0
+    override val utc: UtcDateTime get() = this
     override val unix: Long get() = (internalMillis - DateTime.EPOCH.internalMillis)
     override val year: Int get() = getDatePart(DATE_PART_YEAR)
     override val month: Int get() = getDatePart(DATE_PART_MONTH)
@@ -78,7 +75,7 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, @Suppr
 
     override fun add(deltaMonths: Int, deltaMilliseconds: Long): DateTime = when {
         deltaMonths == 0 && deltaMilliseconds == 0L -> this
-        deltaMonths == 0 -> UtcDateTime(this.internalMillis + deltaMilliseconds, true)
+        deltaMonths == 0 -> UtcDateTime(this.internalMillis + deltaMilliseconds)
         else -> {
             var year = this.year
             var month = this.month
@@ -96,15 +93,12 @@ class UtcDateTime internal constructor(internal val internalMillis: Long, @Suppr
             val days = Month.days(month, year)
             if (day > days) day = days
 
-            UtcDateTime(
-                dateToMillisUnchecked(year, month, day) + (internalMillis % MILLIS_PER_DAY) + deltaMilliseconds,
-                true
-            )
+            UtcDateTime(dateToMillisUnchecked(year, month, day) + (internalMillis % MILLIS_PER_DAY) + deltaMilliseconds)
         }
     }
 
     override operator fun compareTo(other: DateTime): Int = this.unix.compareTo(other.unix)
-    override fun hashCode(): Int = internalMillis.hashCode()
-    override fun equals(other: Any?): Boolean = this.unix == (other as? DateTime?)?.unix
+    //override fun hashCode(): Int = internalMillis.hashCode()
+    //override fun equals(other: Any?): Boolean = this.unix == (other as? DateTime?)?.unix
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
 }
