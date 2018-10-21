@@ -8,7 +8,7 @@ class SimplerDateFormatTest {
 
     @Test
     fun testParse() {
-        assertEquals(784111777000, format.parse("Sun, 06 Nov 1994 08:49:37 UTC"))
+        assertEquals(784111777000, format.parseLong("Sun, 06 Nov 1994 08:49:37 UTC"))
     }
 
     @Test
@@ -27,7 +27,7 @@ class SimplerDateFormatTest {
 
         @Test
         fun testParseUtc() {
-            assertEquals(1462390174000, format.parse("2016-05-04T19:29:34+00:00"))
+            assertEquals(1462390174000, format.parseLong("2016-05-04T19:29:34+00:00"))
         }
 
         @Test
@@ -50,7 +50,7 @@ class SimplerDateFormatTest {
 
         @Test
         fun testParseWithOffset() {
-            assertEquals(1462390174000, format.parse("2016-05-04T19:29:34-07:00"))
+            assertEquals(1462390174000, format.parseLong("2016-05-04T19:29:34-07:00"))
         }
 
         @Test
@@ -73,12 +73,12 @@ class SimplerDateFormatTest {
 
         @Test
         fun testParseUtc() {
-            assertEquals(1462390174000, format.parse("2016-05-04T19:29:34+00:00"))
+            assertEquals(1462390174000, format.parseLong("2016-05-04T19:29:34+00:00"))
         }
 
         @Test
         fun testParseZulu() {
-            assertEquals(1462390174000, format.parse("2016-05-04T19:29:34Z"))
+            assertEquals(1462390174000, format.parseLong("2016-05-04T19:29:34Z"))
         }
 
         @Test

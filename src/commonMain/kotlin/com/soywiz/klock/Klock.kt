@@ -33,11 +33,11 @@ expect object Klock {
 /**
  * Returns the current time as an [UtcDateTime].
  */
-val Klock.currentTime: UtcDateTime get() = UtcDateTime(currentTimeMillis())
+val Klock.currentTime: UtcDateTime get() = UtcDateTime(currentTimeMillisDouble())
 
 /**
  * Returns timezone offset as a [TimeSpan], for a specified [time].
  *
  * For example, GMT+01 would return 60.minutes.
  */
-fun Klock.getLocalTimezoneOffset(time: UtcDateTime): TimeSpan = getLocalTimezoneOffsetMinutes(time.unix).minutes
+fun Klock.getLocalTimezoneOffset(time: UtcDateTime): TimeSpan = getLocalTimezoneOffsetMinutes(time.unixLong).minutes

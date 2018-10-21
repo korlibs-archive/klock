@@ -54,6 +54,7 @@ class SimplerDateFormat(val format: String) {
     // EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
     // YYYY-MM-dd HH:mm:ss
 
+    fun format(date: Double): String = format(DateTime.fromUnix(date))
     fun format(date: Long): String = format(DateTime.fromUnix(date))
 
     fun format(dd: DateTime): String {
@@ -118,18 +119,25 @@ class SimplerDateFormat(val format: String) {
         return out
     }
 
-    fun parse(str: String): Long = parseDate(str).unix
-    fun parseUtc(str: String): Long = parseDate(str).toUtc().unix
+    fun parse(str: String): Double = parseDate(str).unixDouble
+    fun parseUtc(str: String): Double = parseDate(str).utc.unixDouble
 
-    fun parseOrNull(str: String?): Long? = try {
+    fun parseLong(str: String): Long = parseDate(str).unixLong
+    fun parseUtcLong(str: String): Long = parseDate(str).utc.unixLong
+
+    fun parseOrNull(str: String?): Double? = try {
         str?.let { parse(str) }
     } catch (e: Throwable) {
         null
     }
 
-    fun parseDate(str: String): DateTime {
-        return tryParseDate(str) ?: throw RuntimeException("Not a valid format: '$str' for '$format'")
+    fun parseOrNullLong(str: String?): Long? = try {
+        str?.let { parse(str).toLong() }
+    } catch (e: Throwable) {
+        null
     }
+
+    fun parseDate(str: String): DateTime = tryParseDate(str) ?: throw DateException("Not a valid format: '$str' for '$format'")
 
     fun tryParseDate(str: String): DateTime? {
         var millisecond = 0

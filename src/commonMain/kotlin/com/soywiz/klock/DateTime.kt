@@ -13,8 +13,8 @@ interface DateTime : Comparable<DateTime> {
     val seconds: Int
     val milliseconds: Int
     val timeZone: String
-    val unix: Long
-    val unixDouble: Double get() = unix.toDouble()
+    val unixLong: Long get() = unixDouble.toLong()
+    val unixDouble: Double
     val offset: Int
     fun add(deltaMonths: Int, deltaMilliseconds: Long): DateTime
 
@@ -23,7 +23,7 @@ interface DateTime : Comparable<DateTime> {
     val month: Month get() = Month[month1]
 
     val utc: UtcDateTime
-    val local get() = OffsetDateTime(this, Klock.getLocalTimezoneOffsetMinutes(unix))
+    val local get() = OffsetDateTime(this, Klock.getLocalTimezoneOffsetMinutes(unixLong))
 
     @Deprecated("", ReplaceWith("utc"))
     fun toUtc(): DateTime = utc
@@ -59,7 +59,7 @@ interface DateTime : Comparable<DateTime> {
     //override fun equals(other: Any?): Boolean
 
     companion object {
-        val EPOCH = UtcDateTime(0L)
+        val EPOCH = UtcDateTime(0.0)
 
         // Can produce errors on invalid dates
         operator fun invoke(
@@ -85,8 +85,11 @@ interface DateTime : Comparable<DateTime> {
         fun fromString(str: String) = SimplerDateFormat.parse(str)
         fun parse(str: String) = SimplerDateFormat.parse(str)
 
-        fun fromUnix(time: Long): UtcDateTime = UtcDateTime(time)
-        fun fromUnixLocal(time: Long): OffsetDateTime = UtcDateTime(time).local
+        fun fromUnix(time: Double): UtcDateTime = UtcDateTime(time)
+        fun fromUnixLocal(time: Double): OffsetDateTime = UtcDateTime(time).local
+
+        fun fromUnix(time: Long): UtcDateTime = fromUnix(time.toDouble())
+        fun fromUnixLocal(time: Long): OffsetDateTime = fromUnixLocal(time.toDouble())
 
         fun nowUnix() = Klock.currentTimeMillis()
         fun now() = fromUnix(nowUnix())

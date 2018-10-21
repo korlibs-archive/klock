@@ -10,11 +10,11 @@ import com.soywiz.klock.internal.*
  * - Thu Aug 10 -140744 07:15:45 GMT-0014 (Central European Summer Time)
  * - Wed May 23 144683 18:29:30 GMT+0200 (Central European Summer Time)
  */
-inline class UtcDateTime(val unixMillis: Long) : DateTime {
+inline class UtcDateTime(val unixMillis: Double) : DateTime {
     val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
 
     companion object {
-        internal const val EPOCH_INTERNAL_MILLIS = 62135596800000L // Millis since 00-00-0000 00:00 UTC to UNIX EPOCH
+        internal const val EPOCH_INTERNAL_MILLIS = 62135596800000.0 // Millis since 00-00-0000 00:00 UTC to UNIX EPOCH
 
         private const val DATE_PART_YEAR = 0
         private const val DATE_PART_DAY_OF_YEAR = 1
@@ -24,18 +24,17 @@ inline class UtcDateTime(val unixMillis: Long) : DateTime {
         /**
          * Returns milliseconds since EPOCH.
          */
-        internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Long {
-            val y = year - 1
-            Month.daysToStart(month, year)
+        internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Double {
+            val y = (year - 1)
             val n = y * 365 + y / 4 - y / 100 + y / 400 + Month.daysToStart(month, year) + day - 1
-            return n.toLong() * MILLIS_PER_DAY.toLong() - EPOCH_INTERNAL_MILLIS
+            return n.toDouble() * MILLIS_PER_DAY.toDouble() - EPOCH_INTERNAL_MILLIS
         }
 
-        internal fun timeToMillisUnchecked(hour: Int, minute: Int, second: Int): Long {
-            return (hour.toLong() * 3600 + minute.toLong() * 60 + second.toLong()) * MILLIS_PER_SECOND
+        internal fun timeToMillisUnchecked(hour: Int, minute: Int, second: Int): Double {
+            return (hour.toDouble() * 3600 + minute.toDouble() * 60 + second.toDouble()) * MILLIS_PER_SECOND
         }
 
-        internal fun dateToMillis(year: Int, month: Int, day: Int): Long {
+        internal fun dateToMillis(year: Int, month: Int, day: Int): Double {
             //Year.checked(year)
             Month.check(month)
             if (day !in 1..Month.days(month, year)) {
@@ -44,7 +43,7 @@ inline class UtcDateTime(val unixMillis: Long) : DateTime {
             return dateToMillisUnchecked(year, month, day)
         }
 
-        internal fun timeToMillis(hour: Int, minute: Int, second: Int): Long {
+        internal fun timeToMillis(hour: Int, minute: Int, second: Int): Double {
             if (hour !in 0..23) throw DateException("Hour $hour not in 0..23")
             if (minute !in 0..59) throw DateException("Minute $minute not in 0..59")
             if (second !in 0..59) throw DateException("Second $second not in 0..59")
@@ -54,7 +53,7 @@ inline class UtcDateTime(val unixMillis: Long) : DateTime {
         /**
          * [millis] are 00-00-0000 based.
          */
-        internal fun getDatePart(millis: Long, part: Int): Int {
+        internal fun getDatePart(millis: Double, part: Int): Int {
             var n = (millis / MILLIS_PER_DAY).toInt()
             val y400 = n / DAYS_PER_400_YEARS
             n -= y400 * DAYS_PER_400_YEARS
@@ -79,7 +78,7 @@ inline class UtcDateTime(val unixMillis: Long) : DateTime {
 
     override val offset: Int get() = 0
     override val utc: UtcDateTime get() = this
-    override val unix: Long get() = unixMillis
+    override val unixDouble: Double get() = unixMillis
     override val year: Int get() = getDatePart(DATE_PART_YEAR)
     override val month1: Int get() = getDatePart(DATE_PART_MONTH)
     override val dayOfMonth: Int get() = getDatePart(DATE_PART_DAY)
@@ -115,7 +114,7 @@ inline class UtcDateTime(val unixMillis: Long) : DateTime {
         }
     }
 
-    override operator fun compareTo(other: DateTime): Int = this.unix.compareTo(other.unix)
+    override operator fun compareTo(other: DateTime): Int = this.unixDouble.compareTo(other.unixDouble)
     //override fun hashCode(): Int = internalMillis.hashCode()
     //override fun equals(other: Any?): Boolean = this.unix == (other as? DateTime?)?.unix
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)

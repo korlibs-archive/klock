@@ -64,3 +64,5 @@ internal class Moduler(var value: Double) {
     inline fun double(count: Number): Double = double(count.toDouble())
     inline fun int(count: Number): Int = double(count.toDouble()).toInt()
 }
+
+internal infix fun Double.intDiv(other: Double) = floor(this / other)
