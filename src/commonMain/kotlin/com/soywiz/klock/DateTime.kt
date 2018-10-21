@@ -59,8 +59,7 @@ interface DateTime : Comparable<DateTime> {
     //override fun equals(other: Any?): Boolean
 
     companion object {
-        val EPOCH = DateTime(1970, 1, 1, 0, 0, 0) as UtcDateTime
-        private val EPOCH_INTERNAL_MILLIS = EPOCH.internalMillis
+        val EPOCH = UtcDateTime(0L)
 
         // Can produce errors on invalid dates
         operator fun invoke(
@@ -86,8 +85,8 @@ interface DateTime : Comparable<DateTime> {
         fun fromString(str: String) = SimplerDateFormat.parse(str)
         fun parse(str: String) = SimplerDateFormat.parse(str)
 
-        fun fromUnix(time: Long): UtcDateTime = UtcDateTime(EPOCH_INTERNAL_MILLIS + time)
-        fun fromUnixLocal(time: Long): OffsetDateTime = UtcDateTime(EPOCH_INTERNAL_MILLIS + time).toLocal()
+        fun fromUnix(time: Long): UtcDateTime = UtcDateTime(time)
+        fun fromUnixLocal(time: Long): OffsetDateTime = UtcDateTime(time).local
 
         fun nowUnix() = Klock.currentTimeMillis()
         fun now() = fromUnix(nowUnix())

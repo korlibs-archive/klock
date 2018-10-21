@@ -10,18 +10,25 @@ import com.soywiz.klock.internal.*
  * - Thu Aug 10 -140744 07:15:45 GMT-0014 (Central European Summer Time)
  * - Wed May 23 144683 18:29:30 GMT+0200 (Central European Summer Time)
  */
-inline class UtcDateTime(val internalMillis: Long) : DateTime {
+inline class UtcDateTime(val unixMillis: Long) : DateTime {
+    val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
+
     companion object {
+        internal const val EPOCH_INTERNAL_MILLIS = 62135596800000L // Millis since 00-00-0000 00:00 UTC to UNIX EPOCH
+
         private const val DATE_PART_YEAR = 0
         private const val DATE_PART_DAY_OF_YEAR = 1
         private const val DATE_PART_MONTH = 2
         private const val DATE_PART_DAY = 3
 
+        /**
+         * Returns milliseconds since EPOCH.
+         */
         internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Long {
             val y = year - 1
             Month.daysToStart(month, year)
             val n = y * 365 + y / 4 - y / 100 + y / 400 + Month.daysToStart(month, year) + day - 1
-            return n.toLong() * MILLIS_PER_DAY.toLong()
+            return n.toLong() * MILLIS_PER_DAY.toLong() - EPOCH_INTERNAL_MILLIS
         }
 
         internal fun timeToMillisUnchecked(hour: Int, minute: Int, second: Int): Long {
@@ -44,6 +51,9 @@ inline class UtcDateTime(val internalMillis: Long) : DateTime {
             return timeToMillisUnchecked(hour, minute, second)
         }
 
+        /**
+         * [millis] are 00-00-0000 based.
+         */
         internal fun getDatePart(millis: Long, part: Int): Int {
             var n = (millis / MILLIS_PER_DAY).toInt()
             val y400 = n / DAYS_PER_400_YEARS
@@ -69,7 +79,7 @@ inline class UtcDateTime(val internalMillis: Long) : DateTime {
 
     override val offset: Int get() = 0
     override val utc: UtcDateTime get() = this
-    override val unix: Long get() = (internalMillis - DateTime.EPOCH.internalMillis)
+    override val unix: Long get() = unixMillis
     override val year: Int get() = getDatePart(DATE_PART_YEAR)
     override val month1: Int get() = getDatePart(DATE_PART_MONTH)
     override val dayOfMonth: Int get() = getDatePart(DATE_PART_DAY)
@@ -83,7 +93,7 @@ inline class UtcDateTime(val internalMillis: Long) : DateTime {
 
     override fun add(deltaMonths: Int, deltaMilliseconds: Long): DateTime = when {
         deltaMonths == 0 && deltaMilliseconds == 0L -> this
-        deltaMonths == 0 -> UtcDateTime(this.internalMillis + deltaMilliseconds)
+        deltaMonths == 0 -> UtcDateTime(this.unixMillis + deltaMilliseconds)
         else -> {
             var year = this.year
             var month = this.month.index

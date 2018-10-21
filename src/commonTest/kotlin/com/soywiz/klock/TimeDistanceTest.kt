@@ -4,6 +4,11 @@ import kotlin.test.*
 
 class TimeDistanceTest {
     @Test
+    fun testBasic() {
+        assertEquals("Thu, 13 Dec 2018 00:00:00 UTC", DateTime(2018, 12, 13).toString())
+    }
+
+    @Test
     fun testAddDistance() {
         assertEquals(DateTime(2018, 12, 13), DateTime(2017, 12, 13) + 1.years)
         assertEquals(DateTime(2018, 1, 13), DateTime(2017, 12, 13) + 1.months)
