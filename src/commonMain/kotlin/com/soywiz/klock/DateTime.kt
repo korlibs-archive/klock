@@ -4,7 +4,7 @@ import com.soywiz.klock.internal.*
 
 interface DateTime : Comparable<DateTime> {
     val year: Int
-    val month: Int
+    val month1: Int
     val dayOfWeekInt: Int
     val dayOfMonth: Int
     val dayOfYear: Int
@@ -16,18 +16,24 @@ interface DateTime : Comparable<DateTime> {
     val unix: Long
     val unixDouble: Double get() = unix.toDouble()
     val offset: Int
-    val utc: UtcDateTime
     fun add(deltaMonths: Int, deltaMilliseconds: Long): DateTime
 
     val dayOfWeek: DayOfWeek get() = DayOfWeek[dayOfWeekInt]
-    val month0: Int get() = month - 1
-    val month1: Int get() = month
-    val monthEnum: Month get() = Month[month1]
+    val month0: Int get() = month1 - 1
+    val month: Month get() = Month[month1]
 
+    val utc: UtcDateTime
+    val local get() = OffsetDateTime(this, Klock.getLocalTimezoneOffsetMinutes(unix))
+
+    @Deprecated("", ReplaceWith("utc"))
     fun toUtc(): DateTime = utc
-    fun toLocal() = OffsetDateTime(this, Klock.getLocalTimezoneOffsetMinutes(unix))
+
+    @Deprecated("", ReplaceWith("local"))
+    fun toLocal() = local
+
     fun addOffset(offset: Int) = OffsetDateTime(this, this.offset + offset)
     fun toOffset(offset: Int) = OffsetDateTime(this, offset)
+
     fun addYears(delta: Int): DateTime = add(delta * 12, 0L)
     fun addMonths(delta: Int): DateTime = add(delta, 0L)
     fun addDays(delta: Double): DateTime = add(0, (delta * MILLIS_PER_DAY).toLong())

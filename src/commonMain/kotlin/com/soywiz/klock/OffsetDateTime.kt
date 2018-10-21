@@ -28,8 +28,6 @@ class OffsetDateTime private constructor(
     override fun add(deltaMonths: Int, deltaMilliseconds: Long): DateTime =
         OffsetDateTime(utc.add(deltaMonths, deltaMilliseconds), offset)
 
-    override fun toUtc(): DateTime = utc
-
     override fun hashCode(): Int = adjusted.hashCode()
 
     override fun equals(other: Any?): Boolean {

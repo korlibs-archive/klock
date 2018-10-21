@@ -61,10 +61,10 @@ class SimplerDateFormat(val format: String) {
         for (name2 in parts2) {
             val name = name2.trim('\'')
             out += when (name) {
-                "EEE" -> englishDaysOfWeek[dd.dayOfWeek.index].substr(0, 3).capitalize()
-                "EEEE" -> englishDaysOfWeek[dd.dayOfWeek.index].capitalize()
-                "EEEEE" -> englishDaysOfWeek[dd.dayOfWeek.index].substr(0, 1).capitalize()
-                "EEEEEE" -> englishDaysOfWeek[dd.dayOfWeek.index].substr(0, 2).capitalize()
+                "EEE" -> englishDaysOfWeek[dd.dayOfWeek.index0].substr(0, 3).capitalize()
+                "EEEE" -> englishDaysOfWeek[dd.dayOfWeek.index0].capitalize()
+                "EEEEE" -> englishDaysOfWeek[dd.dayOfWeek.index0].substr(0, 1).capitalize()
+                "EEEEEE" -> englishDaysOfWeek[dd.dayOfWeek.index0].substr(0, 2).capitalize()
                 "z", "zzz" -> dd.timeZone
                 "d" -> dd.dayOfMonth.toString()
                 "dd" -> dd.dayOfMonth.padded(2)

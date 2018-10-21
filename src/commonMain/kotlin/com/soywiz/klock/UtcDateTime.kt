@@ -63,7 +63,7 @@ inline class UtcDateTime(val internalMillis: Long) : DateTime {
     override val utc: UtcDateTime get() = this
     override val unix: Long get() = (internalMillis - DateTime.EPOCH.internalMillis)
     override val year: Int get() = getDatePart(DATE_PART_YEAR)
-    override val month: Int get() = getDatePart(DATE_PART_MONTH)
+    override val month1: Int get() = getDatePart(DATE_PART_MONTH)
     override val dayOfMonth: Int get() = getDatePart(DATE_PART_DAY)
     override val dayOfWeekInt: Int get() = ((internalMillis / MILLIS_PER_DAY + 1) % 7).toInt()
     override val dayOfYear: Int get() = getDatePart(DATE_PART_DAY_OF_YEAR)
@@ -78,7 +78,7 @@ inline class UtcDateTime(val internalMillis: Long) : DateTime {
         deltaMonths == 0 -> UtcDateTime(this.internalMillis + deltaMilliseconds)
         else -> {
             var year = this.year
-            var month = this.month
+            var month = this.month.index
             var day = this.dayOfMonth
             val i = month - 1 + deltaMonths
 
