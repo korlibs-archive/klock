@@ -49,7 +49,7 @@ fun Klock.currentTimeMillis(): Long = currentTimeMillisLong
 @Deprecated("", ReplaceWith("Klock.currentTimeMillisDouble", "com.soywiz.klock.Klock"))
 fun Klock.currentTimeMillisDouble(): Double = currentTimeMillisDouble
 
-@Deprecated("", ReplaceWith("Klock.localTimezoneOffsetMinutes(UtcDateTime(unix)).minutes.toInt()", "com.soywiz.klock.Klock"))
+@Deprecated("", ReplaceWith("Klock.localTimezoneOffsetMinutes(DateTime(unix)).minutes.toInt()", "com.soywiz.klock.Klock"))
 fun Klock.getLocalTimezoneOffsetMinutes(unix: Long): Int = localTimezoneOffsetMinutes(DateTime(unix)).minutes.toInt()
 
 //@Deprecated("", ReplaceWith("PerformanceCounter.microseconds"))

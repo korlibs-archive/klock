@@ -1,3 +1,5 @@
+import kotlin.test.*
+
 class KlockNativeTest {
     @Test
     fun demo() {

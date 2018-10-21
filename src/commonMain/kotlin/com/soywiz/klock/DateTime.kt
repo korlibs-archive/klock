@@ -11,7 +11,8 @@ import com.soywiz.klock.internal.*
  * - Wed May 23 144683 18:29:30 GMT+0200 (Central European Summer Time)
  */
 inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
-    val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
+//data class DateTime(val unixMillis: Double) : Comparable<DateTime> {
+    private val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
 
     companion object {
         val EPOCH = DateTime(0.0)
@@ -40,9 +41,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         fun fromUnix(time: Long): DateTime = fromUnix(time.toDouble())
         fun fromUnixLocal(time: Long): DateTimeWithOffset = fromUnixLocal(time.toDouble())
 
-        fun nowUnix() = Klock.currentTimeMillis()
-        fun now() = fromUnix(nowUnix())
-        fun nowLocal() = fromUnix(nowUnix()).toLocal()
+        fun now(): DateTime = KlockInternal.currentTime
+        fun nowLocal(): DateTimeWithOffset = fromUnix(nowUnix()).local
+
+        fun nowUnix(): Double = now().unixDouble
+        fun nowUnixLong(): Long = now().unixLong
 
         // Can't produce errors on invalid dates and tries to adjust it to a valid date.
         fun createClamped(

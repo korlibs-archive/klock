@@ -5,12 +5,12 @@ import kotlinx.cinterop.*
 import platform.posix.*
 
 internal actual object KlockInternal {
-    actual val currentTime: UtcDateTime get() = memScoped {
+    actual val currentTime: DateTime get() = memScoped {
         val timeVal = alloc<timeval>()
         gettimeofday(timeVal.ptr, null)
         val sec = timeVal.tv_sec
         val usec = timeVal.tv_usec
-        UtcDateTime((sec * 1_000L) + (usec / 1_000L))
+        DateTime((sec * 1_000L) + (usec / 1_000L))
     }
 
     actual val microClock: Double get() = memScoped {
@@ -26,7 +26,7 @@ internal actual object KlockInternal {
     //actual fun currentTimeMillis(): Long = kotlin.system.getTimeMillis()
     //actual fun microClock(): Double = (kotlin.system.getTimeMicros() - microStart).toDouble()
 
-    actual fun localTimezoneOffsetMinutes(time: UtcDateTime): TimeSpan = memScoped {
+    actual fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan = memScoped {
         val t = alloc<time_tVar>()
         val tm = alloc<tm>()
         t.value = (time.unixLong / 1000L).convert()
