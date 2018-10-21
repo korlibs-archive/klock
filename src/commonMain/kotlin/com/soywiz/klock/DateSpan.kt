@@ -4,9 +4,6 @@ inline val Int.years get() = DateSpan(12 * this)
 inline val Int.months get() = DateSpan(this)
 
 inline class DateSpan(val totalMonths: Int) : Comparable<DateSpan> {
-    val years: Int get() = totalMonths / 12
-    val months: Int get() = totalMonths % 12
-
     operator fun unaryMinus() = DateSpan(-totalMonths)
 
     operator fun plus(other: TimeSpan) = DateTimeSpan(this, other)
@@ -23,9 +20,12 @@ inline class DateSpan(val totalMonths: Int) : Comparable<DateSpan> {
     override fun compareTo(other: DateSpan): Int = this.totalMonths.compareTo(other.totalMonths)
 
     override fun toString(): String {
-        return arrayListOf<String>().apply {
-            if (years != 0) add("${years}Y")
-            if (months != 0) add("${months}M")
-        }.joinToString(" ")
+        val list = arrayListOf<String>()
+        if (years != 0) list.add("${years}Y")
+        if (months != 0) list.add("${months}M")
+        return list.joinToString(" ")
     }
 }
+
+val DateSpan.years: Int get() = totalMonths / 12
+val DateSpan.months: Int get() = totalMonths % 12
