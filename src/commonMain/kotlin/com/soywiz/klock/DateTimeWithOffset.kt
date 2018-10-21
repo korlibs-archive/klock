@@ -3,7 +3,7 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
-class DateTimeWithOffset private constructor(
+data class DateTimeWithOffset(
     val base: DateTime,
     val offset: Int
 ) : Comparable<DateTimeWithOffset> {
@@ -14,11 +14,6 @@ class DateTimeWithOffset private constructor(
     val deltaHoursAbs: Int get() = deltaTotalMinutesAbs / 60
     val deltaMinutesAbs: Int get() = deltaTotalMinutesAbs % 60
 
-    companion object {
-        //operator fun invoke(utc: DateTime, offset: Int) = OffsetDateTime(utc.utc, utc.offsetTotalMinutes + offset)
-        operator fun invoke(utc: DateTime, offset: Int) = DateTimeWithOffset(utc.utc, offset)
-    }
-
     val timeZone: String by lazy {
         val sign = if (positive) "+" else "-"
         val hour = deltaHoursAbs.padded(2)
@@ -28,7 +23,7 @@ class DateTimeWithOffset private constructor(
 
     fun add(deltaMonths: Int, deltaMilliseconds: Double): DateTimeWithOffset = DateTimeWithOffset(base.add(deltaMonths, deltaMilliseconds), offset)
     override fun hashCode(): Int = adjusted.hashCode()
-    override fun equals(other: Any?): Boolean = other is DateTime && this.adjusted.unixDouble == other.adjusted.unixDouble
+    override fun equals(other: Any?): Boolean = other is DateTimeWithOffset && this.adjusted.unixDouble == other.adjusted.unixDouble
     override fun compareTo(other: DateTimeWithOffset): Int = this.adjusted.unixMillis.compareTo(other.adjusted.unixMillis)
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
 }

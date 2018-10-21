@@ -73,7 +73,7 @@ inline class TimeSpan(val milliseconds: Double) : Comparable<TimeSpan> {
 
         @PublishedApi
         internal fun toTimeString(totalMilliseconds: Double, components: Int = 3, addMilliseconds: Boolean = false): String {
-            val milliseconds = totalMilliseconds % 1000L
+            val milliseconds = (totalMilliseconds % 1000).toInt()
             val out = toTimeStringRaw(totalMilliseconds, components)
             return if (addMilliseconds) "$out.$milliseconds" else out
         }

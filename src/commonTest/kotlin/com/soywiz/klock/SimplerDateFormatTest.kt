@@ -45,7 +45,7 @@ class SimplerDateFormatTest {
         fun testParseWithOffsetAsUtc() {
             val offsetDateStr = "2016-05-04T19:29:34+05:00"
             val utcDateStr = "2016-05-04T14:29:34+00:00"
-            assertEquals(format.parse(utcDateStr), format.parseUtc(offsetDateStr))
+            assertTrue(format.parse(utcDateStr) == format.parseUtc(offsetDateStr))
         }
 
         @Test
@@ -56,7 +56,10 @@ class SimplerDateFormatTest {
         @Test
         fun testParseFormatOffset() {
             val dateStr = "2016-05-04T19:29:34+05:00"
-            assertEquals(dateStr, format.format(format.parseDate(dateStr)))
+            val date = format.parseDate(dateStr)
+            //println(date.base)
+            //println(date.offset)
+            assertEquals(dateStr, format.format(date))
         }
 
         @Test

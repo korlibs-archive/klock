@@ -60,7 +60,8 @@ class SimplerDateFormat(val format: String) {
     fun format(dd: DateTime): String = format(dd.toOffset(0))
 
     fun format(dd: DateTimeWithOffset): String {
-        val utc = dd.base
+        //val utc = dd.base
+        val utc = dd.adjusted
         var out = ""
         for (name2 in parts2) {
             val name = name2.trim('\'')
@@ -140,7 +141,9 @@ class SimplerDateFormat(val format: String) {
         null
     }
 
-    fun parseDate(str: String): DateTimeWithOffset = tryParseDate(str) ?: throw DateException("Not a valid format: '$str' for '$format'")
+    fun parseDate(str: String): DateTimeWithOffset {
+        return tryParseDate(str) ?: throw DateException("Not a valid format: '$str' for '$format'")
+    }
 
     fun tryParseDate(str: String): DateTimeWithOffset? {
         var millisecond = 0
