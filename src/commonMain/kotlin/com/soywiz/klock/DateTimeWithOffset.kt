@@ -7,7 +7,8 @@ data class DateTimeWithOffset(
     val base: DateTime,
     val offset: Int
 ) : Comparable<DateTimeWithOffset> {
-    val adjusted: DateTime by lazy { (base + offset.minutes) }
+    //val adjusted: DateTime by lazy { (base + offset.minutes) } // @TODO: Kotlin inline bug! (ClassCastException)
+    val adjusted: DateTime get() = (base + offset.minutes)
 
     private val deltaTotalMinutesAbs: Int = abs(offset)
     val positive: Boolean get() = offset >= 0

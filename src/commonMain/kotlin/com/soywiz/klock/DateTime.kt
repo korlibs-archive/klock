@@ -10,8 +10,7 @@ import com.soywiz.klock.internal.*
  * - Thu Aug 10 -140744 07:15:45 GMT-0014 (Central European Summer Time)
  * - Wed May 23 144683 18:29:30 GMT+0200 (Central European Summer Time)
  */
-//inline class DateTime(val unixMillis: Double) : Comparable<DateTime> { // @TODO: Needed to prevent allocations!
-data class DateTime(val unixMillis: Double) : Comparable<DateTime> {
+inline class DateTime(val unixMillis: Double) : Comparable<DateTime> { // @TODO: Needed to prevent allocations!
     private val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
 
     companion object {
