@@ -1,6 +1,5 @@
 package com.soywiz.klock.internal
 
-import com.soywiz.klock.*
 import kotlin.math.*
 
 internal const val MILLIS_PER_MICROSECOND = 1.0 / 1000.0

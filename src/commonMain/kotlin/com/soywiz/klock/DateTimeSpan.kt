@@ -70,15 +70,13 @@ data class DateTimeSpan(
         return this.timeSpan.compareTo(other.timeSpan)
     }
 
-    override fun toString(): String {
-        return arrayListOf<String>().apply {
-            if (years != 0) add("${years}Y")
-            if (months != 0) add("${months}M")
-            if (weeks != 0) add("${weeks}W")
-            if (days != 0) add("${days}D")
-            if (hours != 0) add("${hours}H")
-            if (minutes != 0) add("${minutes}m")
-            if (seconds != 0 || milliseconds != 0.0) add("${seconds + milliseconds / 1000.0}s")
-        }.joinToString(" ")
-    }
+    override fun toString(): String = arrayListOf<String>().apply {
+        if (years != 0) add("${years}Y")
+        if (months != 0) add("${months}M")
+        if (weeks != 0) add("${weeks}W")
+        if (days != 0) add("${days}D")
+        if (hours != 0) add("${hours}H")
+        if (minutes != 0) add("${minutes}m")
+        if (seconds != 0 || milliseconds != 0.0) add("${seconds + milliseconds / 1000.0}s")
+    }.joinToString(" ")
 }
