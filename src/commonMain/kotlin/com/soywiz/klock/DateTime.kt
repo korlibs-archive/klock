@@ -41,11 +41,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         fun fromUnix(time: Long): DateTime = fromUnix(time.toDouble())
         fun fromUnixLocal(time: Long): DateTimeWithOffset = fromUnixLocal(time.toDouble())
 
-        fun now(): DateTime = KlockInternal.currentTime
+        fun now(): DateTime = DateTime(KlockInternal.currentTime)
         fun nowLocal(): DateTimeWithOffset = fromUnix(nowUnix()).local
 
-        fun nowUnix(): Double = now().unixDouble
-        fun nowUnixLong(): Long = now().unixLong
+        fun nowUnix(): Double = KlockInternal.currentTime
+        fun nowUnixLong(): Long = KlockInternal.currentTime.toLong()
 
         // Can't produce errors on invalid dates and tries to adjust it to a valid date.
         fun createClamped(
@@ -258,7 +258,5 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
     }
 
     override fun compareTo(other: DateTime): Int = this.adjusted.unixMillis.compareTo(other.adjusted.unixMillis)
-    //override fun hashCode(): Int = internalMillis.hashCode()
-    //override fun equals(other: Any?): Boolean = this.unix == (other as? DateTime?)?.unix
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
 }

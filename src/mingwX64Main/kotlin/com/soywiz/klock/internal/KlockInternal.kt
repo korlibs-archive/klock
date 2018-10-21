@@ -5,13 +5,13 @@ import kotlinx.cinterop.*
 import platform.posix.*
 
 internal actual object KlockInternal {
-    actual val currentTime: DateTime
+    actual val currentTime: Double
         get() = memScoped {
             val timeVal = alloc<timeval>()
             mingw_gettimeofday(timeVal.ptr, null) // mingw: doesn't expose gettimeofday, but mingw_gettimeofday
             val sec = timeVal.tv_sec
             val usec = timeVal.tv_usec
-            DateTime((sec * 1_000L) + (usec / 1_000L))
+            ((sec * 1_000L) + (usec / 1_000L)).toDouble()
         }
 
     actual val microClock: Double

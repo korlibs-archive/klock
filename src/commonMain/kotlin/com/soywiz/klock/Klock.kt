@@ -12,7 +12,7 @@ object Klock
  *
  * Note that since [DateTime] is inline, this property doesn't allocate on JavaScript.
  */
-val Klock.currentTime: DateTime get() = KlockInternal.currentTime
+val Klock.currentTime: DateTime get() = DateTime(KlockInternal.currentTime)
 
 /**
  * Returns a performance counter measure in microseconds.
@@ -41,13 +41,13 @@ val Klock.currentTimeMillisDouble get() = currentTime.unixDouble
 val Klock.currentTimeMillisLong get() = currentTime.unixLong
 
 @Deprecated("", ReplaceWith("Klock.microClock", "com.soywiz.klock.Klock"))
-fun Klock.microClock(): Double = microClock
+fun Klock.microClock(): Double = KlockInternal.microClock
 
 @Deprecated("", ReplaceWith("Klock.currentTimeMillis", "com.soywiz.klock.Klock"))
-fun Klock.currentTimeMillis(): Long = currentTimeMillisLong
+fun Klock.currentTimeMillis(): Long = KlockInternal.currentTime.toLong()
 
 @Deprecated("", ReplaceWith("Klock.currentTimeMillisDouble", "com.soywiz.klock.Klock"))
-fun Klock.currentTimeMillisDouble(): Double = currentTimeMillisDouble
+fun Klock.currentTimeMillisDouble(): Double = KlockInternal.currentTime
 
 @Deprecated("", ReplaceWith("Klock.localTimezoneOffsetMinutes(DateTime(unix)).minutes.toInt()", "com.soywiz.klock.Klock"))
 fun Klock.getLocalTimezoneOffsetMinutes(unix: Long): Int = localTimezoneOffsetMinutes(DateTime(unix)).minutes.toInt()
