@@ -25,7 +25,7 @@ val Klock.microClock: Double get() = KlockInternal.microClock
  *
  * For example, GMT+01 would return 60.minutes.
  */
-fun Klock.localTimezoneOffsetMinutes(time: DateTime): TimeSpan = KlockInternal.localTimezoneOffsetMinutes(time)
+fun Klock.localTimezoneOffset(time: DateTime): TimeSpan = KlockInternal.localTimezoneOffsetMinutes(time)
 
 /**
  * Returns the total milliseconds since unix epoch.
@@ -50,7 +50,7 @@ fun Klock.currentTimeMillis(): Long = KlockInternal.currentTime.toLong()
 fun Klock.currentTimeMillisDouble(): Double = KlockInternal.currentTime
 
 @Deprecated("", ReplaceWith("Klock.localTimezoneOffsetMinutes(DateTime(unix)).minutes.toInt()", "com.soywiz.klock.Klock"))
-fun Klock.getLocalTimezoneOffsetMinutes(unix: Long): Int = localTimezoneOffsetMinutes(DateTime(unix)).minutes.toInt()
+fun Klock.getLocalTimezoneOffsetMinutes(unix: Long): Int = localTimezoneOffset(DateTime(unix)).minutes.toInt()
 
 //@Deprecated("", ReplaceWith("PerformanceCounter.microseconds"))
 //val Klock.microClock: Double get() = PerformanceCounter.microseconds

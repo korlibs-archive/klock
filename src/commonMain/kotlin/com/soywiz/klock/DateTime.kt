@@ -209,7 +209,7 @@ data class DateTime(val unixMillis: Double) : Comparable<DateTime> {
     val dayOfWeek: DayOfWeek get() = DayOfWeek[dayOfWeekInt]
     val month0: Int get() = month1 - 1
     val month: Month get() = Month[month1]
-    val local get() = DateTimeWithOffset(this, Klock.localTimezoneOffsetMinutes(DateTime(unixDouble)).minutes.toInt())
+    val local get() = DateTimeWithOffset(this, Klock.localTimezoneOffset(DateTime(unixDouble)).minutes.toInt())
 
     @Deprecated("", ReplaceWith("utc"))
     fun toUtc(): DateTime = utc
