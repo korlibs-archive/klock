@@ -55,7 +55,7 @@ data class TimeDistance(
     val years: Int get() = totalMonths / 12
     val months: Int get() = totalMonths % 12
 
-    val totalMilliseconds: Long get() = totalTime.millisecondsLong
+    val totalMilliseconds: Double get() = totalTime.milliseconds
 
     val weeks: Int get() = computed.weeks
     val days: Int get() = computed.days

@@ -5,7 +5,7 @@ import kotlin.math.*
 
 class SimplerDateFormat(val format: String) {
     companion object {
-        private val rx = Regex("""('[\w]+'|[\w]+\B[^Xx]|[Xx]{1,3}|[\w]+)""")
+        private val rx by lazy { Regex("""('[\w]+'|[\w]+\B[^Xx]|[Xx]{1,3}|[\w]+)""") }
         private val englishDaysOfWeek = listOf(
             "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
         )

@@ -10,10 +10,10 @@ import com.soywiz.klock.internal.*
  * - Thu Aug 10 -140744 07:15:45 GMT-0014 (Central European Summer Time)
  * - Wed May 23 144683 18:29:30 GMT+0200 (Central European Summer Time)
  */
-inline class UtcDateTime(val unixMillis: Double) : DateTime, Comparable<UtcDateTime> {
+inline class UtcDateTime(val unixMillis: Double) : DateTime, Comparable<DateTime> {
     val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
 
-    companion object {
+    companion object : _InternalDateTimeCompanion() {
         internal const val EPOCH_INTERNAL_MILLIS = 62135596800000.0 // Millis since 00-00-0000 00:00 UTC to UNIX EPOCH
 
         private const val DATE_PART_YEAR = 0
@@ -78,6 +78,7 @@ inline class UtcDateTime(val unixMillis: Double) : DateTime, Comparable<UtcDateT
 
     override val offset: Int get() = 0
     override val utc: UtcDateTime get() = this
+    override val adjusted: UtcDateTime get() = this
     override val unixDouble: Double get() = unixMillis
     override val year: Int get() = getDatePart(DATE_PART_YEAR)
     override val month1: Int get() = getDatePart(DATE_PART_MONTH)
@@ -90,8 +91,8 @@ inline class UtcDateTime(val unixMillis: Double) : DateTime, Comparable<UtcDateT
     override val milliseconds: Int get() = ((internalMillis) % 1000).toInt()
     override val timeZone: String get() = "UTC"
 
-    override fun add(deltaMonths: Int, deltaMilliseconds: Long): DateTime = when {
-        deltaMonths == 0 && deltaMilliseconds == 0L -> this
+    override fun add(deltaMonths: Int, deltaMilliseconds: Double): DateTime = when {
+        deltaMonths == 0 && deltaMilliseconds == 0.0 -> this
         deltaMonths == 0 -> UtcDateTime(this.unixMillis + deltaMilliseconds)
         else -> {
             var year = this.year
@@ -114,7 +115,7 @@ inline class UtcDateTime(val unixMillis: Double) : DateTime, Comparable<UtcDateT
         }
     }
 
-    override operator fun compareTo(other: UtcDateTime): Int = this.unixDouble.compareTo(other.unixDouble)
+    override fun compareTo(other: DateTime): Int = this.adjusted.unixMillis.compareTo(other.adjusted.unixMillis)
     //override fun hashCode(): Int = internalMillis.hashCode()
     //override fun equals(other: Any?): Boolean = this.unix == (other as? DateTime?)?.unix
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)

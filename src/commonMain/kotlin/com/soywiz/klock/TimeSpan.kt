@@ -13,14 +13,13 @@ inline val Number.days get() = TimeSpan.fromDays(this.toDouble())
 inline val Number.weeks get() = TimeSpan.fromWeeks(this.toDouble())
 
 @Suppress("DataClassPrivateConstructor")
-inline class TimeSpan(private val ms: Double) : Comparable<TimeSpan> {
-    val nanoseconds: Double get() = this.ms * 1_000_000.0
-    val microseconds: Double get() = this.ms * 1_000.0
-    val milliseconds: Double get() = this.ms
-    val millisecondsLong: Long get() = this.ms.toLong()
-    val millisecondsInt: Int get() = this.ms.toInt()
-    val seconds: Double get() = this.ms / 1000.0
-    val minutes: Double get() = this.ms / 60_000.0
+inline class TimeSpan(val milliseconds: Double) : Comparable<TimeSpan> {
+    val nanoseconds: Double get() = this.milliseconds * 1_000_000.0
+    val microseconds: Double get() = this.milliseconds * 1_000.0
+    val millisecondsLong: Long get() = this.milliseconds.toLong()
+    val millisecondsInt: Int get() = this.milliseconds.toInt()
+    val seconds: Double get() = this.milliseconds / 1000.0
+    val minutes: Double get() = this.milliseconds / 60_000.0
 
     companion object {
         /**
@@ -51,7 +50,7 @@ inline class TimeSpan(private val ms: Double) : Comparable<TimeSpan> {
 
         private val timeSteps = listOf(60, 60, 24)
         private fun toTimeStringRaw(totalMilliseconds: Double, components: Int = 3): String {
-            var timeUnit = (totalMilliseconds / 1000.0).roundToInt()
+            var timeUnit = floor(totalMilliseconds / 1000.0).toInt()
 
             val out = arrayListOf<String>()
 
@@ -69,9 +68,8 @@ inline class TimeSpan(private val ms: Double) : Comparable<TimeSpan> {
             return out.reversed().joinToString(":")
         }
 
-        inline fun toTimeString(totalMilliseconds: Number, components: Int = 3, addMilliseconds: Boolean = false): String {
-            return toTimeString(totalMilliseconds.toDouble(), components, addMilliseconds)
-        }
+        inline fun toTimeString(totalMilliseconds: Number, components: Int = 3, addMilliseconds: Boolean = false): String =
+            toTimeString(totalMilliseconds.toDouble(), components, addMilliseconds)
 
         @PublishedApi
         internal fun toTimeString(totalMilliseconds: Double, components: Int = 3, addMilliseconds: Boolean = false): String {
@@ -81,13 +79,13 @@ inline class TimeSpan(private val ms: Double) : Comparable<TimeSpan> {
         }
     }
 
-    override fun compareTo(other: TimeSpan): Int = this.ms.compareTo(other.ms)
+    override fun compareTo(other: TimeSpan): Int = this.milliseconds.compareTo(other.milliseconds)
 
-    operator fun unaryMinus() = TimeSpan(-this.ms)
-    operator fun plus(other: TimeSpan): TimeSpan = TimeSpan(this.ms + other.ms)
-    operator fun minus(other: TimeSpan): TimeSpan = TimeSpan(this.ms - other.ms)
-    operator fun times(scale: Int): TimeSpan = TimeSpan(this.ms * scale)
-    operator fun times(scale: Double): TimeSpan = TimeSpan((this.ms * scale))
+    operator fun unaryMinus() = TimeSpan(-this.milliseconds)
+    operator fun plus(other: TimeSpan): TimeSpan = TimeSpan(this.milliseconds + other.milliseconds)
+    operator fun minus(other: TimeSpan): TimeSpan = TimeSpan(this.milliseconds - other.milliseconds)
+    operator fun times(scale: Int): TimeSpan = TimeSpan(this.milliseconds * scale)
+    operator fun times(scale: Double): TimeSpan = TimeSpan((this.milliseconds * scale))
 }
 
 fun TimeSpan.toTimeString(components: Int = 3, addMilliseconds: Boolean = false): String =

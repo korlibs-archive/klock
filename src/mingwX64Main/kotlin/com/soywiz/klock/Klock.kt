@@ -4,15 +4,15 @@ import kotlinx.cinterop.*
 import platform.posix.*
 
 actual object Klock {
-    actual fun currentTimeMillis(): Long = memScoped {
+    actual val currentTime: UtcDateTime get() = memScoped {
         val timeVal = alloc<timeval>()
         mingw_gettimeofday(timeVal.ptr, null) // mingw: doesn't expose gettimeofday, but mingw_gettimeofday
         val sec = timeVal.tv_sec
         val usec = timeVal.tv_usec
-        (sec * 1_000L) + (usec / 1_000L)
+        UtcDateTime((sec * 1_000L) + (usec / 1_000L))
     }
 
-    actual fun microClock(): Double = memScoped {
+    actual val microClock: Double get() = memScoped {
         val timeVal = alloc<timeval>()
         mingw_gettimeofday(timeVal.ptr, null)
         val sec = timeVal.tv_sec
@@ -20,7 +20,5 @@ actual object Klock {
         ((sec * 1_000_000L) + usec).toDouble()
     }
 
-    actual fun currentTimeMillisDouble(): Double = currentTimeMillis().toDouble()
-
-    actual fun getLocalTimezoneOffsetMinutes(unix: Long): Int = 0
+    actual fun localTimezoneOffsetMinutes(time: UtcDateTime): TimeSpan = 0.milliseconds
 }

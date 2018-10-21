@@ -1,5 +1,6 @@
 package com.soywiz.klock.internal
 
+import com.soywiz.klock.*
 import kotlin.math.*
 
 internal const val MILLIS_PER_MICROSECOND = 1.0 / 1000.0
@@ -66,3 +67,116 @@ internal class Moduler(var value: Double) {
 }
 
 internal infix fun Double.intDiv(other: Double) = floor(this / other)
+
+open class _InternalDateTimeCompanion {
+    val EPOCH = UtcDateTime(0.0)
+
+    // Can produce errors on invalid dates
+    operator fun invoke(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int = 0,
+        minute: Int = 0,
+        second: Int = 0,
+        milliseconds: Int = 0
+    ): DateTime = UtcDateTime(
+        UtcDateTime.dateToMillis(year, month, day) + UtcDateTime.timeToMillis(hour, minute, second) + milliseconds
+    )
+
+    operator fun invoke(time: Long) = fromUnix(time)
+
+    fun fromString(str: String) = SimplerDateFormat.parse(str)
+    fun parse(str: String) = SimplerDateFormat.parse(str)
+
+    fun fromUnix(time: Double): UtcDateTime = UtcDateTime(time)
+    fun fromUnixLocal(time: Double): OffsetDateTime = UtcDateTime(time).local
+
+    fun fromUnix(time: Long): UtcDateTime = fromUnix(time.toDouble())
+    fun fromUnixLocal(time: Long): OffsetDateTime = fromUnixLocal(time.toDouble())
+
+    fun nowUnix() = Klock.currentTimeMillis()
+    fun now() = fromUnix(nowUnix())
+    fun nowLocal() = fromUnix(nowUnix()).toLocal()
+
+    // Can't produce errors on invalid dates and tries to adjust it to a valid date.
+    fun createClamped(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int = 0,
+        minute: Int = 0,
+        second: Int = 0,
+        milliseconds: Int = 0
+    ): DateTime {
+        val clampedMonth = month.clamp(1, 12)
+        return createUnchecked(
+            year = year,
+            month = clampedMonth,
+            day = day.clamp(1, daysInMonth(clampedMonth, year)),
+            hour = hour.clamp(0, 23),
+            minute = minute.clamp(0, 59),
+            second = second.clamp(0, 59),
+            milliseconds = milliseconds
+        )
+    }
+
+    // Can't produce errors on invalid dates and tries to adjust it to a valid date.
+    fun createAdjusted(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int = 0,
+        minute: Int = 0,
+        second: Int = 0,
+        milliseconds: Int = 0
+    ): DateTime {
+        var dy = year
+        var dm = month
+        var dd = day
+        var th = hour
+        var tm = minute
+        var ts = second
+
+        tm += ts.cycleSteps(0, 59); ts = ts.cycle(0, 59) // Adjust seconds, adding minutes
+        th += tm.cycleSteps(0, 59); tm = tm.cycle(0, 59) // Adjust minutes, adding hours
+        dd += th.cycleSteps(0, 23); th = th.cycle(0, 23) // Adjust hours, adding days
+
+        while (true) {
+            val dup = daysInMonth(dm, dy)
+
+            dm += dd.cycleSteps(1, dup); dd = dd.cycle(1, dup) // Adjust days, adding months
+            dy += dm.cycleSteps(1, 12); dm = dm.cycle(1, 12) // Adjust months, adding years
+
+            // We already have found a day that is valid for the adjusted month!
+            if (dd.cycle(1, daysInMonth(dm, dy)) == dd) {
+                break
+            }
+        }
+
+        return createUnchecked(dy, dm, dd, th, tm, ts, milliseconds)
+    }
+
+    // Can't produce errors on invalid dates
+    fun createUnchecked(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int = 0,
+        minute: Int = 0,
+        second: Int = 0,
+        milliseconds: Int = 0
+    ): DateTime {
+        return UtcDateTime(
+            UtcDateTime.dateToMillisUnchecked(year, month, day) + UtcDateTime.timeToMillisUnchecked(
+                hour,
+                minute,
+                second
+            ) + milliseconds
+        )
+    }
+
+    fun isLeapYear(year: Int): Boolean = Year.isLeap(year)
+    fun daysInMonth(month: Int, isLeap: Boolean): Int = Month.days(month, isLeap)
+    fun daysInMonth(month: Int, year: Int): Int = daysInMonth(month, isLeapYear(year))
+}

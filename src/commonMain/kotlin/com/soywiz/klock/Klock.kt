@@ -5,39 +5,46 @@ package com.soywiz.klock
  */
 expect object Klock {
     /**
-     * Returns the total milliseconds since unix epoch.
-     */
-    fun currentTimeMillis(): Long
-
-    /**
-     * Returns the total milliseconds since unix epoch.
+     * Returns the current time as [UtcDateTime].
      *
-     * The same as `currentTimeMillis` but as double. To prevent allocation on
-     * targets without Long support.
+     * Note that since [UtcDateTime] is inline, this property doesn't allocate on JavaScript.
      */
-    fun currentTimeMillisDouble(): Double
+    val currentTime: UtcDateTime
 
     /**
      * Returns a performance counter measure in microseconds.
      */
-    fun microClock(): Double
+    val microClock: Double
 
     /**
-     * Returns timezone offset in minutes, for a specified [unix] epoch in milliseconds.
+     * Returns timezone offset as a [TimeSpan], for a specified [time].
      *
-     * For example, GMT+01 would return 60.
+     * For example, GMT+01 would return 60.minutes.
      */
-    fun getLocalTimezoneOffsetMinutes(unix: Long): Int
+    fun localTimezoneOffsetMinutes(time: UtcDateTime): TimeSpan
 }
 
 /**
- * Returns the current time as an [UtcDateTime].
+ * Returns the total milliseconds since unix epoch.
+ *
+ * The same as [currentTimeMillisLong] but as double. To prevent allocation on
+ * targets without Long support.
  */
-val Klock.currentTime: UtcDateTime get() = UtcDateTime(currentTimeMillisDouble())
+val Klock.currentTimeMillisDouble get() = currentTime.unixDouble
 
 /**
- * Returns timezone offset as a [TimeSpan], for a specified [time].
- *
- * For example, GMT+01 would return 60.minutes.
+ * Returns the total milliseconds since unix epoch.
  */
-fun Klock.getLocalTimezoneOffset(time: UtcDateTime): TimeSpan = getLocalTimezoneOffsetMinutes(time.unixLong).minutes
+val Klock.currentTimeMillisLong get() = currentTime.unixLong
+
+@Deprecated("", ReplaceWith("Klock.microClock", "com.soywiz.klock.Klock"))
+fun Klock.microClock(): Double = microClock
+
+@Deprecated("", ReplaceWith("Klock.currentTimeMillis", "com.soywiz.klock.Klock"))
+fun Klock.currentTimeMillis(): Long = currentTimeMillisLong
+
+@Deprecated("", ReplaceWith("Klock.currentTimeMillisDouble", "com.soywiz.klock.Klock"))
+fun Klock.currentTimeMillisDouble(): Double = currentTimeMillisDouble
+
+@Deprecated("", ReplaceWith("Klock.localTimezoneOffsetMinutes(UtcDateTime(unix)).minutes.toInt()", "com.soywiz.klock.Klock"))
+fun Klock.getLocalTimezoneOffsetMinutes(unix: Long): Int = localTimezoneOffsetMinutes(UtcDateTime(unix)).minutes.toInt()

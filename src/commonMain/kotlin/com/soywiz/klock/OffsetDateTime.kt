@@ -6,8 +6,8 @@ import kotlin.math.*
 class OffsetDateTime private constructor(
     override val utc: UtcDateTime,
     override val offset: Int,
-    val adjusted: UtcDateTime = utc.addMinutes(offset.toDouble()) as UtcDateTime
-) : DateTime by adjusted, Comparable<OffsetDateTime> {
+    override val adjusted: UtcDateTime = utc.addMinutes(offset.toDouble()) as UtcDateTime
+) : DateTime by adjusted, Comparable<DateTime> {
     private val deltaTotalMinutesAbs: Int = abs(offset)
     val positive: Boolean get() = offset >= 0
     val deltaHoursAbs: Int get() = deltaTotalMinutesAbs / 60
@@ -25,19 +25,9 @@ class OffsetDateTime private constructor(
         "GMT$sign$hour$minute"
     }
 
-    override fun add(deltaMonths: Int, deltaMilliseconds: Long): DateTime =
-        OffsetDateTime(utc.add(deltaMonths, deltaMilliseconds), offset)
-
+    override fun add(deltaMonths: Int, deltaMilliseconds: Double): DateTime = OffsetDateTime(utc.add(deltaMonths, deltaMilliseconds), offset)
     override fun hashCode(): Int = adjusted.hashCode()
-
-    override fun equals(other: Any?): Boolean {
-        if (other !is DateTime) return false
-        val thisMs = this.utc.unixDouble + (this.offset * 1000 * 60)
-        val thatMs = other.utc.unixDouble + (other.offset * 1000 * 60)
-        return thisMs == thatMs
-    }
-
-    override fun compareTo(other: OffsetDateTime): Int = this.adjusted.compareTo(other.adjusted)
-
+    override fun equals(other: Any?): Boolean = other is DateTime && this.adjusted.unixDouble == other.adjusted.unixDouble
+    override fun compareTo(other: DateTime): Int = this.adjusted.unixMillis.compareTo(other.adjusted.unixMillis)
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
 }

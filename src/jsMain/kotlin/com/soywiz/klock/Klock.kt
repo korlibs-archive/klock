@@ -4,14 +4,13 @@ import kotlin.browser.*
 import kotlin.math.*
 
 actual object Klock {
-    actual fun currentTimeMillis(): Long = js("Date.now()").unsafeCast<Double>().toLong()
-    actual fun currentTimeMillisDouble(): Double = js("Date.now()").unsafeCast<Double>()
+    actual val currentTime: UtcDateTime get() = UtcDateTime(js("Date.now()").unsafeCast<Double>())
 
-    actual fun getLocalTimezoneOffsetMinutes(unix: Long): Int {
+    actual val microClock: Double get() = floor(window.performance.now() * 1000)
+
+    actual fun localTimezoneOffsetMinutes(time: UtcDateTime): TimeSpan {
         @Suppress("UNUSED_VARIABLE")
-        val rtime = unix.toDouble()
-        return js("-(new Date(rtime)).getTimezoneOffset()").unsafeCast<Int>()
+        val rtime = time.unixDouble
+        return js("-(new Date(rtime)).getTimezoneOffset()").unsafeCast<Int>().minutes
     }
-
-    actual fun microClock(): Double = floor(window.performance.now() * 1000)
 }

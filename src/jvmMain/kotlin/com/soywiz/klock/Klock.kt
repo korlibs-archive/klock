@@ -3,8 +3,7 @@ package com.soywiz.klock
 import java.util.*
 
 actual object Klock {
-    actual fun currentTimeMillis(): Long = System.currentTimeMillis()
-    actual fun currentTimeMillisDouble(): Double = System.currentTimeMillis().toDouble()
-    actual fun microClock(): Double = (System.nanoTime() / 1000L).toDouble()
-    actual fun getLocalTimezoneOffsetMinutes(unix: Long): Int = TimeZone.getDefault().getOffset(unix) / 1000 / 60
+    actual val currentTime: UtcDateTime get() = UtcDateTime(System.currentTimeMillis())
+    actual val microClock: Double get() = (System.nanoTime() / 1000L).toDouble()
+    actual fun localTimezoneOffsetMinutes(time: UtcDateTime): TimeSpan = TimeZone.getDefault().getOffset(time.unixLong).milliseconds
 }
