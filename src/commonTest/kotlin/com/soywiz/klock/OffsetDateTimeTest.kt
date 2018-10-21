@@ -14,6 +14,6 @@ class OffsetDateTimeTest {
         assertTrue(date1.toOffset(0) < date1.toOffset(+60))
         assertTrue(date1.toOffset(0) == date1.toOffset(+0))
         assertTrue(date1.toOffset(+60) > date1.toOffset(+0))
-        assertTrue(date1.toOffset(+60) > date1)
+        assertTrue(date1.toOffset(+60) > date1.toOffset(0))
     }
 }

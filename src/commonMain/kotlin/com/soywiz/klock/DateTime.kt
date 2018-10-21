@@ -2,7 +2,7 @@ package com.soywiz.klock
 
 import com.soywiz.klock.internal.*
 
-interface DateTime : Comparable<DateTime> {
+interface DateTime {
     val year: Int
     val month1: Int
     val dayOfWeekInt: Int

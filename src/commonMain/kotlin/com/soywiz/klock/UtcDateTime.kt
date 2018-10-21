@@ -10,7 +10,7 @@ import com.soywiz.klock.internal.*
  * - Thu Aug 10 -140744 07:15:45 GMT-0014 (Central European Summer Time)
  * - Wed May 23 144683 18:29:30 GMT+0200 (Central European Summer Time)
  */
-inline class UtcDateTime(val unixMillis: Double) : DateTime {
+inline class UtcDateTime(val unixMillis: Double) : DateTime, Comparable<UtcDateTime> {
     val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
 
     companion object {
@@ -114,7 +114,7 @@ inline class UtcDateTime(val unixMillis: Double) : DateTime {
         }
     }
 
-    override operator fun compareTo(other: DateTime): Int = this.unixDouble.compareTo(other.unixDouble)
+    override operator fun compareTo(other: UtcDateTime): Int = this.unixDouble.compareTo(other.unixDouble)
     //override fun hashCode(): Int = internalMillis.hashCode()
     //override fun equals(other: Any?): Boolean = this.unix == (other as? DateTime?)?.unix
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
