@@ -8,11 +8,11 @@ import com.soywiz.klock.internal.*
 object Klock
 
 /**
- * Returns the current time as [UtcDateTime].
+ * Returns the current time as [DateTime].
  *
- * Note that since [UtcDateTime] is inline, this property doesn't allocate on JavaScript.
+ * Note that since [DateTime] is inline, this property doesn't allocate on JavaScript.
  */
-val Klock.currentTime: UtcDateTime get() = KlockInternal.currentTime
+val Klock.currentTime: DateTime get() = KlockInternal.currentTime
 
 /**
  * Returns a performance counter measure in microseconds.
@@ -25,7 +25,7 @@ val Klock.microClock: Double get() = PerformanceCounter.microseconds
  *
  * For example, GMT+01 would return 60.minutes.
  */
-fun Klock.localTimezoneOffsetMinutes(time: UtcDateTime): TimeSpan = KlockInternal.localTimezoneOffsetMinutes(time)
+fun Klock.localTimezoneOffsetMinutes(time: DateTime): TimeSpan = KlockInternal.localTimezoneOffsetMinutes(time)
 
 /**
  * Returns the total milliseconds since unix epoch.
@@ -50,7 +50,7 @@ fun Klock.currentTimeMillis(): Long = currentTimeMillisLong
 fun Klock.currentTimeMillisDouble(): Double = currentTimeMillisDouble
 
 @Deprecated("", ReplaceWith("Klock.localTimezoneOffsetMinutes(UtcDateTime(unix)).minutes.toInt()", "com.soywiz.klock.Klock"))
-fun Klock.getLocalTimezoneOffsetMinutes(unix: Long): Int = localTimezoneOffsetMinutes(UtcDateTime(unix)).minutes.toInt()
+fun Klock.getLocalTimezoneOffsetMinutes(unix: Long): Int = localTimezoneOffsetMinutes(DateTime(unix)).minutes.toInt()
 
 //@Deprecated("", ReplaceWith("PerformanceCounter.microseconds"))
 //val Klock.microClock: Double get() = PerformanceCounter.microseconds

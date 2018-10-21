@@ -20,7 +20,7 @@ class SimplerDateFormat(val format: String) {
 
         val FORMATS = listOf(DEFAULT_FORMAT, FORMAT1)
 
-        fun parse(str: String): DateTime {
+        fun parse(str: String): DateTimeWithOffset {
             var lastError: Throwable? = null
             for (format in FORMATS) {
                 try {
@@ -57,39 +57,42 @@ class SimplerDateFormat(val format: String) {
     fun format(date: Double): String = format(DateTime.fromUnix(date))
     fun format(date: Long): String = format(DateTime.fromUnix(date))
 
-    fun format(dd: DateTime): String {
+    fun format(dd: DateTime): String = format(dd.toOffset(0))
+
+    fun format(dd: DateTimeWithOffset): String {
+        val utc = dd.base
         var out = ""
         for (name2 in parts2) {
             val name = name2.trim('\'')
             out += when (name) {
-                "EEE" -> englishDaysOfWeek[dd.dayOfWeek.index0].substr(0, 3).capitalize()
-                "EEEE" -> englishDaysOfWeek[dd.dayOfWeek.index0].capitalize()
-                "EEEEE" -> englishDaysOfWeek[dd.dayOfWeek.index0].substr(0, 1).capitalize()
-                "EEEEEE" -> englishDaysOfWeek[dd.dayOfWeek.index0].substr(0, 2).capitalize()
+                "EEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].substr(0, 3).capitalize()
+                "EEEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].capitalize()
+                "EEEEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].substr(0, 1).capitalize()
+                "EEEEEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].substr(0, 2).capitalize()
                 "z", "zzz" -> dd.timeZone
-                "d" -> dd.dayOfMonth.toString()
-                "dd" -> dd.dayOfMonth.padded(2)
-                "M" -> dd.month1.padded(1)
-                "MM" -> dd.month1.padded(2)
-                "MMM" -> englishMonths[dd.month0].substr(0, 3).capitalize()
-                "MMMM" -> englishMonths[dd.month0].capitalize()
-                "MMMMM" -> englishMonths[dd.month0].substr(0, 1).capitalize()
-                "y" -> dd.year
-                "yy" -> (dd.year % 100).padded(2)
-                "yyy" -> (dd.year % 1000).padded(3)
-                "yyyy" -> dd.year.padded(4)
-                "YYYY" -> dd.year.padded(4)
-                "H" -> dd.hours.padded(1)
-                "HH" -> dd.hours.padded(2)
-                "h" -> (((12 + dd.hours) % 12)).padded(1)
-                "hh" -> (((12 + dd.hours) % 12)).padded(2)
-                "m" -> dd.minutes.padded(1)
-                "mm" -> dd.minutes.padded(2)
-                "s" -> dd.seconds.padded(1)
-                "ss" -> dd.seconds.padded(2)
+                "d" -> utc.dayOfMonth.toString()
+                "dd" -> utc.dayOfMonth.padded(2)
+                "M" -> utc.month1.padded(1)
+                "MM" -> utc.month1.padded(2)
+                "MMM" -> englishMonths[utc.month0].substr(0, 3).capitalize()
+                "MMMM" -> englishMonths[utc.month0].capitalize()
+                "MMMMM" -> englishMonths[utc.month0].substr(0, 1).capitalize()
+                "y" -> utc.year
+                "yy" -> (utc.year % 100).padded(2)
+                "yyy" -> (utc.year % 1000).padded(3)
+                "yyyy" -> utc.year.padded(4)
+                "YYYY" -> utc.year.padded(4)
+                "H" -> utc.hours.padded(1)
+                "HH" -> utc.hours.padded(2)
+                "h" -> (((12 + utc.hours) % 12)).padded(1)
+                "hh" -> (((12 + utc.hours) % 12)).padded(2)
+                "m" -> utc.minutes.padded(1)
+                "mm" -> utc.minutes.padded(2)
+                "s" -> utc.seconds.padded(1)
+                "ss" -> utc.seconds.padded(2)
                 "S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS" -> {
-                    val milli = dd.milliseconds
-                    val base10length = log10(dd.milliseconds.toDouble()).toInt() + 1
+                    val milli = utc.milliseconds
+                    val base10length = log10(utc.milliseconds.toDouble()).toInt() + 1
                     if (base10length > name.length) {
                         val fractionalPart = (milli.toDouble() * 10.0.pow(-1 * (base10length - name.length))).toInt()
                         fractionalPart
@@ -112,18 +115,18 @@ class SimplerDateFormat(val format: String) {
                         }
                     }
                 }
-                "a" -> if (dd.hours < 12) "am" else "pm"
+                "a" -> if (utc.hours < 12) "am" else "pm"
                 else -> name
             }
         }
         return out
     }
 
-    fun parse(str: String): Double = parseDate(str).unixDouble
-    fun parseUtc(str: String): Double = parseDate(str).utc.unixDouble
+    fun parse(str: String): Double = parseDate(str).adjusted.unixDouble
+    fun parseUtc(str: String): Double = parseDate(str).base.unixDouble
 
-    fun parseLong(str: String): Long = parseDate(str).unixLong
-    fun parseUtcLong(str: String): Long = parseDate(str).utc.unixLong
+    fun parseLong(str: String): Long = parseDate(str).adjusted.unixLong
+    fun parseUtcLong(str: String): Long = parseDate(str).base.unixLong
 
     fun parseOrNull(str: String?): Double? = try {
         str?.let { parse(str) }
@@ -137,9 +140,9 @@ class SimplerDateFormat(val format: String) {
         null
     }
 
-    fun parseDate(str: String): DateTime = tryParseDate(str) ?: throw DateException("Not a valid format: '$str' for '$format'")
+    fun parseDate(str: String): DateTimeWithOffset = tryParseDate(str) ?: throw DateException("Not a valid format: '$str' for '$format'")
 
-    fun tryParseDate(str: String): DateTime? {
+    fun tryParseDate(str: String): DateTimeWithOffset? {
         var millisecond = 0
         var second = 0
         var minute = 0
@@ -203,8 +206,8 @@ class SimplerDateFormat(val format: String) {
         if (is12HourFormat and isPm) hour += 12
         val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second, millisecond)
         return when (offset) {
-            null -> dateTime
-            0 -> dateTime.toUtc()
+            null -> dateTime.toOffset(0)
+            0 -> dateTime.utc.toOffset(0)
             else -> dateTime.minus(offset.minutes).toOffset(offset)
         }
     }

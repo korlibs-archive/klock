@@ -2,7 +2,7 @@ package com.soywiz.klock
 
 import kotlin.test.*
 
-class OffsetDateTimeTest {
+class DateTimeTestWithOffset {
     val date1 = (DateTime(2018, 3, 2, 1) + 100.seconds)
     val date2 = (DateTime(2018, 3, 2, 1) + 100.seconds + 60.minutes)
 
@@ -14,11 +14,6 @@ class OffsetDateTimeTest {
     @Test
     fun test2() {
         assertEquals(date1.toOffset(+60), date2.toOffset(+0))
-    }
-
-    @Test
-    fun test3() {
-        assertTrue(date1.toOffset(+60) == date2)
     }
 
     @Test

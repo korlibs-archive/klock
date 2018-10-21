@@ -3,11 +3,12 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
-class OffsetDateTime private constructor(
-    override val utc: UtcDateTime,
-    override val offset: Int,
-    override val adjusted: UtcDateTime
-) : DateTime by adjusted, Comparable<DateTime> {
+class DateTimeWithOffset private constructor(
+    val base: DateTime,
+    val offset: Int
+) : Comparable<DateTimeWithOffset> {
+    val adjusted: DateTime by lazy { (base + offset.minutes) }
+
     private val deltaTotalMinutesAbs: Int = abs(offset)
     val positive: Boolean get() = offset >= 0
     val deltaHoursAbs: Int get() = deltaTotalMinutesAbs / 60
@@ -15,19 +16,19 @@ class OffsetDateTime private constructor(
 
     companion object {
         //operator fun invoke(utc: DateTime, offset: Int) = OffsetDateTime(utc.utc, utc.offsetTotalMinutes + offset)
-        operator fun invoke(utc: DateTime, offset: Int) = OffsetDateTime(utc.utc, offset, (utc + offset.minutes).utc)
+        operator fun invoke(utc: DateTime, offset: Int) = DateTimeWithOffset(utc.utc, offset)
     }
 
-    override val timeZone: String = run {
+    val timeZone: String by lazy {
         val sign = if (positive) "+" else "-"
         val hour = deltaHoursAbs.padded(2)
         val minute = deltaMinutesAbs.padded(2)
-        "GMT$sign$hour$minute"
+        if (offset == 0) "UTC" else "GMT$sign$hour$minute"
     }
 
-    override fun add(deltaMonths: Int, deltaMilliseconds: Double): DateTime = OffsetDateTime(utc.add(deltaMonths, deltaMilliseconds), offset)
+    fun add(deltaMonths: Int, deltaMilliseconds: Double): DateTimeWithOffset = DateTimeWithOffset(base.add(deltaMonths, deltaMilliseconds), offset)
     override fun hashCode(): Int = adjusted.hashCode()
     override fun equals(other: Any?): Boolean = other is DateTime && this.adjusted.unixDouble == other.adjusted.unixDouble
-    override fun compareTo(other: DateTime): Int = this.adjusted.unixMillis.compareTo(other.adjusted.unixMillis)
+    override fun compareTo(other: DateTimeWithOffset): Int = this.adjusted.unixMillis.compareTo(other.adjusted.unixMillis)
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
 }
