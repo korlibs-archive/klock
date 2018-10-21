@@ -2,6 +2,14 @@ package com.soywiz.klock
 
 import com.soywiz.klock.internal.*
 
+/**
+ * Represents a Date in UTC (GMT+00) with millisecond precision.
+ *
+ * It is internally represented as an inlined double, thus doesn't allocate in any target including JS.
+ * It can represent without loss dates between (-(2 ** 52) and (2 ** 52)):
+ * - Thu Aug 10 -140744 07:15:45 GMT-0014 (Central European Summer Time)
+ * - Wed May 23 144683 18:29:30 GMT+0200 (Central European Summer Time)
+ */
 inline class UtcDateTime(val internalMillis: Long) : DateTime {
     companion object {
         private const val DATE_PART_YEAR = 0
