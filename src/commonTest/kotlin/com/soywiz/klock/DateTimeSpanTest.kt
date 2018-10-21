@@ -2,7 +2,7 @@ package com.soywiz.klock
 
 import kotlin.test.*
 
-class TimeDistanceTest {
+class DateTimeSpanTest {
     @Test
     fun testBasic() {
         assertEquals("Thu, 13 Dec 2018 00:00:00 UTC", DateTime(2018, 12, 13).toString())
@@ -22,6 +22,8 @@ class TimeDistanceTest {
 
     @Test
     fun testToString() {
+        assertEquals("1Y 1M", (1.years + 1.months).toString())
+        assertEquals("1M", (1.months).toString())
         assertEquals("1M 10W 10H", (1.months + 10.hours + 10.weeks).toString())
         assertEquals("1M 11W 1D 10H", (1.months + 10.hours + 10.weeks + 8.days).toString())
     }

@@ -1,10 +1,10 @@
 package com.soywiz.klock
 
 inline fun measureTime(callback: () -> Unit): TimeSpan {
-    val start = Klock.currentTimeMillisDouble()
+    val start = Klock.currentTime
     callback()
-    val end = Klock.currentTimeMillisDouble()
-    return (end - start).milliseconds
+    val end = Klock.currentTime
+    return end - start
 }
 
 data class TimedResult<T>(val result: T, val time: TimeSpan)

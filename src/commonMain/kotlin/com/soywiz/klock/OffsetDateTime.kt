@@ -6,7 +6,7 @@ import kotlin.math.*
 class OffsetDateTime private constructor(
     override val utc: UtcDateTime,
     override val offset: Int,
-    override val adjusted: UtcDateTime = utc.addMinutes(offset.toDouble()) as UtcDateTime
+    override val adjusted: UtcDateTime
 ) : DateTime by adjusted, Comparable<DateTime> {
     private val deltaTotalMinutesAbs: Int = abs(offset)
     val positive: Boolean get() = offset >= 0
@@ -15,7 +15,7 @@ class OffsetDateTime private constructor(
 
     companion object {
         //operator fun invoke(utc: DateTime, offset: Int) = OffsetDateTime(utc.utc, utc.offsetTotalMinutes + offset)
-        operator fun invoke(utc: DateTime, offset: Int) = OffsetDateTime(utc.utc, offset)
+        operator fun invoke(utc: DateTime, offset: Int) = OffsetDateTime(utc.utc, offset, (utc + offset.minutes).utc)
     }
 
     override val timeZone: String = run {
