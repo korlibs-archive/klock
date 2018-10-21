@@ -4,7 +4,17 @@ import com.soywiz.klock.internal.*
 
 object PerformanceCounter {
     /**
+     * Returns a performance counter measure in nanoseconds.
+     */
+    val nanoseconds: Double get() = KlockInternal.microClock * 1000.0
+
+    /**
      * Returns a performance counter measure in microseconds.
      */
     val microseconds: Double get() = KlockInternal.microClock
+
+    /**
+     * Returns a performance counter measure in milliseconds.
+     */
+    val milliseconds: Double get() = KlockInternal.microClock / 1000.0
 }
