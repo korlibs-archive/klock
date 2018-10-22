@@ -21,6 +21,7 @@ data class DateTimeSpan(
     )
 
     operator fun unaryMinus() = DateTimeSpan(-dateSpan, -timeSpan)
+    operator fun unaryPlus() = DateTimeSpan(+dateSpan, +timeSpan)
 
     operator fun plus(other: TimeSpan) = DateTimeSpan(dateSpan, timeSpan + other)
     operator fun plus(other: DateSpan) = DateTimeSpan(dateSpan + other, timeSpan)

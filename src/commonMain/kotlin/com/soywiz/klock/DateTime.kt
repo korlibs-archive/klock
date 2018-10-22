@@ -17,6 +17,18 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         // Can produce errors on invalid dates
         operator fun invoke(
             year: Int,
+            month: Month,
+            day: Int,
+            hour: Int = 0,
+            minute: Int = 0,
+            second: Int = 0,
+            milliseconds: Int = 0
+        ): DateTime = DateTime(
+            DateTime.dateToMillis(year, month.index, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
+        )
+
+        operator fun invoke(
+            year: Int,
             month: Int,
             day: Int,
             hour: Int = 0,
@@ -33,15 +45,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         fun parse(str: String) = SimplerDateFormat.parse(str)
 
         fun fromUnix(time: Double): DateTime = DateTime(time)
-        fun fromUnixLocal(time: Double): DateTimeWithOffset = DateTime(time).local
-
         fun fromUnix(time: Long): DateTime = fromUnix(time.toDouble())
-        fun fromUnixLocal(time: Long): DateTimeWithOffset = fromUnixLocal(time.toDouble())
 
         fun now(): DateTime = DateTime(KlockInternal.currentTime)
-        fun nowLocal(): DateTimeWithOffset = fromUnix(nowUnix()).local
-
         fun nowUnix(): Double = KlockInternal.currentTime
+
         fun nowUnixLong(): Long = KlockInternal.currentTime.toLong()
 
         // Can't produce errors on invalid dates and tries to adjust it to a valid date.
@@ -189,9 +197,8 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
 
     private fun getDatePart(part: Int): Int = getDatePart(internalMillis, part)
 
-    val offset: Int get() = 0
-    val utc: DateTime get() = this
-    val adjusted: DateTime get() = this
+    val localOffset: TimeSpan get() = Klock.localTimezoneOffset(DateTime(unixDouble))
+
     val unixDouble: Double get() = unixMillis
     val year: Int get() = getDatePart(DATE_PART_YEAR)
     val month1: Int get() = getDatePart(DATE_PART_MONTH)
@@ -208,16 +215,18 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
     val dayOfWeek: DayOfWeek get() = DayOfWeek[dayOfWeekInt]
     val month0: Int get() = month1 - 1
     val month: Month get() = Month[month1]
-    val local get() = DateTimeWithOffset(this, Klock.localTimezoneOffset(DateTime(unixDouble)).minutes.toInt())
 
-    @Deprecated("", ReplaceWith("utc"))
-    fun toUtc(): DateTime = utc
+    val localBase get() = DateTimeWithOffset(this, localOffset)
+    val localAdjusted get() = DateTimeWithOffset.adjusted(this, localOffset)
 
     @Deprecated("", ReplaceWith("local"))
-    fun toLocal() = local
+    fun toLocal() = localBase
 
-    fun addOffset(offset: Int) = DateTimeWithOffset(this, this.offset + offset)
-    fun toOffset(offset: Int) = DateTimeWithOffset(this, offset)
+    fun toOffsetBase(offset: TimeSpan) = DateTimeWithOffset(this, offset)
+    fun toOffsetBase(minutes: Int) = toOffsetBase(minutes.minutes)
+
+    fun toOffsetAdjusted(offset: TimeSpan) = DateTimeWithOffset.adjusted(this, offset)
+    fun toOffsetAdjusted(minutes: Int) = toOffsetAdjusted(minutes.minutes)
 
     operator fun plus(delta: DateSpan): DateTime = this.add(delta.totalMonths, 0.0)
     operator fun plus(delta: DateTimeSpan): DateTime = this.add(delta.totalMonths, delta.totalMilliseconds)
@@ -256,9 +265,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         }
     }
 
+    fun add(date: DateSpan, time: TimeSpan): DateTime = add(date.totalMonths, time.milliseconds)
+
     fun format(dt: SimplerDateFormat): String = dt.format(this)
     fun format(dt: String): String = SimplerDateFormat(dt).format(this)
 
-    override fun compareTo(other: DateTime): Int = this.adjusted.unixMillis.compareTo(other.adjusted.unixMillis)
+    override fun compareTo(other: DateTime): Int = this.unixMillis.compareTo(other.unixMillis)
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
 }

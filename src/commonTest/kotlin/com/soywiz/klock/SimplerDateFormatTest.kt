@@ -19,7 +19,7 @@ class SimplerDateFormatTest {
     @Test
     fun testParseFormat() {
         val dateStr = "Sun, 06 Nov 1994 08:49:37 UTC"
-        assertEquals(dateStr, format.format(format.parse(dateStr)))
+        assertEquals(dateStr, format.format(format.parseDouble(dateStr)))
     }
 
     class StrictOffset {
@@ -38,14 +38,14 @@ class SimplerDateFormatTest {
         @Test
         fun testParseFormatUtc() {
             val dateStr = "2016-05-04T19:29:34+00:00"
-            assertEquals(dateStr, format.format(format.parse(dateStr)))
+            assertEquals(dateStr, format.format(format.parseDouble(dateStr)))
         }
 
         @Test
         fun testParseWithOffsetAsUtc() {
             val offsetDateStr = "2016-05-04T19:29:34+05:00"
             val utcDateStr = "2016-05-04T14:29:34+00:00"
-            assertTrue(format.parse(utcDateStr) == format.parseUtc(offsetDateStr))
+            assertEquals(format.parse(offsetDateStr).adjusted, format.parse(utcDateStr).adjusted)
         }
 
         @Test
@@ -56,7 +56,7 @@ class SimplerDateFormatTest {
         @Test
         fun testParseFormatOffset() {
             val dateStr = "2016-05-04T19:29:34+05:00"
-            val date = format.parseDate(dateStr)
+            val date = format.parse(dateStr)
             //println(date.base)
             //println(date.offset)
             assertEquals(dateStr, format.format(date))
@@ -66,7 +66,7 @@ class SimplerDateFormatTest {
         fun testParseWithZuluFails() {
             val dateStr = "2016-05-04T19:29:34Z"
             assertFailsWith(RuntimeException::class, "Zulu Time Zone is only accepted with X-XXX formats.") {
-                format.parse(dateStr)
+                format.parseDouble(dateStr)
             }
         }
     }
@@ -93,13 +93,13 @@ class SimplerDateFormatTest {
         fun testParseWithUtcOffsetFormatsWithZulu() {
             val dateStr = "2016-05-04T19:29:34+00:00"
             val expectedStr = "2016-05-04T19:29:34Z"
-            assertEquals(expectedStr, format.format(format.parse(dateStr)))
+            assertEquals(expectedStr, format.format(format.parseDouble(dateStr)))
         }
 
         @Test
         fun testParseWithZuluFormatsWithZulu() {
             val dateStr = "2016-05-04T19:29:34Z"
-            assertEquals(dateStr, format.format(format.parse(dateStr)))
+            assertEquals(dateStr, format.format(format.parseDouble(dateStr)))
         }
     }
 }

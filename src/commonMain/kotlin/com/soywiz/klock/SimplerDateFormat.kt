@@ -18,13 +18,15 @@ class SimplerDateFormat(val format: String) {
         val DEFAULT_FORMAT by lazy { SimplerDateFormat("EEE, dd MMM yyyy HH:mm:ss z") }
         val FORMAT1 by lazy { SimplerDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX") }
 
+        val FORMAT_DATE by lazy { SimplerDateFormat("yyyy-MM-dd") }
+
         val FORMATS = listOf(DEFAULT_FORMAT, FORMAT1)
 
         fun parse(str: String): DateTimeWithOffset {
             var lastError: Throwable? = null
             for (format in FORMATS) {
                 try {
-                    return format.parseDate(str)
+                    return format.parse(str)
                 } catch (e: Throwable) {
                     lastError = e
                 }
@@ -57,11 +59,11 @@ class SimplerDateFormat(val format: String) {
     fun format(date: Double): String = format(DateTime.fromUnix(date))
     fun format(date: Long): String = format(DateTime.fromUnix(date))
 
-    fun format(dd: DateTime): String = format(dd.toOffset(0))
+    fun format(dd: DateTime): String = format(dd.toOffsetBase(0))
 
     fun format(dd: DateTimeWithOffset): String {
-        //val utc = dd.base
-        val utc = dd.adjusted
+        val utc = dd.base
+        //val utc = dd.adjusted
         var out = ""
         for (name2 in parts2) {
             val name = name2.trim('\'')
@@ -102,17 +104,19 @@ class SimplerDateFormat(val format: String) {
                         fractionalPart.substr(0, name.length)
                     }
                 }
-                "X", "XX", "XXX", "x", "xx", "xxx" -> when {
-                    name.startsWith("X") && dd.offset == 0 -> "Z"
-                    else -> {
-                        val p = if (dd.offset >= 0) "+" else "-"
-                        val hours = dd.offset / 60
-                        val minutes = dd.offset % 60
-                        when (name) {
-                            "X", "x" -> "$p${hours.padded(2)}"
-                            "XX", "xx" -> "$p${hours.padded(2)}${minutes.padded(2)}"
-                            "XXX", "xxx" -> "$p${hours.padded(2)}:${minutes.padded(2)}"
-                            else -> name
+                "X", "XX", "XXX", "x", "xx", "xxx" -> {
+                    when {
+                        name.startsWith("X") && dd.offsetMinutes == 0 -> "Z"
+                        else -> {
+                            val p = if (dd.offsetMinutes >= 0) "+" else "-"
+                            val hours = dd.offsetMinutes / 60
+                            val minutes = dd.offsetMinutes % 60
+                            when (name) {
+                                "X", "x" -> "$p${hours.padded(2)}"
+                                "XX", "xx" -> "$p${hours.padded(2)}${minutes.padded(2)}"
+                                "XXX", "xxx" -> "$p${hours.padded(2)}:${minutes.padded(2)}"
+                                else -> name
+                            }
                         }
                     }
                 }
@@ -123,29 +127,28 @@ class SimplerDateFormat(val format: String) {
         return out
     }
 
-    fun parse(str: String): Double = parseDate(str).adjusted.unixDouble
-    fun parseUtc(str: String): Double = parseDate(str).base.unixDouble
+    //fun parseDouble(str: String): Double = parse(str).base.unixDouble
+    //fun parseUtc(str: String): Double = parse(str).adjusted.unixDouble
+//
+    //fun parseLong(str: String): Long = parse(str).base.unixLong
+    //fun parseUtcLong(str: String): Long = parse(str).adjusted.unixLong
+//
+    //fun parseDoubleOrNull(str: String?): Double? = try {
+    //    str?.let { parseDouble(str) }
+    //} catch (e: Throwable) {
+    //    null
+    //}
+//
+    //fun parseDoubleOrNullLong(str: String?): Long? = try {
+    //    str?.let { parseDouble(str).toLong() }
+    //} catch (e: Throwable) {
+    //    null
+    //}
 
-    fun parseLong(str: String): Long = parseDate(str).adjusted.unixLong
-    fun parseUtcLong(str: String): Long = parseDate(str).base.unixLong
+    fun parse(str: String): DateTimeWithOffset =
+        tryParse(str, doThrow = true) ?: throw DateException("Not a valid format: '$str' for '$format'")
 
-    fun parseOrNull(str: String?): Double? = try {
-        str?.let { parse(str) }
-    } catch (e: Throwable) {
-        null
-    }
-
-    fun parseOrNullLong(str: String?): Long? = try {
-        str?.let { parse(str).toLong() }
-    } catch (e: Throwable) {
-        null
-    }
-
-    fun parseDate(str: String): DateTimeWithOffset {
-        return tryParseDate(str) ?: throw DateException("Not a valid format: '$str' for '$format'")
-    }
-
-    fun tryParseDate(str: String): DateTimeWithOffset? {
+    fun tryParse(str: String, doThrow: Boolean = false): DateTimeWithOffset? {
         var millisecond = 0
         var second = 0
         var minute = 0
@@ -165,7 +168,7 @@ class SimplerDateFormat(val format: String) {
                 "M", "MM" -> month = value.toInt()
                 "MMM" -> month = englishMonths3.indexOf(value.toLowerCase()) + 1
                 "y", "yyyy", "YYYY" -> fullYear = value.toInt()
-                "yy" -> throw RuntimeException("Not guessing years from two digits.")
+                "yy" -> if (doThrow) throw RuntimeException("Not guessing years from two digits.") else return null
                 "yyy" -> fullYear = value.toInt() + if (value.toInt() < 800) 2000 else 1000 // guessing year...
                 "H", "HH" -> hour = value.toInt()
                 "m", "mm" -> minute = value.toInt()
@@ -182,7 +185,7 @@ class SimplerDateFormat(val format: String) {
                 "X", "XX", "XXX", "x", "xx", "xxx" -> when {
                     name.startsWith("X") && value.first() == 'Z' -> offset = 0
                     name.startsWith("x") && value.first() == 'Z' -> {
-                        throw RuntimeException("Zulu Time Zone is only accepted with X-XXX formats.")
+                        if (doThrow) throw RuntimeException("Zulu Time Zone is only accepted with X-XXX formats.") else return null
                     }
                     value.first() != 'Z' -> {
                         val hours = value.drop(1).substringBefore(':').toInt()
@@ -194,7 +197,7 @@ class SimplerDateFormat(val format: String) {
                     }
                 }
                 "MMMM" -> month = englishMonths.indexOf(value.toLowerCase()) + 1
-                "MMMMM" -> throw RuntimeException("Not possible to get the month from one letter.")
+                "MMMMM" -> if (doThrow) throw RuntimeException("Not possible to get the month from one letter.") else return null
                 "h", "hh" -> {
                     hour = value.toInt()
                     is12HourFormat = true
@@ -206,12 +209,10 @@ class SimplerDateFormat(val format: String) {
             }
         }
         //return DateTime.createClamped(fullYear, month, day, hour, minute, second)
-        if (is12HourFormat and isPm) hour += 12
-        val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second, millisecond)
-        return when (offset) {
-            null -> dateTime.toOffset(0)
-            0 -> dateTime.utc.toOffset(0)
-            else -> dateTime.minus(offset.minutes).toOffset(offset)
+        if (is12HourFormat && isPm) {
+            hour += 12
         }
+        val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second, millisecond)
+        return dateTime.toOffsetBase(offset ?: 0)
     }
 }

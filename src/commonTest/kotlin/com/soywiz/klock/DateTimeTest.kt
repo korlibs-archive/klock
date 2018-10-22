@@ -114,7 +114,7 @@ class DateTimeTest {
         assertEquals(
             message = "Sat, 08 S 2018 04:08:09 UTC",
             expected = null,
-            actual = SimplerDateFormat("EEE, dd MMMMM yyyy HH:mm:ss z").parseOrNull("Sat, 08 S 2018 04:08:09 UTC")
+            actual = SimplerDateFormat("EEE, dd MMMMM yyyy HH:mm:ss z").parseDoubleOrNull("Sat, 08 S 2018 04:08:09 UTC")
         )
 
         assertEquals(
@@ -125,7 +125,7 @@ class DateTimeTest {
         assertEquals(
             message = "Sat, 08 Sep 18 04:08:09 UTC - yy",
             expected = null,
-            actual = SimplerDateFormat("EEE, dd MMM yy HH:mm:ss z").parseOrNull("Sat, 08 Sep 18 04:08:09 UTC")
+            actual = SimplerDateFormat("EEE, dd MMM yy HH:mm:ss z").parseDoubleOrNull("Sat, 08 Sep 18 04:08:09 UTC")
         )
         assertEquals(
             message = "Sat, 08 Sep 018 04:08:09 UTC - yyy",

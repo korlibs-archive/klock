@@ -82,6 +82,7 @@ inline class TimeSpan(val milliseconds: Double) : Comparable<TimeSpan> {
     override fun compareTo(other: TimeSpan): Int = this.milliseconds.compareTo(other.milliseconds)
 
     operator fun unaryMinus() = TimeSpan(-this.milliseconds)
+    operator fun unaryPlus() = TimeSpan(+this.milliseconds)
 
     operator fun plus(other: TimeSpan): TimeSpan = TimeSpan(this.milliseconds + other.milliseconds)
     operator fun plus(other: DateSpan): DateTimeSpan = DateTimeSpan(other, this)

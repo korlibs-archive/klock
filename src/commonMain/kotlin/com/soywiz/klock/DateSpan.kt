@@ -5,6 +5,7 @@ inline val Int.months get() = DateSpan(this)
 
 inline class DateSpan(val totalMonths: Int) : Comparable<DateSpan> {
     operator fun unaryMinus() = DateSpan(-totalMonths)
+    operator fun unaryPlus() = DateSpan(+totalMonths)
 
     operator fun plus(other: TimeSpan) = DateTimeSpan(this, other)
     operator fun plus(other: DateSpan) = DateSpan(totalMonths + other.totalMonths)
