@@ -14,55 +14,55 @@ class DateTimeTest {
     @Test
     fun testFormattingToCustomDateTimeFormats() {
         val dt = DateTime(2018, 9, 8, 4, 8, 9)
-        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(dt).toString())
-        assertEquals("Saturday, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEEE, dd MMM yyyy HH:mm:ss z").format(dt).toString())
-        assertEquals("S, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEEEE, dd MMM yyyy HH:mm:ss z").format(dt).toString())
-        assertEquals("Sa, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEEEEE, dd MMM yyyy HH:mm:ss z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", dt.format("EEE, dd MMM yyyy HH:mm:ss z"))
+        assertEquals("Saturday, 08 Sep 2018 04:08:09 UTC", dt.format("EEEE, dd MMM yyyy HH:mm:ss z"))
+        assertEquals("S, 08 Sep 2018 04:08:09 UTC", dt.format("EEEEE, dd MMM yyyy HH:mm:ss z"))
+        assertEquals("Sa, 08 Sep 2018 04:08:09 UTC", dt.format("EEEEEE, dd MMM yyyy HH:mm:ss z"))
 
-        assertEquals("Sat, 8 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEE, d MMM yyyy HH:mm:ss z").format(dt).toString())
+        assertEquals("Sat, 8 Sep 2018 04:08:09 UTC", dt.format("EEE, d MMM yyyy HH:mm:ss z"))
 
-        assertEquals("Sat, 08 9 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd M yyyy HH:mm:ss z").format(dt).toString())
-        assertEquals("Sat, 08 09 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MM yyyy HH:mm:ss z").format(dt).toString())
-        assertEquals("Sat, 08 September 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMMM yyyy HH:mm:ss z").format(dt).toString())
-        assertEquals("Sat, 08 S 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMMMM yyyy HH:mm:ss z").format(dt).toString())
+        assertEquals("Sat, 08 9 2018 04:08:09 UTC", dt.format("EEE, dd M yyyy HH:mm:ss z"))
+        assertEquals("Sat, 08 09 2018 04:08:09 UTC", dt.format("EEE, dd MM yyyy HH:mm:ss z"))
+        assertEquals("Sat, 08 September 2018 04:08:09 UTC", dt.format("EEE, dd MMMM yyyy HH:mm:ss z"))
+        assertEquals("Sat, 08 S 2018 04:08:09 UTC", dt.format("EEE, dd MMMMM yyyy HH:mm:ss z"))
 
-        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM y HH:mm:ss z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 18 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM yy HH:mm:ss z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM yyy HH:mm:ss z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", dt.format("EEE, dd MMM y HH:mm:ss z"))
+        assertEquals("Sat, 08 Sep 18 04:08:09 UTC", dt.format("EEE, dd MMM yy HH:mm:ss z"))
+        assertEquals("Sat, 08 Sep 018 04:08:09 UTC", dt.format("EEE, dd MMM yyy HH:mm:ss z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", dt.format("EEE, dd MMM yyyy HH:mm:ss z"))
 
-        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", SimplerDateFormat("EEE, dd MMM YYYY HH:mm:ss z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 04:08:09 UTC", dt.format("EEE, dd MMM YYYY HH:mm:ss z"))
 
-        assertEquals("Sat, 08 Sep 2018 4:08:09 UTC", SimplerDateFormat("EEE, dd MMM yyyy H:mm:ss z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 4:08:09 UTC", dt.format("EEE, dd MMM yyyy H:mm:ss z"))
 
-        assertEquals("Sat, 08 Sep 2018 4:08:09 am UTC", SimplerDateFormat("EEE, dd MMM yyyy h:mm:ss a z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:09 am UTC", SimplerDateFormat("EEE, dd MMM yyyy hh:mm:ss a z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 4:08:09 am UTC", dt.format("EEE, dd MMM yyyy h:mm:ss a z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:09 am UTC", dt.format("EEE, dd MMM yyyy hh:mm:ss a z"))
 
-        assertEquals("Sat, 08 Sep 2018 04:8:09 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:m:ss z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 04:8:09 UTC", dt.format("EEE, dd MMM yyyy HH:m:ss z"))
 
-        assertEquals("Sat, 08 Sep 2018 04:08:9 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 04:08:9 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s z"))
     }
 
     @Test
     fun testFormattingToCustomDateTimeFormatsWithMilliseconds999() {
         val dt = DateTime(2018, 9, 8, 4, 8, 9, 999)
-        assertEquals("Sat, 08 Sep 2018 04:08:9.9 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.S z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.99 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SS z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.999 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SSS z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.9990 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SSSS z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.99900 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SSSSS z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.999000 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SSSSSS z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 04:08:9.9 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.S z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.99 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SS z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.999 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SSS z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.9990 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SSSS z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.99900 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SSSSS z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.999000 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SSSSSS z"))
     }
 
     @Test
     fun testFormattingToCustomDateTimeFormatsWithMilliseconds009() {
         val dt = DateTime(2018, 9, 8, 4, 8, 9, 9)
-        assertEquals("Sat, 08 Sep 2018 04:08:9.0 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.S z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.00 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SS z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.009 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SSS z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.0090 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SSSS z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.00900 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SSSSS z").format(dt).toString())
-        assertEquals("Sat, 08 Sep 2018 04:08:9.009000 UTC", SimplerDateFormat("EEE, dd MMM yyyy HH:mm:s.SSSSSS z").format(dt).toString())
+        assertEquals("Sat, 08 Sep 2018 04:08:9.0 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.S z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.00 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SS z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.009 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SSS z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.0090 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SSSS z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.00900 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SSSSS z"))
+        assertEquals("Sat, 08 Sep 2018 04:08:9.009000 UTC", dt.format("EEE, dd MMM yyyy HH:mm:s.SSSSSS z"))
     }
 
     @Test
@@ -231,7 +231,7 @@ class DateTimeTest {
 
     @Test
     fun testParsingDateTimesWithMilliseconds() {
-        var dtmilli = 1536379689999L
+        val dtmilli = 1536379689999L
         assertEquals(dtmilli, DateTime(2018, 9, 8, 4, 8, 9, 999).unixLong)
         assertEquals(
             message = "Sat, 08 Sep 2018 04:08:09.999 UTC",

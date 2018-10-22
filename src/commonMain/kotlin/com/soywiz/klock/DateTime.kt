@@ -10,9 +10,7 @@ import com.soywiz.klock.internal.*
  * - Thu Aug 10 -140744 07:15:45 GMT-0014 (Central European Summer Time)
  * - Wed May 23 144683 18:29:30 GMT+0200 (Central European Summer Time)
  */
-inline class DateTime(val unixMillis: Double) : Comparable<DateTime> { // @TODO: Needed to prevent allocations!
-    private val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
-
+inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
     companion object {
         val EPOCH = DateTime(0.0)
 
@@ -187,7 +185,9 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> { // @TODO:
         }
     }
 
-    private fun getDatePart(part: Int): Int = Companion.getDatePart(internalMillis, part)
+    private val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
+
+    private fun getDatePart(part: Int): Int = getDatePart(internalMillis, part)
 
     val offset: Int get() = 0
     val utc: DateTime get() = this
@@ -255,6 +255,9 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> { // @TODO:
             DateTime(dateToMillisUnchecked(year, month, day) + (internalMillis % MILLIS_PER_DAY) + deltaMilliseconds)
         }
     }
+
+    fun format(dt: SimplerDateFormat): String = dt.format(this)
+    fun format(dt: String): String = SimplerDateFormat(dt).format(this)
 
     override fun compareTo(other: DateTime): Int = this.adjusted.unixMillis.compareTo(other.adjusted.unixMillis)
     override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
