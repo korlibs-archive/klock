@@ -73,21 +73,18 @@ dependencies {
 node {
     version = '8.11.4'
     download = true
-    nodeModulesDir = file("$buildDir/yarn")
+    nodeModulesDir = file("$buildDir/npm")
 }
 
 def jsCompilations = kotlin.targets.js.compilations
-task addYarnDeps(type: YarnTask) {
-    doFirst {
-        mkdir "$buildDir/yarn"
-    }
-    args = ["add", "mocha@5.2.0"]
+task installMocha(type: NpmTask) {
+    args = ["install", "mocha@5.2.0"]
 }
 
 task populateNodeModules {
     doLast {
         copy {
-            from "$buildDir/yarn/node_modules"
+            from "$buildDir/npm/node_modules"
             from jsCompilations.main.output.allOutputs
             jsCompilations.test.runtimeDependencyFiles.each {
                 if (it.exists() && !it.isDirectory()) {
@@ -103,7 +100,7 @@ task populateNodeModules {
 //println("-------------")
 //dump(jsCompilations.test.output)
 
-task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, addYarnDeps, populateNodeModules]) {
+task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, installMocha, populateNodeModules]) {
     script = file("$buildDir/node_modules/mocha/bin/mocha")
     args = [relativePath("${jsCompilations.test.output.classesDirs.first()}/klock_test.js")]
 }
