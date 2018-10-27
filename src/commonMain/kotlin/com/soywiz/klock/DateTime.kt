@@ -193,22 +193,21 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         }
     }
 
-    private val internalMillis get() = EPOCH_INTERNAL_MILLIS + unixMillis
+    private fun getDatePart(part: Int): Int = getDatePart(zeroMillis, part)
 
-    private fun getDatePart(part: Int): Int = getDatePart(internalMillis, part)
-
+    val zeroMillis: Double get() = EPOCH_INTERNAL_MILLIS + unixMillis
     val localOffset: TimeSpan get() = Klock.localTimezoneOffset(DateTime(unixDouble))
 
     val unixDouble: Double get() = unixMillis
     val year: Int get() = getDatePart(DATE_PART_YEAR)
     val month1: Int get() = getDatePart(DATE_PART_MONTH)
     val dayOfMonth: Int get() = getDatePart(DATE_PART_DAY)
-    val dayOfWeekInt: Int get() = ((internalMillis / MILLIS_PER_DAY + 1) % 7).toInt()
+    val dayOfWeekInt: Int get() = ((zeroMillis / MILLIS_PER_DAY + 1) % 7).toInt()
     val dayOfYear: Int get() = getDatePart(DATE_PART_DAY_OF_YEAR)
-    val hours: Int get() = (((internalMillis / MILLIS_PER_HOUR) % 24).toInt())
-    val minutes: Int get() = ((internalMillis / MILLIS_PER_MINUTE) % 60).toInt()
-    val seconds: Int get() = ((internalMillis / MILLIS_PER_SECOND) % 60).toInt()
-    val milliseconds: Int get() = ((internalMillis) % 1000).toInt()
+    val hours: Int get() = (((zeroMillis / MILLIS_PER_HOUR) % 24).toInt())
+    val minutes: Int get() = ((zeroMillis / MILLIS_PER_MINUTE) % 60).toInt()
+    val seconds: Int get() = ((zeroMillis / MILLIS_PER_SECOND) % 60).toInt()
+    val milliseconds: Int get() = ((zeroMillis) % 1000).toInt()
     val timeZone: String get() = "UTC"
 
     val unixLong: Long get() = unixDouble.toLong()
@@ -261,7 +260,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             val days = Month.days(month, year)
             if (day > days) day = days
 
-            DateTime(dateToMillisUnchecked(year, month, day) + (internalMillis % MILLIS_PER_DAY) + deltaMilliseconds)
+            DateTime(dateToMillisUnchecked(year, month, day) + (zeroMillis % MILLIS_PER_DAY) + deltaMilliseconds)
         }
     }
 

@@ -59,11 +59,14 @@ data class DateTimeSpan(
     val totalMilliseconds: Double get() = timeSpan.milliseconds
 
     val weeks: Int get() = computed.weeks
+    val daysIncludingWeeks: Int get() = computed.days + (computed.weeks * 7)
     val days: Int get() = computed.days
     val hours: Int get() = computed.hours
     val minutes: Int get() = computed.minutes
     val seconds: Int get() = computed.seconds
     val milliseconds: Double get() = computed.milliseconds
+
+    val secondsIncludingMilliseconds: Double get() = computed.seconds + computed.milliseconds / 1000.0
 
     // @TODO: If milliseconds overflow months this could not be exactly true. But probably will work in most cases.
     override fun compareTo(other: DateTimeSpan): Int {
@@ -71,13 +74,16 @@ data class DateTimeSpan(
         return this.timeSpan.compareTo(other.timeSpan)
     }
 
-    override fun toString(): String = arrayListOf<String>().apply {
+    fun toString(includeWeeks: Boolean): String = arrayListOf<String>().apply {
         if (years != 0) add("${years}Y")
         if (months != 0) add("${months}M")
-        if (weeks != 0) add("${weeks}W")
-        if (days != 0) add("${days}D")
+        if (includeWeeks && weeks != 0) add("${weeks}W")
+        if (days != 0 || (includeWeeks && weeks != 0)) add("${if (includeWeeks) days else daysIncludingWeeks}D")
         if (hours != 0) add("${hours}H")
         if (minutes != 0) add("${minutes}m")
-        if (seconds != 0 || milliseconds != 0.0) add("${seconds + milliseconds / 1000.0}s")
+        if (seconds != 0 || milliseconds != 0.0) add("${secondsIncludingMilliseconds}s")
+        if (dateSpan == 0.years && ((timeSpan == 0.seconds) || (timeSpan == (-0).seconds))) add("0s")
     }.joinToString(" ")
+
+    override fun toString(): String = toString(includeWeeks = true)
 }

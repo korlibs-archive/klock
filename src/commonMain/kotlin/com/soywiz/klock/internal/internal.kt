@@ -54,11 +54,14 @@ internal infix fun Int.umod(that: Int): Int {
     }
 }
 
-internal class Moduler(var value: Double) {
+internal class Moduler(val value: Double) {
+    private var avalue = abs(value)
+    private var sign = sign(value)
+
     fun double(count: Double): Double {
-        val ret = (value / count)
-        value %= count
-        return floor(ret)
+        val ret = (avalue / count)
+        avalue %= count
+        return floor(ret) * sign
     }
 
     inline fun double(count: Number): Double = double(count.toDouble())

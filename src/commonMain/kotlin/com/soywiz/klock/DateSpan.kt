@@ -15,15 +15,15 @@ inline class DateSpan(val totalMonths: Int) : Comparable<DateSpan> {
     operator fun minus(other: DateSpan) = this + -other
     operator fun minus(other: DateTimeSpan) = this + -other
 
-    inline operator fun times(times: Double) = DateSpan((totalMonths * times).toInt())
-    inline operator fun div(times: Double) = DateSpan((totalMonths / times).toInt())
+    inline operator fun times(times: Number) = DateSpan((totalMonths * times.toDouble()).toInt())
+    inline operator fun div(times: Number) = DateSpan((totalMonths / times.toDouble()).toInt())
 
     override fun compareTo(other: DateSpan): Int = this.totalMonths.compareTo(other.totalMonths)
 
     override fun toString(): String {
         val list = arrayListOf<String>()
         if (years != 0) list.add("${years}Y")
-        if (months != 0) list.add("${months}M")
+        if (months != 0 || years == 0) list.add("${months}M")
         return list.joinToString(" ")
     }
 }

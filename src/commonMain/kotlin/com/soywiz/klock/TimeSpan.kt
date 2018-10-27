@@ -20,6 +20,8 @@ inline class TimeSpan(val milliseconds: Double) : Comparable<TimeSpan> {
     val millisecondsInt: Int get() = this.milliseconds.toInt()
     val seconds: Double get() = this.milliseconds / 1000.0
     val minutes: Double get() = this.milliseconds / 60_000.0
+    val hours: Double get() = this.milliseconds / 3600_000.0
+    val days: Double get() = this.milliseconds / (24 * 3600_000.0)
 
     companion object {
         /**
