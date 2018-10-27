@@ -78,7 +78,7 @@ data class DateTimeSpan(
         if (years != 0) add("${years}Y")
         if (months != 0) add("${months}M")
         if (includeWeeks && weeks != 0) add("${weeks}W")
-        if (days != 0 || (includeWeeks && weeks != 0)) add("${if (includeWeeks) days else daysIncludingWeeks}D")
+        if (days != 0 || (!includeWeeks && weeks != 0)) add("${if (includeWeeks) days else daysIncludingWeeks}D")
         if (hours != 0) add("${hours}H")
         if (minutes != 0) add("${minutes}m")
         if (seconds != 0 || milliseconds != 0.0) add("${secondsIncludingMilliseconds}s")
