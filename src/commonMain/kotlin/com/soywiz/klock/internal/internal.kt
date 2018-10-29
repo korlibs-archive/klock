@@ -56,7 +56,7 @@ internal infix fun Int.umod(that: Int): Int {
 
 internal class Moduler(val value: Double) {
     private var avalue = abs(value)
-    private var sign = sign(value)
+    private val sign = sign(value)
 
     fun double(count: Double): Double {
         val ret = (avalue / count)
