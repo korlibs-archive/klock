@@ -135,34 +135,25 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
 
         internal const val EPOCH_INTERNAL_MILLIS = 62135596800000.0 // Millis since 00-00-0000 00:00 UTC to UNIX EPOCH
 
-        private const val DATE_PART_YEAR = 0
-        private const val DATE_PART_DAY_OF_YEAR = 1
-        private const val DATE_PART_MONTH = 2
-        private const val DATE_PART_DAY = 3
+        internal enum class DatePart { Year, DayOfYear, Month, Day}
 
         /**
          * Returns milliseconds since EPOCH.
          */
-        internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Double {
-            val y = (year - 1)
-            val n = y * 365 + y / 4 - y / 100 + y / 400 + Month.daysToStart(month, year) + day - 1
-            return n.toDouble() * MILLIS_PER_DAY.toDouble() - EPOCH_INTERNAL_MILLIS
-        }
+        internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Double =
+            (Year(year).daysSinceOne + Month.daysToStart(month, year) + day - 1) * MILLIS_PER_DAY.toDouble() - EPOCH_INTERNAL_MILLIS
 
-        internal fun timeToMillisUnchecked(hour: Int, minute: Int, second: Int): Double {
-            return (hour.toDouble() * 3600 + minute.toDouble() * 60 + second.toDouble()) * MILLIS_PER_SECOND
-        }
+        private fun timeToMillisUnchecked(hour: Int, minute: Int, second: Int): Double =
+            hour.toDouble() * MILLIS_PER_HOUR + minute.toDouble() * MILLIS_PER_MINUTE + second.toDouble() * MILLIS_PER_SECOND
 
-        internal fun dateToMillis(year: Int, month: Int, day: Int): Double {
+        private fun dateToMillis(year: Int, month: Int, day: Int): Double {
             //Year.checked(year)
             Month.check(month)
-            if (day !in 1..Month.days(month, year)) {
-                throw DateException("Day $day not valid for year=$year and month=$month")
-            }
+            if (day !in 1..Month.days(month, year)) throw DateException("Day $day not valid for year=$year and month=$month")
             return dateToMillisUnchecked(year, month, day)
         }
 
-        internal fun timeToMillis(hour: Int, minute: Int, second: Int): Double {
+        private fun timeToMillis(hour: Int, minute: Int, second: Int): Double {
             if (hour !in 0..23) throw DateException("Hour $hour not in 0..23")
             if (minute !in 0..59) throw DateException("Minute $minute not in 0..59")
             if (second !in 0..59) throw DateException("Second $second not in 0..59")
@@ -172,43 +163,44 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         /**
          * [millis] are 00-00-0000 based.
          */
-        internal fun getDatePart(millis: Double, part: Int): Int {
-            var n = (millis / MILLIS_PER_DAY).toInt()
-            val y400 = n / DAYS_PER_400_YEARS
-            n -= y400 * DAYS_PER_400_YEARS
-            var y100 = n / DAYS_PER_100_YEARS
-            if (y100 == 4) y100 = 3
-            n -= y100 * DAYS_PER_100_YEARS
-            val y4 = n / DAYS_PER_4_YEARS
-            n -= y4 * DAYS_PER_4_YEARS
-            var y1 = n / DAYS_PER_YEAR
-            if (y1 == 4) y1 = 3
-            if (part == DATE_PART_YEAR) return y400 * 400 + y100 * 100 + y4 * 4 + y1 + 1
-            n -= y1 * DAYS_PER_YEAR
-            if (part == DATE_PART_DAY_OF_YEAR) return n + 1
-            val leapYear = y1 == 3 && (y4 != 24 || y100 == 3)
-            var m = n shr 5 + 1
-            while (n >= Month.daysToEnd(m, leapYear)) m++
-            return if (part == DATE_PART_MONTH) m else n - Month.daysToStart(m, leapYear) + 1
+        internal fun getDatePart(millis: Double, part: DatePart): Int {
+            val totalDays = (millis / MILLIS_PER_DAY).toInt()
+
+            // Year
+            val year = Year.fromDays(totalDays)
+            if (part == DatePart.Year) return year.year
+
+            // Day of Year
+            val isLeap = year.isLeap
+            val startYearDays = year.daysSinceOne
+            val dayOfYear = 1 + (totalDays - startYearDays)
+            if (part == DatePart.DayOfYear) return dayOfYear
+
+            // Month
+            val month = Month.fromDayOfYear(dayOfYear, isLeap) ?: error("Invalid dayOfYear=$dayOfYear, isLeap=$isLeap")
+            if (part == DatePart.Month) return month.index
+
+            // Day
+            val dayOfMonth = dayOfYear - month.daysToStart(isLeap)
+            if (part == DatePart.Day) return dayOfMonth
+
+            error("Invalid DATE_PART")
         }
     }
-
-    private fun getDatePart(part: Int): Int = getDatePart(zeroMillis, part)
 
     val zeroMillis: Double get() = EPOCH_INTERNAL_MILLIS + unixMillis
     val localOffset: TimeSpan get() = Klock.localTimezoneOffset(DateTime(unixDouble))
 
     val unixDouble: Double get() = unixMillis
-    val year: Int get() = getDatePart(DATE_PART_YEAR)
-    val month1: Int get() = getDatePart(DATE_PART_MONTH)
-    val dayOfMonth: Int get() = getDatePart(DATE_PART_DAY)
+    val year: Int get() = getDatePart(zeroMillis, DatePart.Year)
+    val month1: Int get() = getDatePart(zeroMillis, DatePart.Month)
+    val dayOfMonth: Int get() = getDatePart(zeroMillis, DatePart.Day)
     val dayOfWeekInt: Int get() = ((zeroMillis / MILLIS_PER_DAY + 1) % 7).toInt()
-    val dayOfYear: Int get() = getDatePart(DATE_PART_DAY_OF_YEAR)
+    val dayOfYear: Int get() = getDatePart(zeroMillis, DatePart.DayOfYear)
     val hours: Int get() = (((zeroMillis / MILLIS_PER_HOUR) % 24).toInt())
     val minutes: Int get() = ((zeroMillis / MILLIS_PER_MINUTE) % 60).toInt()
     val seconds: Int get() = ((zeroMillis / MILLIS_PER_SECOND) % 60).toInt()
     val milliseconds: Int get() = ((zeroMillis) % 1000).toInt()
-    val timeZone: String get() = "UTC"
 
     val unixLong: Long get() = unixDouble.toLong()
     val dayOfWeek: DayOfWeek get() = DayOfWeek[dayOfWeekInt]
@@ -250,11 +242,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             val i = month - 1 + deltaMonths
 
             if (i >= 0) {
-                month = i % 12 + 1
-                year += i / 12
+                month = i % Month.Count + 1
+                year += i / Month.Count
             } else {
-                month = 12 + (i + 1) % 12
-                year += (i - 11) / 12
+                month = Month.Count + (i + 1) % Month.Count
+                year += (i - (Month.Count - 1)) / Month.Count
             }
             //Year.checked(year)
             val days = Month.days(month, year)

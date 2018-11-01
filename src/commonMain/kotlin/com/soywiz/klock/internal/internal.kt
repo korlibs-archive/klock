@@ -2,19 +2,11 @@ package com.soywiz.klock.internal
 
 import kotlin.math.*
 
-internal const val MILLIS_PER_MICROSECOND = 1.0 / 1000.0
-internal const val MILLIS_PER_NANOSECOND = MILLIS_PER_MICROSECOND / 1000.0
-
 internal const val MILLIS_PER_SECOND = 1000
-internal const val MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60
-internal const val MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60
-internal const val MILLIS_PER_DAY = MILLIS_PER_HOUR * 24
-internal const val MILLIS_PER_WEEK = MILLIS_PER_DAY * 7
-
-internal const val DAYS_PER_YEAR = 365
-internal const val DAYS_PER_4_YEARS = DAYS_PER_YEAR * 4 + 1
-internal const val DAYS_PER_100_YEARS = DAYS_PER_4_YEARS * 25 - 1
-internal const val DAYS_PER_400_YEARS = DAYS_PER_100_YEARS * 4 + 1
+internal const val MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60 // 60_000
+internal const val MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60 // 3600_000
+internal const val MILLIS_PER_DAY = MILLIS_PER_HOUR * 24 // 86400_000
+internal const val MILLIS_PER_WEEK = MILLIS_PER_DAY * 7 // 604800_000
 
 internal fun Int.padded(count: Int) = this.toString().padStart(count, '0')
 

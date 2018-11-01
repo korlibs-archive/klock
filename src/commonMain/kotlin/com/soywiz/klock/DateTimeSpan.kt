@@ -17,7 +17,7 @@ data class DateTimeSpan(
         milliseconds: Double = 0.0
     ) : this(
         years.years + months.months,
-        (weeks * MILLIS_PER_WEEK + days * MILLIS_PER_DAY + hours * MILLIS_PER_HOUR + minutes * MILLIS_PER_MINUTE + seconds * MILLIS_PER_SECOND + milliseconds).milliseconds
+        weeks.weeks + days.days + hours.hours + minutes.minutes + seconds.seconds + milliseconds.milliseconds
     )
 
     operator fun unaryMinus() = DateTimeSpan(-dateSpan, -timeSpan)

@@ -1,5 +1,7 @@
 package com.soywiz.klock
 
+import kotlin.math.*
+
 /**
  * Represents a Year in a typed way.
  *
@@ -25,7 +27,44 @@ inline class Year(val year: Int) : Comparable<Year> {
         /**
          * Determines if a year is leap. The model works for years between 1..9999, outside this range, the result might be invalid.
          */
-        fun isLeap(year: Int): Boolean = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+        fun isLeap(year: Int): Boolean = (year % 4 == 0) && (year % 100 != 0 || year % 400 == 0)
+
+        /**
+         * Computes the year from the number of days since 0001-01-01.
+         */
+        fun fromDays(days: Int): Year {
+            // https://en.wikipedia.org/wiki/Leap_year#Algorithm
+            // Each 400 years the modular cycle is completed
+
+            val v400 = days / DAYS_PER_400_YEARS
+            val r400 = days % DAYS_PER_400_YEARS
+
+            val v100 = min(r400 / DAYS_PER_100_YEARS, 3)
+            val r100 = r400 % DAYS_PER_100_YEARS
+
+            val v4 = r100 / DAYS_PER_4_YEARS
+            val r4 = r100 % DAYS_PER_4_YEARS
+
+            val v1 = min(r4 / DAYS_COMMON, 3)
+
+            return Year(1 + v1 + (v4 * 4) + (v100 * 100) + (v400 * 400))
+        }
+
+        fun days(isLeap: Boolean) = if (isLeap) DAYS_LEAP else DAYS_COMMON
+
+        fun leapCountSinceOne(year: Int): Int = ((year - 1) / 4) - ((year - 1) / 100) + ((year - 1) / 400)
+        fun daysSinceOne(year: Int): Int = DAYS_COMMON * (year - 1) + leapCountSinceOne(year)
+
+        const val DAYS_LEAP = 366
+        const val DAYS_COMMON = 365
+
+        private const val LEAP_PER_4_YEARS = 1
+        private const val LEAP_PER_100_YEARS = 24 // 24 or 25 (25 the first chunk)
+        private const val LEAP_PER_400_YEARS = 97
+
+        private const val DAYS_PER_4_YEARS = 4 * DAYS_COMMON + LEAP_PER_4_YEARS
+        private const val DAYS_PER_100_YEARS = 100 * DAYS_COMMON + LEAP_PER_100_YEARS
+        private const val DAYS_PER_400_YEARS = 400 * DAYS_COMMON + LEAP_PER_400_YEARS
     }
 
     /**
@@ -37,6 +76,24 @@ inline class Year(val year: Int) : Comparable<Year> {
      * Determines if this year is leap. The model works for years between 1..9999, outside this range, the result might be invalid.
      */
     val isLeap get() = Year.isLeap(year)
+
+    /**
+     * Total days of this year, 365 (non leap) [DAYS_COMMON] or 366 (leap) [DAYS_LEAP].
+     */
+    val days: Int get() = Year.days(isLeap)
+
+    /**
+     * Number of leap years since the year 1 (without including this one)
+     */
+    val leapCountSinceOne: Int get() = leapCountSinceOne(year)
+
+    /**
+     * Number of days since year 1 to reach this year
+     */
+    val daysSinceOne: Int get() = daysSinceOne(year)
+
+    operator fun plus(delta: Int) = Year(year + delta)
+    operator fun minus(delta: Int) = Year(year - delta)
 
     /**
      * Compares two years.

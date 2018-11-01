@@ -24,6 +24,9 @@ inline class TimeSpan(val milliseconds: Double) : Comparable<TimeSpan> {
     val days: Double get() = this.milliseconds / (24 * 3600_000.0)
 
     companion object {
+        private const val MILLIS_PER_MICROSECOND = 1.0 / 1000.0
+        private const val MILLIS_PER_NANOSECOND = MILLIS_PER_MICROSECOND / 1000.0
+
         /**
          * Zero time
          */
