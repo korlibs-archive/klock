@@ -131,7 +131,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         }
 
         fun isLeapYear(year: Int): Boolean = Year.isLeap(year)
-        fun daysInMonth(month: Int, isLeap: Boolean): Int = Month.days(month, isLeap)
+        fun daysInMonth(month: Int, isLeap: Boolean): Int = Month(month).days(isLeap)
         fun daysInMonth(month: Int, year: Int): Int = daysInMonth(month, isLeapYear(year))
 
         internal const val EPOCH_INTERNAL_MILLIS = 62135596800000.0 // Millis since 00-00-0000 00:00 UTC to UNIX EPOCH
@@ -142,15 +142,15 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
          * Returns milliseconds since EPOCH.
          */
         internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Double =
-            (Year(year).daysSinceOne + Month.daysToStart(month, year) + day - 1) * MILLIS_PER_DAY.toDouble() - EPOCH_INTERNAL_MILLIS
+            (Year(year).daysSinceOne + Month(month).daysToStart(year) + day - 1) * MILLIS_PER_DAY.toDouble() - EPOCH_INTERNAL_MILLIS
 
         private fun timeToMillisUnchecked(hour: Int, minute: Int, second: Int): Double =
             hour.toDouble() * MILLIS_PER_HOUR + minute.toDouble() * MILLIS_PER_MINUTE + second.toDouble() * MILLIS_PER_SECOND
 
         private fun dateToMillis(year: Int, month: Int, day: Int): Double {
             //Year.checked(year)
-            Month.check(month)
-            if (day !in 1..Month.days(month, year)) throw DateException("Day $day not valid for year=$year and month=$month")
+            Month.checked(month)
+            if (day !in 1..Month(month).days(year)) throw DateException("Day $day not valid for year=$year and month=$month")
             return dateToMillisUnchecked(year, month, day)
         }
 
@@ -250,7 +250,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
                 year += (i - (Month.Count - 1)) / Month.Count
             }
             //Year.checked(year)
-            val days = Month.days(month, year)
+            val days = Month(month).days(year)
             if (day > days) day = days
 
             DateTime(dateToMillisUnchecked(year, month, day) + (zeroMillis % MILLIS_PER_DAY) + deltaMilliseconds)
