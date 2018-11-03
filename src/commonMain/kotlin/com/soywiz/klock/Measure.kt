@@ -1,22 +1,19 @@
 package com.soywiz.klock
 
+/**
+ * Executes a [callback] and measure the time it takes to complete.
+ */
 inline fun measureTime(callback: () -> Unit): TimeSpan {
-    val start = Klock.currentTimeMillisDouble
+    val start = Klock.currentTime
     callback()
-    val end = Klock.currentTimeMillisDouble
-    return (end - start).milliseconds
+    val end = Klock.currentTime
+    return end - start
 }
 
-// Once DateTime is inline:
-//inline fun measureTime(callback: () -> Unit): TimeSpan {
-//    val start = Klock.currentTime
-//    callback()
-//    val end = Klock.currentTime
-//    return end - start
-//}
-
-data class TimedResult<T>(val result: T, val time: TimeSpan)
-
+/**
+ * Executes a [callback] measuring the time it takes to complete,
+ * returning a [TimedResult] with the time and the returning value of the callback.
+ */
 inline fun <T : Any> measureTimeWithResult(callback: () -> T): TimedResult<T> {
     lateinit var result: T
     val elapsed = measureTime {
@@ -24,6 +21,11 @@ inline fun <T : Any> measureTimeWithResult(callback: () -> T): TimedResult<T> {
     }
     return TimedResult(result, elapsed)
 }
+
+/**
+ * Represents a [result] associated to a [time].
+ */
+data class TimedResult<T>(val result: T, val time: TimeSpan)
 
 @Deprecated("", ReplaceWith("measureTime(callback).millisecondsInt"))
 inline fun measureTimeMs(callback: () -> Unit): Int = measureTime(callback).millisecondsInt

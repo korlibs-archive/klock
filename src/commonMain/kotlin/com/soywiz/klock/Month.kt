@@ -28,22 +28,22 @@ enum class Month(
     /** 0: [January], 1: [February], 2: [March], 3: [April], 4: [May], 5: [June], 6: [July], 7: [August], 8: [September], 9: [October], 10: [November], 11: [December] */
     val index0: Int get() = index1 - 1
 
-    /** Number of days in a specific month (28-31) depending whether the year [isLeap] or not. */
-    fun days(isLeap: Boolean): Int = if (isLeap) daysLeap else daysCommon
+    /** Number of days in a specific month (28-31) depending whether the year is [leap] or not. */
+    fun days(leap: Boolean): Int = if (leap) daysLeap else daysCommon
     /** Number of days in a specific month (28-31) depending whether the [year] or not. */
     fun days(year: Int): Int = days(Year(year).isLeap)
     /** Number of days in a specific month (28-31) depending whether the [year] or not. */
     fun days(year: Year): Int = days(year.isLeap)
 
-    /** Number of days since the start of the year [isLeap] to reach this month. */
-    fun daysToStart(isLeap: Boolean): Int = DAYS_TO_START(isLeap)[index0]
+    /** Number of days since the start of the year is [leap] to reach this month. */
+    fun daysToStart(leap: Boolean): Int = DAYS_TO_START(leap)[index0]
     /** Number of days since the start of the [year] to reach this month. */
     fun daysToStart(year: Int): Int = daysToStart(Year(year).isLeap)
     /** Number of days since the start of the [year] to reach this month. */
     fun daysToStart(year: Year): Int = daysToStart(year.isLeap)
 
-    /** Number of days since the start of the year [isLeap] to reach next month. */
-    fun daysToEnd(isLeap: Boolean): Int = DAYS_TO_START(isLeap)[index1]
+    /** Number of days since the start of the year is [leap] to reach next month. */
+    fun daysToEnd(leap: Boolean): Int = DAYS_TO_START(leap)[index1]
     /** Number of days since the start of the [year] to reach next month. */
     fun daysToEnd(year: Int): Int = daysToEnd(Year(year).isLeap)
     /** Number of days since the start of the [year] to reach next month. */
@@ -83,12 +83,12 @@ enum class Month(
         fun checked(index1: Int) = BY_INDEX0[index1.also { if (index1 !in 1..12) throw DateException("Month $index1 not in 1..12") } - 1]
 
         /**
-         * Gets the [Month] of a [dayOfYear] in a [isLeap] year.
+         * Gets the [Month] of a [dayOfYear] in a [leap] year.
          *
          * Returns null if the year doesn't contain that [dayOfYear].
          */
-        fun fromDayOfYear(dayOfYear: Int, isLeap: Boolean): Month? {
-            val days = DAYS_TO_START(isLeap)
+        fun fromDayOfYear(dayOfYear: Int, leap: Boolean): Month? {
+            val days = DAYS_TO_START(leap)
             val day0 = dayOfYear - 1
             val guess = day0 / 32
 
@@ -110,7 +110,7 @@ enum class Month(
         private val DAYS_TO_START_LEAP = generateDaysToStart(leap = true)
         private val DAYS_TO_START_COMMON = generateDaysToStart(leap = false)
 
-        private inline fun generateDaysToStart(leap: Boolean): IntArray {
+        private fun generateDaysToStart(leap: Boolean): IntArray {
             var total = 0
             return IntArray(13) {
                 total += if (it == 0) 0 else BY_INDEX0[it - 1].days(leap)
