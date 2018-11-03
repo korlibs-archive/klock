@@ -1,9 +1,18 @@
 package com.soywiz.klock
 
-data class DateRange(val from: DateTime, val to: DateTime, val inclusive: Boolean) {
-    val duration by lazy { to - from }
+/**
+ * Represents an open or close range between two dates.
+ */
+data class DateTimeRange(val from: DateTime, val to: DateTime, val inclusive: Boolean) {
+    /**
+     * Duration [TimeSpan] without having into account actual months/years.
+     */
+    val duration: TimeSpan by lazy { to - from }
 
-    val span by lazy {
+    /**
+     * [DateTimeSpan] distance between two dates, month and year aware.
+     */
+    val span: DateTimeSpan by lazy {
         val reverse = to < from
         val rfrom = if (!reverse) from else to
         val rto = if (!reverse) to else from
@@ -37,6 +46,9 @@ data class DateRange(val from: DateTime, val to: DateTime, val inclusive: Boolea
         if (reverse) -out else out
     }
 
+    /**
+     * Checks if a date is contained in this range.
+     */
     operator fun contains(date: DateTime): Boolean {
         val unix = date.unixDouble
         val from = from.unixDouble
@@ -49,5 +61,12 @@ data class DateRange(val from: DateTime, val to: DateTime, val inclusive: Boolea
     }
 }
 
-operator fun DateTime.rangeTo(other: DateTime) = DateRange(this, other, inclusive = true)
-infix fun DateTime.until(other: DateTime) = DateRange(this, other, inclusive = false)
+/**
+ * Generates a closed range between two [DateTime]
+ */
+operator fun DateTime.rangeTo(other: DateTime) = DateTimeRange(this, other, inclusive = true)
+
+/**
+ * Generates a open range from the right between two [DateTime].
+ */
+infix fun DateTime.until(other: DateTime) = DateTimeRange(this, other, inclusive = false)
