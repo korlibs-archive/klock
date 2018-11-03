@@ -6,10 +6,10 @@ class KlockTest {
     //@Test
     @Test
     fun testTimeAdvances() {
-        val time1 = Klock.currentTimeMillis()
+        val time1 = DateTime.nowUnix()
         assertTrue("Time is provided in milliseconds since EPOCH. Expected ($time1 >= 1508887000000)") { time1 >= 1508887000000 }
         while (true) {
-            val time2 = Klock.currentTimeMillis()
+            val time2 = DateTime.nowUnix()
             assertTrue("Time advances") { time2 >= time1 }
             if (time2 > time1) break
         }
@@ -17,6 +17,6 @@ class KlockTest {
 
     @Test
     fun testThatLocalTimezoneOffsetRuns() {
-        assertTrue(Klock.getLocalTimezoneOffsetMinutes(0L) != -1)
+        assertTrue(TimezoneOffset.local(DateTime(0L)).seconds != -1.0)
     }
 }

@@ -22,9 +22,6 @@ enum class DayOfWeek(
      */
     val index1 get() = index0 + 1
 
-    @Deprecated("", ReplaceWith("index0"))
-    val index get() = index0
-
     companion object {
         private val BY_INDEX0 = values()
 

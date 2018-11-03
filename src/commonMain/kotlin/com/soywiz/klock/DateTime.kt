@@ -47,10 +47,25 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         fun fromUnix(time: Double): DateTime = DateTime(time)
         fun fromUnix(time: Long): DateTime = fromUnix(time.toDouble())
 
+        /**
+         * Returns the current time as [DateTime].
+         *
+         * Note that since [DateTime] is inline, this property doesn't allocate on JavaScript.
+         */
         fun now(): DateTime = DateTime(KlockInternal.currentTime)
         fun nowLocal(): DateTimeWithOffset = DateTimeWithOffset.nowLocal()
+
+        /**
+         * Returns the total milliseconds since unix epoch.
+         *
+         * The same as [nowUnixLong] but as double. To prevent allocation on
+         * targets without Long support.
+         */
         fun nowUnix(): Double = KlockInternal.currentTime
 
+        /**
+         * Returns the total milliseconds since unix epoch.
+         */
         fun nowUnixLong(): Long = KlockInternal.currentTime.toLong()
 
         // Can't produce errors on invalid dates and tries to adjust it to a valid date.
@@ -190,7 +205,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
     }
 
     val zeroMillis: Double get() = EPOCH_INTERNAL_MILLIS + unixMillis
-    val localOffset: TimeSpan get() = Klock.localTimezoneOffset(DateTime(unixDouble))
+    val localOffset: TimeSpan get() = TimezoneOffset.local(DateTime(unixDouble))
 
     val unixDouble: Double get() = unixMillis
     val year: Int get() = getDatePart(zeroMillis, DatePart.Year)
@@ -208,13 +223,10 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
     val month0: Int get() = month1 - 1
     val month: Month get() = Month[month1]
 
-    val localBase get() = DateTimeWithOffset(this, localOffset)
+    val localBase get() = DateTimeWithOffset(this, localOffset.offset)
     val localAdjusted get() = DateTimeWithOffset.adjusted(this, localOffset)
 
-    @Deprecated("", ReplaceWith("local"))
-    fun toLocal() = localBase
-
-    fun toOffsetBase(offset: TimeSpan) = DateTimeWithOffset(this, offset)
+    fun toOffsetBase(offset: TimeSpan) = DateTimeWithOffset(this, offset.offset)
     fun toOffsetBase(minutes: Int) = toOffsetBase(minutes.minutes)
 
     fun toOffsetAdjusted(offset: TimeSpan) = DateTimeWithOffset.adjusted(this, offset)

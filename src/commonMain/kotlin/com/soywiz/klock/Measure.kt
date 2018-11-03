@@ -4,9 +4,9 @@ package com.soywiz.klock
  * Executes a [callback] and measure the time it takes to complete.
  */
 inline fun measureTime(callback: () -> Unit): TimeSpan {
-    val start = Klock.currentTime
+    val start = DateTime.now()
     callback()
-    val end = Klock.currentTime
+    val end = DateTime.now()
     return end - start
 }
 
@@ -26,9 +26,3 @@ inline fun <T : Any> measureTimeWithResult(callback: () -> T): TimedResult<T> {
  * Represents a [result] associated to a [time].
  */
 data class TimedResult<T>(val result: T, val time: TimeSpan)
-
-@Deprecated("", ReplaceWith("measureTime(callback).millisecondsInt"))
-inline fun measureTimeMs(callback: () -> Unit): Int = measureTime(callback).millisecondsInt
-
-@Deprecated("", ReplaceWith("measureTimeWithResult(callback)"))
-inline fun <T : Any> measureTime(callback: () -> T): TimedResult<T> = measureTimeWithResult(callback)
