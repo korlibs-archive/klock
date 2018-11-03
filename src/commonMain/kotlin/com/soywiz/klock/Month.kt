@@ -3,42 +3,59 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
-/**
- * Represents one the twelve months of the year.
- */
+/** Represents one the twelve months of the year. */
 enum class Month(
     /** 1: [January], 2: [February], 3: [March], 4: [April], 5: [May], 6: [June], 7: [July], 8: [August], 9: [September], 10: [October], 11: [November], 12: [December] */
-    val index1: Int
+    val index1: Int,
+    /** Number of days of this month in a common year */
+    val daysCommon: Int,
+    /** Number of days of this month in a leap year */
+    val daysLeap: Int = daysCommon
 ) {
-    January(1), // 31
-    February(2), // 28/29
-    March(3), // 31
-    April(4), // 30
-    May(5), // 31
-    June(6), // 30
-    July(7), // 31
-    August(8), // 31
-    September(9), // 30
-    October(10), // 31
-    November(11), // 30
-    December(12); // 31
+    January(1, daysCommon = 31),
+    February(2, daysCommon = 28, daysLeap = 29),
+    March(3, daysCommon = 31),
+    April(4, daysCommon = 30),
+    May(5, daysCommon = 31),
+    June(6, daysCommon = 30),
+    July(7, daysCommon = 31),
+    August(8, daysCommon = 31),
+    September(9, daysCommon = 30),
+    October(10, daysCommon = 31),
+    November(11, daysCommon = 30),
+    December(12, daysCommon = 31);
 
+    /** 0: [January], 1: [February], 2: [March], 3: [April], 4: [May], 5: [June], 6: [July], 7: [August], 8: [September], 9: [October], 10: [November], 11: [December] */
     val index0: Int get() = index1 - 1
 
-    fun days(isLeap: Boolean): Int = DAYS_TO_MONTH(isLeap).let { days -> days[index1] - days[index0] }
-    fun daysToStart(isLeap: Boolean): Int = DAYS_TO_MONTH(isLeap)[index0]
-    fun daysToEnd(isLeap: Boolean): Int = DAYS_TO_MONTH(isLeap)[index1]
-
+    /** Number of days in a specific month (28-31) depending whether the year [isLeap] or not. */
+    fun days(isLeap: Boolean): Int = if (isLeap) daysLeap else daysCommon
+    /** Number of days in a specific month (28-31) depending whether the [year] or not. */
     fun days(year: Int): Int = days(Year(year).isLeap)
-    fun daysToStart(year: Int): Int = daysToStart(Year(year).isLeap)
-    fun daysToEnd(year: Int): Int = daysToEnd(Year(year).isLeap)
-
+    /** Number of days in a specific month (28-31) depending whether the [year] or not. */
     fun days(year: Year): Int = days(year.isLeap)
+
+    /** Number of days since the start of the year [isLeap] to reach this month. */
+    fun daysToStart(isLeap: Boolean): Int = DAYS_TO_START(isLeap)[index0]
+    /** Number of days since the start of the [year] to reach this month. */
+    fun daysToStart(year: Int): Int = daysToStart(Year(year).isLeap)
+    /** Number of days since the start of the [year] to reach this month. */
     fun daysToStart(year: Year): Int = daysToStart(year.isLeap)
+
+    /** Number of days since the start of the year [isLeap] to reach next month. */
+    fun daysToEnd(isLeap: Boolean): Int = DAYS_TO_START(isLeap)[index1]
+    /** Number of days since the start of the [year] to reach next month. */
+    fun daysToEnd(year: Int): Int = daysToEnd(Year(year).isLeap)
+    /** Number of days since the start of the [year] to reach next month. */
     fun daysToEnd(year: Year): Int = daysToEnd(year.isLeap)
 
-    operator fun plus(months: Int): Month = Month[index1 + months]
-    operator fun minus(months: Int): Month = Month[index1 - months]
+    /** Previous [Month]. */
+    val previous: Month get() = this - 1
+    /** Next [Month]. */
+    val next: Month get() = this + 1
+
+    operator fun plus(delta: Int): Month = Month[index1 + delta]
+    operator fun minus(delta: Int): Month = Month[index1 - delta]
 
     operator fun minus(other: Month): Int = abs(this.index0 - other.index0)
 
@@ -48,15 +65,31 @@ enum class Month(
          */
         const val Count = 12
 
+        /** 1: [January], 2: [February], 3: [March], 4: [April], 5: [May], 6: [June], 7: [July], 8: [August], 9: [September], 10: [October], 11: [November], 12: [December] */
         operator fun invoke(index1: Int) = adjusted(index1)
+        /** 1: [January], 2: [February], 3: [March], 4: [April], 5: [May], 6: [June], 7: [July], 8: [August], 9: [September], 10: [October], 11: [November], 12: [December] */
         operator fun get(index1: Int) = adjusted(index1)
 
+        /**
+         * Gets the [Month] from a month index where [January]=1 wrapping the index to valid values.
+         *
+         * For example 0 and 12=[December], 1 and 13=[January], -1 and 11=[November].
+         */
         fun adjusted(index1: Int) = BY_INDEX0[(index1 - 1) umod 12]
+
+        /**
+         * Gets the [Month] from a month index where [January]=1 checking that the provided [index1] is valid between 1..12.
+         */
         fun checked(index1: Int) = BY_INDEX0[index1.also { if (index1 !in 1..12) throw DateException("Month $index1 not in 1..12") } - 1]
 
-        fun fromDayOfYear(day: Int, isLeap: Boolean): Month? {
-            val days = DAYS_TO_MONTH(isLeap)
-            val day0 = day - 1
+        /**
+         * Gets the [Month] of a [dayOfYear] in a [isLeap] year.
+         *
+         * Returns null if the year doesn't contain that [dayOfYear].
+         */
+        fun fromDayOfYear(dayOfYear: Int, isLeap: Boolean): Month? {
+            val days = DAYS_TO_START(isLeap)
+            val day0 = dayOfYear - 1
             val guess = day0 / 32
 
             if (guess in 0..11 && day0 in days[guess] until days[guess + 1]) return Month[guess + 1]
@@ -65,9 +98,24 @@ enum class Month(
             return null
         }
 
+        /**
+         * Gets the [Month] of a [dayOfYear] in the specified [year].
+         *
+         * Returns null if the year doesn't contain that [dayOfYear].
+         */
+        fun fromDayOfYear(dayOfYear: Int, year: Year): Month? = fromDayOfYear(dayOfYear, year.isLeap)
+
         private val BY_INDEX0 = values()
-        private fun DAYS_TO_MONTH(isLeap: Boolean): IntArray = if (isLeap) DAYS_TO_MONTH_366 else DAYS_TO_MONTH_365
-        private val DAYS_TO_MONTH_366 = intArrayOf(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366)
-        private val DAYS_TO_MONTH_365 = intArrayOf(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365)
+        private fun DAYS_TO_START(isLeap: Boolean): IntArray = if (isLeap) DAYS_TO_START_LEAP else DAYS_TO_START_COMMON
+        private val DAYS_TO_START_LEAP = generateDaysToStart(leap = true)
+        private val DAYS_TO_START_COMMON = generateDaysToStart(leap = false)
+
+        private inline fun generateDaysToStart(leap: Boolean): IntArray {
+            var total = 0
+            return IntArray(13) {
+                total += if (it == 0) 0 else BY_INDEX0[it - 1].days(leap)
+                total
+            }
+        }
     }
 }
