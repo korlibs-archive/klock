@@ -1,8 +1,18 @@
 package com.soywiz.klock
 
+/**
+ * Creates a [DateSpan] representing these years.
+ */
 inline val Int.years get() = DateSpan(12 * this)
+
+/**
+ * Creates a [DateSpan] representing these months.
+ */
 inline val Int.months get() = DateSpan(this)
 
+/**
+ * Represents a number of years and months.
+ */
 inline class DateSpan(val totalMonths: Int) : Comparable<DateSpan> {
     operator fun unaryMinus() = DateSpan(-totalMonths)
     operator fun unaryPlus() = DateSpan(+totalMonths)

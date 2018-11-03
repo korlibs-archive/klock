@@ -3,7 +3,13 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
-enum class Month(val index: Int) {
+/**
+ * Represents one the twelve months of the year.
+ */
+enum class Month(
+    /** 1: [January], 2: [February], 3: [March], 4: [April], 5: [May], 6: [June], 7: [July], 8: [August], 9: [September], 10: [October], 11: [November], 12: [December] */
+    val index1: Int
+) {
     January(1), // 31
     February(2), // 28/29
     March(3), // 31
@@ -17,22 +23,22 @@ enum class Month(val index: Int) {
     November(11), // 30
     December(12); // 31
 
-    val index0: Int get() = index - 1
+    val index0: Int get() = index1 - 1
 
-    fun days(isLeap: Boolean): Int = days(index, isLeap)
-    fun daysToStart(isLeap: Boolean): Int = daysToStart(index, isLeap)
-    fun daysToEnd(isLeap: Boolean): Int = daysToEnd(index, isLeap)
+    fun days(isLeap: Boolean): Int = days(index1, isLeap)
+    fun daysToStart(isLeap: Boolean): Int = daysToStart(index1, isLeap)
+    fun daysToEnd(isLeap: Boolean): Int = daysToEnd(index1, isLeap)
 
-    fun days(year: Int): Int = days(index, year)
-    fun daysToStart(year: Int): Int = daysToStart(index, year)
-    fun daysToEnd(year: Int): Int = daysToEnd(index, year)
+    fun days(year: Int): Int = days(index1, year)
+    fun daysToStart(year: Int): Int = daysToStart(index1, year)
+    fun daysToEnd(year: Int): Int = daysToEnd(index1, year)
 
-    fun days(year: Year): Int = days(index, year.year)
-    fun daysToStart(year: Year): Int = daysToStart(index, year.year)
-    fun daysToEnd(year: Year): Int = daysToEnd(index, year.year)
+    fun days(year: Year): Int = days(index1, year.year)
+    fun daysToStart(year: Year): Int = daysToStart(index1, year.year)
+    fun daysToEnd(year: Year): Int = daysToEnd(index1, year.year)
 
-    operator fun plus(months: Int): Month = Month[index + months]
-    operator fun minus(months: Int): Month = Month[index - months]
+    operator fun plus(months: Int): Month = Month[index1 + months]
+    operator fun minus(months: Int): Month = Month[index1 - months]
 
     operator fun minus(other: Month): Int = abs(this.index0 - other.index0)
 

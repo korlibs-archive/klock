@@ -50,13 +50,31 @@ inline class Year(val year: Int) : Comparable<Year> {
             return Year(1 + v1 + (v4 * 4) + (v100 * 100) + (v400 * 400))
         }
 
+        /**
+         * Get the number of days of a year depending on being leap or not.
+         * Normal, non leap years contains 365 days, while leap ones 366.
+         */
         fun days(isLeap: Boolean) = if (isLeap) DAYS_LEAP else DAYS_COMMON
 
+        /**
+         * Return the number of leap years that happened between 1 and the specified [year].
+         */
         fun leapCountSinceOne(year: Int): Int = ((year - 1) / 4) - ((year - 1) / 100) + ((year - 1) / 400)
+
+        /**
+         * Number of days since 1 and the beginning of the specified [year].
+         */
         fun daysSinceOne(year: Int): Int = DAYS_COMMON * (year - 1) + leapCountSinceOne(year)
 
-        const val DAYS_LEAP = 366
+        /**
+         * Number of days in a normal year.
+         */
         const val DAYS_COMMON = 365
+
+        /**
+         * Number of days in a leap year.
+         */
+        const val DAYS_LEAP = 366
 
         private const val LEAP_PER_4_YEARS = 1
         private const val LEAP_PER_100_YEARS = 24 // 24 or 25 (25 the first chunk)

@@ -24,7 +24,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             second: Int = 0,
             milliseconds: Int = 0
         ): DateTime = DateTime(
-            DateTime.dateToMillis(year, month.index, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
+            DateTime.dateToMillis(year, month.index1, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
         )
 
         operator fun invoke(
@@ -178,7 +178,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
 
             // Month
             val month = Month.fromDayOfYear(dayOfYear, isLeap) ?: error("Invalid dayOfYear=$dayOfYear, isLeap=$isLeap")
-            if (part == DatePart.Month) return month.index
+            if (part == DatePart.Month) return month.index1
 
             // Day
             val dayOfMonth = dayOfYear - month.daysToStart(isLeap)
@@ -237,7 +237,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         deltaMonths == 0 -> DateTime(this.unixMillis + deltaMilliseconds)
         else -> {
             var year = this.year
-            var month = this.month.index
+            var month = this.month.index1
             var day = this.dayOfMonth
             val i = month - 1 + deltaMonths
 
