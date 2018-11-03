@@ -48,6 +48,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         fun fromUnix(time: Long): DateTime = fromUnix(time.toDouble())
 
         fun now(): DateTime = DateTime(KlockInternal.currentTime)
+        fun nowLocal(): DateTimeWithOffset = DateTimeWithOffset.nowLocal()
         fun nowUnix(): Double = KlockInternal.currentTime
 
         fun nowUnixLong(): Long = KlockInternal.currentTime.toLong()

@@ -1,13 +1,20 @@
 package com.soywiz.klock
 
+/**
+ * Class to provide time that can be overriden to mock or change its behaviour.
+ */
 open class TimeProvider {
-    open fun currentTimeMillis() = Klock.currentTimeMillis()
+    /**
+     * Returns a [DateTime] for this provider.
+     */
+    open fun now(): DateTime = DateTime.now()
 
     companion object {
-        fun now() = Klock.currentTimeMillis()
-
-        operator fun invoke(callback: () -> Long) = object : TimeProvider() {
-            override fun currentTimeMillis(): Long = callback()
+        /**
+         * Constructs a [TimeProvider] from a [callback] producing a [DateTime].
+         */
+        operator fun invoke(callback: () -> DateTime) = object : TimeProvider() {
+            override fun now(): DateTime = callback()
         }
     }
 }

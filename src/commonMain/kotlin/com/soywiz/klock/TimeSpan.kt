@@ -3,15 +3,51 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
+/**
+ * [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds].
+ */
 inline val Number.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
+
+/**
+ * [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds].
+ */
 inline val Number.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
+
+/**
+ * [TimeSpan] representing this number as [milliseconds] or 1 / 1_000 [seconds].
+ */
 inline val Number.milliseconds get() = TimeSpan.fromMilliseconds(this.toDouble())
+
+/**
+ * [TimeSpan] representing this number as [seconds].
+ */
 inline val Number.seconds get() = TimeSpan.fromSeconds((this.toDouble()))
+
+/**
+ * [TimeSpan] representing this number as [minutes] or 60 [seconds].
+ */
 inline val Number.minutes get() = TimeSpan.fromMinutes(this.toDouble())
+
+/**
+ * [TimeSpan] representing this number as [hours] or 3_600 [seconds].
+ */
 inline val Number.hours get() = TimeSpan.fromHours(this.toDouble())
+
+/**
+ * [TimeSpan] representing this number as [days] or 86_400 [seconds].
+ */
 inline val Number.days get() = TimeSpan.fromDays(this.toDouble())
+
+/**
+ * [TimeSpan] representing this number as [weeks] or 604_800 [seconds].
+ */
 inline val Number.weeks get() = TimeSpan.fromWeeks(this.toDouble())
 
+/**
+ * Represents a span of time, with [milliseconds] precision.
+ *
+ * It is an inline class wrapping [Double] instead of [Long] to work on JavaScript without allocations.
+ */
 @Suppress("DataClassPrivateConstructor")
 inline class TimeSpan(val milliseconds: Double) : Comparable<TimeSpan> {
     val nanoseconds: Double get() = this.milliseconds * 1_000_000.0

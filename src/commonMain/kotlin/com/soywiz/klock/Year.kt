@@ -110,11 +110,11 @@ inline class Year(val year: Int) : Comparable<Year> {
      */
     val daysSinceOne: Int get() = daysSinceOne(year)
 
-    operator fun plus(delta: Int) = Year(year + delta)
-    operator fun minus(delta: Int) = Year(year - delta)
-
     /**
      * Compares two years.
      */
     override fun compareTo(other: Year): Int = this.year.compareTo(other.year)
+
+    operator fun plus(delta: Int) = Year(year + delta)
+    operator fun minus(delta: Int) = Year(year - delta)
 }
