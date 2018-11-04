@@ -3,7 +3,7 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 
 data class DateTimeSpan(
-    val dateSpan: MonthSpan,
+    val monthSpan: MonthSpan,
     val timeSpan: TimeSpan
 ) : Comparable<DateTimeSpan> {
     constructor(
@@ -20,12 +20,12 @@ data class DateTimeSpan(
         weeks.weeks + days.days + hours.hours + minutes.minutes + seconds.seconds + milliseconds.milliseconds
     )
 
-    operator fun unaryMinus() = DateTimeSpan(-dateSpan, -timeSpan)
-    operator fun unaryPlus() = DateTimeSpan(+dateSpan, +timeSpan)
+    operator fun unaryMinus() = DateTimeSpan(-monthSpan, -timeSpan)
+    operator fun unaryPlus() = DateTimeSpan(+monthSpan, +timeSpan)
 
-    operator fun plus(other: TimeSpan) = DateTimeSpan(dateSpan, timeSpan + other)
-    operator fun plus(other: MonthSpan) = DateTimeSpan(dateSpan + other, timeSpan)
-    operator fun plus(other: DateTimeSpan) = DateTimeSpan(dateSpan + other.dateSpan, timeSpan + other.timeSpan)
+    operator fun plus(other: TimeSpan) = DateTimeSpan(monthSpan, timeSpan + other)
+    operator fun plus(other: MonthSpan) = DateTimeSpan(monthSpan + other, timeSpan)
+    operator fun plus(other: DateTimeSpan) = DateTimeSpan(monthSpan + other.monthSpan, timeSpan + other.timeSpan)
 
     operator fun minus(other: TimeSpan) = this + -other
     operator fun minus(other: MonthSpan) = this + -other
@@ -34,7 +34,7 @@ data class DateTimeSpan(
     inline operator fun times(times: Number) = times(times.toDouble())
     inline operator fun div(times: Number) = times(1.0 / times.toDouble())
 
-    operator fun times(times: Double) = DateTimeSpan((dateSpan * times), (timeSpan * times))
+    operator fun times(times: Double) = DateTimeSpan((monthSpan * times), (timeSpan * times))
 
     private class ComputedTime(val weeks: Int, val days: Int, val hours: Int, val minutes: Int, val seconds: Int, val milliseconds: Double) {
         companion object {
@@ -52,10 +52,10 @@ data class DateTimeSpan(
 
     private val computed by lazy { ComputedTime(timeSpan) }
 
-    val years: Int get() = dateSpan.years
-    val months: Int get() = dateSpan.months
+    val years: Int get() = monthSpan.years
+    val months: Int get() = monthSpan.months
 
-    val totalMonths: Int get() = dateSpan.totalMonths
+    val totalMonths: Int get() = monthSpan.totalMonths
     val totalMilliseconds: Double get() = timeSpan.milliseconds
 
     val weeks: Int get() = computed.weeks
@@ -70,7 +70,7 @@ data class DateTimeSpan(
 
     // @TODO: If milliseconds overflow months this could not be exactly true. But probably will work in most cases.
     override fun compareTo(other: DateTimeSpan): Int {
-        if (this.totalMonths != other.totalMonths) return this.dateSpan.compareTo(other.dateSpan)
+        if (this.totalMonths != other.totalMonths) return this.monthSpan.compareTo(other.monthSpan)
         return this.timeSpan.compareTo(other.timeSpan)
     }
 
@@ -82,7 +82,7 @@ data class DateTimeSpan(
         if (hours != 0) add("${hours}H")
         if (minutes != 0) add("${minutes}m")
         if (seconds != 0 || milliseconds != 0.0) add("${secondsIncludingMilliseconds}s")
-        if (dateSpan == 0.years && ((timeSpan == 0.seconds) || (timeSpan == (-0).seconds))) add("0s")
+        if (monthSpan == 0.years && ((timeSpan == 0.seconds) || (timeSpan == (-0).seconds))) add("0s")
     }.joinToString(" ")
 
     override fun toString(): String = toString(includeWeeks = true)

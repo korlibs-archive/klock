@@ -22,7 +22,7 @@ inline class MonthSpan(
 
     operator fun plus(other: TimeSpan) = DateTimeSpan(this, other)
     operator fun plus(other: MonthSpan) = MonthSpan(totalMonths + other.totalMonths)
-    operator fun plus(other: DateTimeSpan) = DateTimeSpan(other.dateSpan + this, other.timeSpan)
+    operator fun plus(other: DateTimeSpan) = DateTimeSpan(other.monthSpan + this, other.timeSpan)
 
     operator fun minus(other: TimeSpan) = this + -other
     operator fun minus(other: MonthSpan) = this + -other

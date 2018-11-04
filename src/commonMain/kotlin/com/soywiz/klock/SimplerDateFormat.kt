@@ -127,24 +127,6 @@ class SimplerDateFormat(val format: String) {
         return out
     }
 
-    //fun parseDouble(str: String): Double = parse(str).base.unixDouble
-    //fun parseUtc(str: String): Double = parse(str).adjusted.unixDouble
-//
-    //fun parseLong(str: String): Long = parse(str).base.unixLong
-    //fun parseUtcLong(str: String): Long = parse(str).adjusted.unixLong
-//
-    //fun parseDoubleOrNull(str: String?): Double? = try {
-    //    str?.let { parseDouble(str) }
-    //} catch (e: Throwable) {
-    //    null
-    //}
-//
-    //fun parseDoubleOrNullLong(str: String?): Long? = try {
-    //    str?.let { parseDouble(str).toLong() }
-    //} catch (e: Throwable) {
-    //    null
-    //}
-
     fun parse(str: String): DateTimeWithOffset =
         tryParse(str, doThrow = true) ?: throw DateException("Not a valid format: '$str' for '$format'")
 

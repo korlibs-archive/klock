@@ -56,7 +56,7 @@ data class DateTimeWithOffset(
     fun add(dateSpan: MonthSpan, timeSpan: TimeSpan): DateTimeWithOffset = DateTimeWithOffset(base.add(dateSpan, timeSpan), offset)
 
     operator fun plus(delta: MonthSpan) = add(delta, 0.milliseconds)
-    operator fun plus(delta: DateTimeSpan) = add(delta.dateSpan, delta.timeSpan)
+    operator fun plus(delta: DateTimeSpan) = add(delta.monthSpan, delta.timeSpan)
     operator fun plus(delta: TimeSpan) = add(0.months, delta)
 
     operator fun minus(delta: MonthSpan) = this + (-delta)
