@@ -22,7 +22,7 @@ inline class TimezoneOffset(val milliseconds: Double) {
          *
          * For example, GMT+01 would return 60.minutes.
          */
-        fun local(time: DateTime): TimeSpan = KlockInternal.localTimezoneOffsetMinutes(time)
+        fun local(time: DateTime): TimezoneOffset = KlockInternal.localTimezoneOffsetMinutes(time).offset
     }
 }
 

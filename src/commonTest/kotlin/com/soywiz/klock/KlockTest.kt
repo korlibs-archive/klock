@@ -17,6 +17,6 @@ class KlockTest {
 
     @Test
     fun testThatLocalTimezoneOffsetRuns() {
-        assertTrue(TimezoneOffset.local(DateTime(0L)).seconds != -1.0)
+        assertTrue(TimezoneOffset.local(DateTime(0L)).time.seconds != -1.0)
     }
 }

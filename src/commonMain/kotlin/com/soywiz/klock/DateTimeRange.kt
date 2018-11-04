@@ -50,9 +50,9 @@ data class DateTimeRange(val from: DateTime, val to: DateTime, val inclusive: Bo
      * Checks if a date is contained in this range.
      */
     operator fun contains(date: DateTime): Boolean {
-        val unix = date.unixDouble
-        val from = from.unixDouble
-        val to = to.unixDouble
+        val unix = date.unixMillisDouble
+        val from = from.unixMillisDouble
+        val to = to.unixMillisDouble
         if (unix < from) return false
         return when {
             inclusive -> unix <= to

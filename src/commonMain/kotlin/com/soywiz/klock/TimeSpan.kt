@@ -45,6 +45,11 @@ inline class TimeSpan(
     /** Returns the total number of [weeks] for this [TimeSpan] (604_800 [seconds]) */
     val weeks: Double get() = this.milliseconds / MILLIS_PER_WEEK
 
+    /** Returns the total number of [milliseconds] as a [Long] */
+    val millisecondsLong: Long get() = milliseconds.toLong()
+    /** Returns the total number of [milliseconds] as an [Int] */
+    val millisecondsInt: Int get() = milliseconds.toInt()
+
     override fun compareTo(other: TimeSpan): Int = this.milliseconds.compareTo(other.milliseconds)
 
     operator fun unaryMinus() = TimeSpan(-this.milliseconds)

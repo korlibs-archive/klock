@@ -8,7 +8,7 @@ data class DateTimeWithOffset(
     val offset: TimezoneOffset
 ) : Comparable<DateTimeWithOffset> {
     companion object {
-        fun adjusted(adjusted: DateTime, offset: TimeSpan) = DateTimeWithOffset(adjusted + offset, offset.offset)
+        fun adjusted(adjusted: DateTime, offset: TimezoneOffset) = DateTimeWithOffset(adjusted + offset.time, offset)
         fun fromUnixLocal(time: Long): DateTimeWithOffset = fromUnixLocal(time.toDouble())
         fun fromUnixLocal(time: Double): DateTimeWithOffset = DateTime(time).localBase
         fun nowLocal(): DateTimeWithOffset = DateTime.fromUnix(DateTime.nowUnix()).localBase
@@ -27,14 +27,20 @@ data class DateTimeWithOffset(
 
     val offsetMinutes get() = offset.time.minutes.toInt()
 
-    val year: Int get() = base.year
+    val year: Year get() = base.year
+    val yearInt: Int get() = base.yearInt
+
     val month: Month get() = base.month
     val month0: Int get() = base.month0
     val month1: Int get() = base.month1
+
     val dayOfMonth: Int get() = base.dayOfMonth
+
     val dayOfWeek: DayOfWeek get() = base.dayOfWeek
     val dayOfWeekInt: Int get() = base.dayOfWeekInt
+
     val dayOfYear: Int get() = base.dayOfYear
+
     val hours: Int get() = base.hours
     val minutes: Int get() = base.minutes
     val seconds: Int get() = base.seconds
@@ -64,10 +70,10 @@ data class DateTimeWithOffset(
     operator fun minus(delta: TimeSpan) = this + (-delta)
 
     override fun hashCode(): Int = adjusted.hashCode()
-    override fun equals(other: Any?): Boolean = other is DateTimeWithOffset && this.adjusted.unixDouble == other.adjusted.unixDouble
+    override fun equals(other: Any?): Boolean = other is DateTimeWithOffset && this.adjusted.unixMillisDouble == other.adjusted.unixMillisDouble
     override fun compareTo(other: DateTimeWithOffset): Int = this.utc.unixMillis.compareTo(other.utc.unixMillis)
 
-    fun toString(format: SimplerDateFormat): String = format.format(this)
-    fun toString(format: String): String = SimplerDateFormat(format).format(this)
-    override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
+    fun toString(format: DateFormat): String = format.format(this)
+    fun toString(format: String): String = DateFormat(format).format(this)
+    override fun toString(): String = DateFormat.DEFAULT_FORMAT.format(this)
 }

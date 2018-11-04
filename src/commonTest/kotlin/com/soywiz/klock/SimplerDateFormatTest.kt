@@ -4,7 +4,7 @@ import kotlin.test.*
 
 class SimplerDateFormatTest {
     // Sun, 06 Nov 1994 08:49:37 GMT
-    val format = SimplerDateFormat("EEE, dd MMM yyyy HH:mm:ss z")
+    val format = DateFormat("EEE, dd MMM yyyy HH:mm:ss z")
 
     @Test
     fun testParse() {
@@ -23,7 +23,7 @@ class SimplerDateFormatTest {
     }
 
     class StrictOffset {
-        val format = SimplerDateFormat("yyyy-MM-dd'T'HH:mm:ssxxx")
+        val format = DateFormat("yyyy-MM-dd'T'HH:mm:ssxxx")
 
         @Test
         fun testParseUtc() {
@@ -72,7 +72,7 @@ class SimplerDateFormatTest {
     }
 
     class ZuluCapableOffset {
-        val format = SimplerDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        val format = DateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 
         @Test
         fun testParseUtc() {

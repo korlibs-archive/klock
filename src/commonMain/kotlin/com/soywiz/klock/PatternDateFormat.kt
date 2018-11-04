@@ -3,7 +3,7 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
-class SimplerDateFormat(val format: String) {
+class PatternDateFormat(val format: String) : DateFormat {
     companion object {
         private val rx by lazy { Regex("""('[\w]+'|[\w]+\B[^Xx]|[Xx]{1,3}|[\w]+)""") }
         private val englishDaysOfWeek = listOf(
@@ -14,25 +14,6 @@ class SimplerDateFormat(val format: String) {
             "july", "august", "september", "october", "november", "december"
         )
         private val englishMonths3 = englishMonths.map { it.substr(0, 3) }
-
-        val DEFAULT_FORMAT by lazy { SimplerDateFormat("EEE, dd MMM yyyy HH:mm:ss z") }
-        val FORMAT1 by lazy { SimplerDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX") }
-
-        val FORMAT_DATE by lazy { SimplerDateFormat("yyyy-MM-dd") }
-
-        val FORMATS = listOf(DEFAULT_FORMAT, FORMAT1)
-
-        fun parse(str: String): DateTimeWithOffset {
-            var lastError: Throwable? = null
-            for (format in FORMATS) {
-                try {
-                    return format.parse(str)
-                } catch (e: Throwable) {
-                    lastError = e
-                }
-            }
-            throw lastError!!
-        }
     }
 
     private val parts = arrayListOf<String>()
@@ -56,12 +37,7 @@ class SimplerDateFormat(val format: String) {
     // EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
     // YYYY-MM-dd HH:mm:ss
 
-    fun format(date: Double): String = format(DateTime.fromUnix(date))
-    fun format(date: Long): String = format(DateTime.fromUnix(date))
-
-    fun format(dd: DateTime): String = format(dd.toOffsetBase(0))
-
-    fun format(dd: DateTimeWithOffset): String {
+    override fun format(dd: DateTimeWithOffset): String {
         val utc = dd.base
         //val utc = dd.adjusted
         var out = ""
@@ -80,11 +56,11 @@ class SimplerDateFormat(val format: String) {
                 "MMM" -> englishMonths[utc.month0].substr(0, 3).capitalize()
                 "MMMM" -> englishMonths[utc.month0].capitalize()
                 "MMMMM" -> englishMonths[utc.month0].substr(0, 1).capitalize()
-                "y" -> utc.year
-                "yy" -> (utc.year % 100).padded(2)
-                "yyy" -> (utc.year % 1000).padded(3)
-                "yyyy" -> utc.year.padded(4)
-                "YYYY" -> utc.year.padded(4)
+                "y" -> utc.yearInt
+                "yy" -> (utc.yearInt % 100).padded(2)
+                "yyy" -> (utc.yearInt % 1000).padded(3)
+                "yyyy" -> utc.yearInt.padded(4)
+                "YYYY" -> utc.yearInt.padded(4)
                 "H" -> utc.hours.padded(1)
                 "HH" -> utc.hours.padded(2)
                 "h" -> (((12 + utc.hours) % 12)).padded(1)
@@ -127,10 +103,8 @@ class SimplerDateFormat(val format: String) {
         return out
     }
 
-    fun parse(str: String): DateTimeWithOffset =
-        tryParse(str, doThrow = true) ?: throw DateException("Not a valid format: '$str' for '$format'")
 
-    fun tryParse(str: String, doThrow: Boolean = false): DateTimeWithOffset? {
+    override fun tryParse(str: String, doThrow: Boolean): DateTimeWithOffset? {
         var millisecond = 0
         var second = 0
         var minute = 0
@@ -197,4 +171,6 @@ class SimplerDateFormat(val format: String) {
         val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second, millisecond)
         return dateTime.toOffsetBase(offset ?: 0)
     }
+
+    override fun toString(): String = format
 }

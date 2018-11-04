@@ -29,7 +29,7 @@ internal actual object KlockInternal {
     actual fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan = memScoped {
         val t = alloc<time_tVar>()
         val tm = alloc<tm>()
-        t.value = (time.unixLong / 1000L).convert()
+        t.value = (time.unixMillisLong / 1000L).convert()
         localtime_r(t.ptr, tm.ptr)
         tm.tm_gmtoff.toInt().seconds
     }

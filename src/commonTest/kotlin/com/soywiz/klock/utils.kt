@@ -1,6 +1,6 @@
 package com.soywiz.klock
 
-fun SimplerDateFormat.parseLong(str: String) = parse(str).base.unixLong
-fun SimplerDateFormat.parseDouble(str: String) = parse(str).base.unixDouble
-fun SimplerDateFormat.parseDoubleOrNull(str: String) = tryParse(str)?.base?.unixDouble
+fun PatternDateFormat.parseLong(str: String) = parse(str).base.unixMillisLong
+fun PatternDateFormat.parseDouble(str: String) = parse(str).base.unixMillisDouble
+fun PatternDateFormat.parseDoubleOrNull(str: String) = tryParse(str)?.base?.unixMillisDouble
 

@@ -11,7 +11,7 @@ internal actual object KlockInternal {
 
     actual fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan {
         @Suppress("UNUSED_VARIABLE")
-        val rtime = time.unixDouble
+        val rtime = time.unixMillisDouble
         return js("-(new Date(rtime)).getTimezoneOffset()").unsafeCast<Int>().minutes
     }
 }

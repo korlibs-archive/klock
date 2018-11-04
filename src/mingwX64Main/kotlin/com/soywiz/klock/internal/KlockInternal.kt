@@ -25,7 +25,7 @@ internal actual object KlockInternal {
         }
 
     actual fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan = memScoped {
-        val timeAsFileTime = UnixMillisecondsToWindowsTicks(time.unixLong)
+        val timeAsFileTime = UnixMillisecondsToWindowsTicks(time.unixMillisLong)
         val utcFtime = FILETIME_fromWindowsTicks(timeAsFileTime)
         val timezone = getTimeZoneInformation()
         val utcStime = utcFtime.toSystemTime()

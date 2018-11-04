@@ -10,11 +10,36 @@ import com.soywiz.klock.internal.*
  * - Thu Aug 10 -140744 07:15:45 GMT-0014 (Central European Summer Time)
  * - Wed May 23 144683 18:29:30 GMT+0200 (Central European Summer Time)
  */
-inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
+inline class DateTime(
+    /** Number of milliseconds since UNIX [EPOCH] */
+    val unixMillis: Double
+) : Comparable<DateTime> {
     companion object {
+        /** It is the that have elapsed since 00:00:00 UTC, Thursday, 1 January 1970, minus leap seconds. */
         val EPOCH = DateTime(0.0)
 
-        // Can produce errors on invalid dates
+        /**
+         * Constructs a new [DateTime] from date and time information.
+         *
+         * This might throw a [DateException] on invalid dates.
+         */
+        operator fun invoke(
+            year: Year,
+            month: Month,
+            day: Int,
+            hour: Int = 0,
+            minute: Int = 0,
+            second: Int = 0,
+            milliseconds: Int = 0
+        ): DateTime = DateTime(
+            DateTime.dateToMillis(year.year, month.index1, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
+        )
+
+        /**
+         * Constructs a new [DateTime] from date and time information.
+         *
+         * This might throw a [DateException] on invalid dates.
+         */
         operator fun invoke(
             year: Int,
             month: Month,
@@ -27,6 +52,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             DateTime.dateToMillis(year, month.index1, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
         )
 
+        /**
+         * Constructs a new [DateTime] from date and time information.
+         *
+         * This might throw a [DateException] on invalid dates.
+         */
         operator fun invoke(
             year: Int,
             month: Int,
@@ -39,36 +69,12 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             DateTime.dateToMillis(year, month, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
         )
 
-        operator fun invoke(time: Long) = fromUnix(time)
-
-        fun fromString(str: String) = SimplerDateFormat.parse(str)
-        fun parse(str: String) = SimplerDateFormat.parse(str)
-
-        fun fromUnix(time: Double): DateTime = DateTime(time)
-        fun fromUnix(time: Long): DateTime = fromUnix(time.toDouble())
 
         /**
-         * Returns the current time as [DateTime].
+         * Constructs a new [DateTime] from date and time information.
          *
-         * Note that since [DateTime] is inline, this property doesn't allocate on JavaScript.
+         * On invalid dates, this function will try to adjust the specified invalid date to a valid one by clamping components.
          */
-        fun now(): DateTime = DateTime(KlockInternal.currentTime)
-        fun nowLocal(): DateTimeWithOffset = DateTimeWithOffset.nowLocal()
-
-        /**
-         * Returns the total milliseconds since unix epoch.
-         *
-         * The same as [nowUnixLong] but as double. To prevent allocation on
-         * targets without Long support.
-         */
-        fun nowUnix(): Double = KlockInternal.currentTime
-
-        /**
-         * Returns the total milliseconds since unix epoch.
-         */
-        fun nowUnixLong(): Long = KlockInternal.currentTime.toLong()
-
-        // Can't produce errors on invalid dates and tries to adjust it to a valid date.
         fun createClamped(
             year: Int,
             month: Int,
@@ -82,7 +88,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             return createUnchecked(
                 year = year,
                 month = clampedMonth,
-                day = day.clamp(1, daysInMonth(clampedMonth, year)),
+                day = day.clamp(1, Month(month).days(year)),
                 hour = hour.clamp(0, 23),
                 minute = minute.clamp(0, 59),
                 second = second.clamp(0, 59),
@@ -90,7 +96,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             )
         }
 
-        // Can't produce errors on invalid dates and tries to adjust it to a valid date.
+        /**
+         * Constructs a new [DateTime] from date and time information.
+         *
+         * On invalid dates, this function will try to adjust the specified invalid date to a valid one by adjusting other components.
+         */
         fun createAdjusted(
             year: Int,
             month: Int,
@@ -112,13 +122,13 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             dd += th.cycleSteps(0, 23); th = th.cycle(0, 23) // Adjust hours, adding days
 
             while (true) {
-                val dup = daysInMonth(dm, dy)
+                val dup = Month(dm).days(dy)
 
                 dm += dd.cycleSteps(1, dup); dd = dd.cycle(1, dup) // Adjust days, adding months
                 dy += dm.cycleSteps(1, 12); dm = dm.cycle(1, 12) // Adjust months, adding years
 
                 // We already have found a day that is valid for the adjusted month!
-                if (dd.cycle(1, daysInMonth(dm, dy)) == dd) {
+                if (dd.cycle(1, Month(dm).days(dy)) == dd) {
                     break
                 }
             }
@@ -126,7 +136,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             return createUnchecked(dy, dm, dd, th, tm, ts, milliseconds)
         }
 
-        // Can't produce errors on invalid dates
+        /**
+         * Constructs a new [DateTime] from date and time information.
+         *
+         * On invalid dates, will have an undefined behaviour.
+         */
         fun createUnchecked(
             year: Int,
             month: Int,
@@ -137,25 +151,39 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             milliseconds: Int = 0
         ): DateTime {
             return DateTime(
-                DateTime.dateToMillisUnchecked(year, month, day) + DateTime.timeToMillisUnchecked(
-                    hour,
-                    minute,
-                    second
-                ) + milliseconds
+                DateTime.dateToMillisUnchecked(year, month, day) + DateTime.timeToMillisUnchecked(hour, minute, second) + milliseconds
             )
         }
 
-        fun isLeapYear(year: Int): Boolean = Year.isLeap(year)
-        fun daysInMonth(month: Int, isLeap: Boolean): Int = Month(month).days(isLeap)
-        fun daysInMonth(month: Int, year: Int): Int = daysInMonth(month, isLeapYear(year))
+        /** Constructs a new [DateTime] from a [unix] timestamp. */
+        operator fun invoke(unix: Long) = fromUnix(unix)
+        /** Constructs a new [DateTime] from a [unix] timestamp. */
+        operator fun invoke(unix: Double) = fromUnix(unix)
+
+        /** Constructs a new [DateTime] from a [unix] timestamp. */
+        fun fromUnix(unix: Double): DateTime = DateTime(unix)
+        /** Constructs a new [DateTime] from a [unix] timestamp. */
+        fun fromUnix(unix: Long): DateTime = fromUnix(unix.toDouble())
+
+        /** Constructs a new [DateTime] by parsing the [str] using standard date formats. */
+        fun fromString(str: String) = DateFormat.parse(str)
+        /** Constructs a new [DateTime] by parsing the [str] using standard date formats. */
+        fun parse(str: String) = DateFormat.parse(str)
+
+        /** Returns the current time as [DateTime]. Note that since [DateTime] is inline, this property doesn't allocate on JavaScript. */
+        fun now(): DateTime = DateTime(KlockInternal.currentTime)
+        /** Returns the current local time as [DateTimeWithOffset]. */
+        fun nowLocal(): DateTimeWithOffset = DateTimeWithOffset.nowLocal()
+
+        /** Returns the total milliseconds since unix epoch. The same as [nowUnixLong] but as double. To prevent allocation on targets without Long support. */
+        fun nowUnix(): Double = KlockInternal.currentTime
+        /** Returns the total milliseconds since unix epoch. */
+        fun nowUnixLong(): Long = KlockInternal.currentTime.toLong()
 
         internal const val EPOCH_INTERNAL_MILLIS = 62135596800000.0 // Millis since 00-00-0000 00:00 UTC to UNIX EPOCH
 
         internal enum class DatePart { Year, DayOfYear, Month, Day}
 
-        /**
-         * Returns milliseconds since EPOCH.
-         */
         internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Double =
             (Year(year).daysSinceOne + Month(month).daysToStart(year) + day - 1) * MILLIS_PER_DAY.toDouble() - EPOCH_INTERNAL_MILLIS
 
@@ -176,9 +204,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             return timeToMillisUnchecked(hour, minute, second)
         }
 
-        /**
-         * [millis] are 00-00-0000 based.
-         */
+        // millis are 00-00-0000 based.
         internal fun getDatePart(millis: Double, part: DatePart): Int {
             val totalDays = (millis / MILLIS_PER_DAY).toInt()
 
@@ -204,33 +230,77 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         }
     }
 
-    val zeroMillis: Double get() = EPOCH_INTERNAL_MILLIS + unixMillis
-    val localOffset: TimeSpan get() = TimezoneOffset.local(DateTime(unixDouble))
+    /** Number of milliseconds since the 00:00:00 UTC, Monday, 1 January 1 */
+    val yearOneMillis: Double get() = EPOCH_INTERNAL_MILLIS + unixMillis
 
-    val unixDouble: Double get() = unixMillis
-    val year: Int get() = getDatePart(zeroMillis, DatePart.Year)
-    val month1: Int get() = getDatePart(zeroMillis, DatePart.Month)
-    val dayOfMonth: Int get() = getDatePart(zeroMillis, DatePart.Day)
-    val dayOfWeekInt: Int get() = ((zeroMillis / MILLIS_PER_DAY + 1) % 7).toInt()
-    val dayOfYear: Int get() = getDatePart(zeroMillis, DatePart.DayOfYear)
-    val hours: Int get() = (((zeroMillis / MILLIS_PER_HOUR) % 24).toInt())
-    val minutes: Int get() = ((zeroMillis / MILLIS_PER_MINUTE) % 60).toInt()
-    val seconds: Int get() = ((zeroMillis / MILLIS_PER_SECOND) % 60).toInt()
-    val milliseconds: Int get() = ((zeroMillis) % 1000).toInt()
+    /** The local offset for this date for the timezone of the device */
+    val localOffset: TimezoneOffset get() = TimezoneOffset.local(DateTime(unixMillisDouble))
 
-    val unixLong: Long get() = unixDouble.toLong()
-    val dayOfWeek: DayOfWeek get() = DayOfWeek[dayOfWeekInt]
-    val month0: Int get() = month1 - 1
+    /** Number of milliseconds since UNIX [EPOCH] as [Double] */
+    val unixMillisDouble: Double get() = unixMillis
+
+    /** Number of milliseconds since UNIX [EPOCH] as [Long] */
+    val unixMillisLong: Long get() = unixMillisDouble.toLong()
+
+    /** The [Year] part */
+    val year: Year get() = Year(yearInt)
+    /** The [Year] part as [Int] */
+    val yearInt: Int get() = getDatePart(yearOneMillis, DatePart.Year)
+
+    /** The [Month] part */
     val month: Month get() = Month[month1]
 
-    val localBase get() = DateTimeWithOffset(this, localOffset.offset)
-    val localAdjusted get() = DateTimeWithOffset.adjusted(this, localOffset)
+    /** The [Month] part as [Int] where January is represented as 0 */
+    val month0: Int get() = month1 - 1
 
+    /** The [Month] part as [Int] where January is represented as 1 */
+    val month1: Int get() = getDatePart(yearOneMillis, DatePart.Month)
+
+    /** Represents a couple of [Year] and [Month] that has leap information and thus allows to get the number of days of that month */
+    val yearMonth: YearMonth get() = YearMonth(year, month)
+
+    /** The [dayOfMonth] part */
+    val dayOfMonth: Int get() = getDatePart(yearOneMillis, DatePart.Day)
+
+    /** The [dayOfWeek] part */
+    val dayOfWeek: DayOfWeek get() = DayOfWeek[dayOfWeekInt]
+
+    /** The [dayOfWeek] part as [Int] */
+    val dayOfWeekInt: Int get() = ((yearOneMillis / MILLIS_PER_DAY + 1) % 7).toInt()
+
+    /** The [dayOfYear] part */
+    val dayOfYear: Int get() = getDatePart(yearOneMillis, DatePart.DayOfYear)
+
+    /** The [hours] part */
+    val hours: Int get() = (((yearOneMillis / MILLIS_PER_HOUR) % 24).toInt())
+
+    /** The [minutes] part */
+    val minutes: Int get() = ((yearOneMillis / MILLIS_PER_MINUTE) % 60).toInt()
+
+    /** The [seconds] part */
+    val seconds: Int get() = ((yearOneMillis / MILLIS_PER_SECOND) % 60).toInt()
+
+    /** The [milliseconds] part */
+    val milliseconds: Int get() = ((yearOneMillis) % 1000).toInt()
+
+    /** Returns a new local date that will match these components but with a different offset. */
+    val localBase: DateTimeWithOffset get() = DateTimeWithOffset(this, localOffset)
+    /** Returns this date with a local offset. Components might change because of the offset. */
+    val localAdjusted: DateTimeWithOffset get() = DateTimeWithOffset.adjusted(this, localOffset)
+
+    /** Returns a new local date that will match these components but with a different offset in [minutes]. */
+    fun toOffsetBase(minutes: Int) = toOffsetBase(minutes.minutes.offset)
+    /** Returns a new local date that will match these components but with a different [offset]. */
+    fun toOffsetBase(offset: TimezoneOffset) = DateTimeWithOffset(this, offset)
+    /** Returns a new local date that will match these components but with a different [offset]. */
     fun toOffsetBase(offset: TimeSpan) = DateTimeWithOffset(this, offset.offset)
-    fun toOffsetBase(minutes: Int) = toOffsetBase(minutes.minutes)
 
-    fun toOffsetAdjusted(offset: TimeSpan) = DateTimeWithOffset.adjusted(this, offset)
-    fun toOffsetAdjusted(minutes: Int) = toOffsetAdjusted(minutes.minutes)
+    /** Returns this date with a local offset. Components might change because of the offset in [minutes]. */
+    fun toOffsetAdjusted(minutes: Int) = toOffsetAdjusted(minutes.minutes.offset)
+    /** Returns this date with a local offset. Components might change because of the [offset]. */
+    fun toOffsetAdjusted(offset: TimezoneOffset) = DateTimeWithOffset.adjusted(this, offset)
+    /** Returns this date with a local offset. Components might change because of the [offset]. */
+    fun toOffsetAdjusted(offset: TimeSpan) = DateTimeWithOffset.adjusted(this, offset.offset)
 
     operator fun plus(delta: MonthSpan): DateTime = this.add(delta.totalMonths, 0.0)
     operator fun plus(delta: DateTimeSpan): DateTime = this.add(delta.totalMonths, delta.totalMilliseconds)
@@ -240,11 +310,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
     operator fun minus(delta: DateTimeSpan): DateTime = this + -delta
     operator fun minus(delta: TimeSpan): DateTime = this + (-delta)
 
-    operator fun minus(other: DateTime): TimeSpan = (this.unixDouble - other.unixDouble).milliseconds
+    operator fun minus(other: DateTime): TimeSpan = (this.unixMillisDouble - other.unixMillisDouble).milliseconds
 
-    fun toString(format: String): String = toString(SimplerDateFormat(format))
-    fun toString(format: SimplerDateFormat): String = format.format(this)
+    override fun compareTo(other: DateTime): Int = this.unixMillis.compareTo(other.unixMillis)
 
+    /** Constructs a new [DateTime] after adding [deltaMonths] and [deltaMilliseconds] */
     fun add(deltaMonths: Int, deltaMilliseconds: Double): DateTime = when {
         deltaMonths == 0 && deltaMilliseconds == 0.0 -> this
         deltaMonths == 0 -> DateTime(this.unixMillis + deltaMilliseconds)
@@ -265,15 +335,22 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
             val days = Month(month).days(year)
             if (day > days) day = days
 
-            DateTime(dateToMillisUnchecked(year, month, day) + (zeroMillis % MILLIS_PER_DAY) + deltaMilliseconds)
+            DateTime(dateToMillisUnchecked(year.year, month, day) + (yearOneMillis % MILLIS_PER_DAY) + deltaMilliseconds)
         }
     }
 
-    fun add(date: MonthSpan, time: TimeSpan): DateTime = add(date.totalMonths, time.milliseconds)
+    /** Constructs a new [DateTime] after adding [dateSpan] and [timeSpan] */
+    fun add(dateSpan: MonthSpan, timeSpan: TimeSpan): DateTime = add(dateSpan.totalMonths, timeSpan.milliseconds)
 
-    fun format(dt: SimplerDateFormat): String = dt.format(this)
-    fun format(dt: String): String = SimplerDateFormat(dt).format(this)
+    /** Converts this date to String using [format] for representing it */
+    fun format(format: DateFormat): String = format.format(this)
+    /** Converts this date to String using [format] for representing it */
+    fun format(format: String): String = DateFormat(format).format(this)
 
-    override fun compareTo(other: DateTime): Int = this.unixMillis.compareTo(other.unixMillis)
-    override fun toString(): String = SimplerDateFormat.DEFAULT_FORMAT.format(this)
+    /** Converts this date to String using [format] for representing it */
+    fun toString(format: String): String = DateFormat(format).format(this)
+    /** Converts this date to String using [format] for representing it */
+    fun toString(format: DateFormat): String = format.format(this)
+
+    override fun toString(): String = DateFormat.DEFAULT_FORMAT.format(this)
 }

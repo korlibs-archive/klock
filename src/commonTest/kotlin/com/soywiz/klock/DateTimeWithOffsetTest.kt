@@ -41,15 +41,15 @@ class DateTimeWithOffsetTest {
     @Test
     fun test8() {
         assertEquals(
-            DateTime(2018, Month.March, 2).toOffsetBase(+60.minutes),
-            DateTime(2018, Month.February, 2).toOffsetBase(+60.minutes) + 1.months
+            DateTime(Year(2018), Month.March, 2).toOffsetBase(+60.minutes),
+            DateTime(Year(2018), Month.February, 2).toOffsetBase(+60.minutes) + 1.months
         )
     }
 
     @Test
     fun test9() {
         val format = "yyyy-MM-dd HH:mm:ss z"
-        val date = DateTimeWithOffset(DateTime(2018, Month.March, 2), offset = 60.minutes.offset)
+        val date = DateTimeWithOffset(DateTime(Year(2018), Month.March, 2), offset = 60.minutes.offset)
         assertEquals("2018-03-02 00:00:00 GMT+0100", date.toString(format))
         assertEquals("2018-03-02 00:00:00 GMT+0300", date.addOffset(120).toString(format))
     }
