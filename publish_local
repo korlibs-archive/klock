@@ -1,0 +1,4 @@
+#!/bin/bash
+./gradlew publishToMavenLocal
+./gradlew_linux publishToMavenLocal
+./gradlew_wine publishToMavenLocal
