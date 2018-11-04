@@ -1,10 +1,6 @@
 package com.soywiz.klock
 
-/**
- * Represents the day of the week.
- *
- * [Sunday], [Monday], [Tuesday], [Wednesday], [Thursday], [Friday], [Saturday].
- */
+/** Represents the day of the week. [Sunday], [Monday], [Tuesday], [Wednesday], [Thursday], [Friday], [Saturday]. */
 enum class DayOfWeek(
     /** 0: [Sunday], 1: [Monday], 2: [Tuesday], 3: [Wednesday], 4: [Thursday], 5: [Friday], 6: [Saturday] */
     val index0: Int

@@ -37,9 +37,8 @@ class PatternDateFormat(val format: String) : DateFormat {
     // EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
     // YYYY-MM-dd HH:mm:ss
 
-    override fun format(dd: DateTimeWithOffset): String {
-        val utc = dd.base
-        //val utc = dd.adjusted
+    override fun format(dd: DateTimeTz): String {
+        val utc = dd.local
         var out = ""
         for (name2 in parts2) {
             val name = name2.trim('\'')
@@ -48,7 +47,7 @@ class PatternDateFormat(val format: String) : DateFormat {
                 "EEEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].capitalize()
                 "EEEEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].substr(0, 1).capitalize()
                 "EEEEEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].substr(0, 2).capitalize()
-                "z", "zzz" -> dd.timeZone
+                "z", "zzz" -> dd.offset.timeZone
                 "d" -> utc.dayOfMonth.toString()
                 "dd" -> utc.dayOfMonth.padded(2)
                 "M" -> utc.month1.padded(1)
@@ -82,11 +81,11 @@ class PatternDateFormat(val format: String) : DateFormat {
                 }
                 "X", "XX", "XXX", "x", "xx", "xxx" -> {
                     when {
-                        name.startsWith("X") && dd.offsetMinutes == 0 -> "Z"
+                        name.startsWith("X") && dd.offset.totalMinutesInt == 0 -> "Z"
                         else -> {
-                            val p = if (dd.offsetMinutes >= 0) "+" else "-"
-                            val hours = dd.offsetMinutes / 60
-                            val minutes = dd.offsetMinutes % 60
+                            val p = if (dd.offset.totalMinutesInt >= 0) "+" else "-"
+                            val hours = dd.offset.totalMinutesInt / 60
+                            val minutes = dd.offset.totalMinutesInt % 60
                             when (name) {
                                 "X", "x" -> "$p${hours.padded(2)}"
                                 "XX", "xx" -> "$p${hours.padded(2)}${minutes.padded(2)}"
@@ -104,7 +103,7 @@ class PatternDateFormat(val format: String) : DateFormat {
     }
 
 
-    override fun tryParse(str: String, doThrow: Boolean): DateTimeWithOffset? {
+    override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? {
         var millisecond = 0
         var second = 0
         var minute = 0
@@ -169,7 +168,7 @@ class PatternDateFormat(val format: String) : DateFormat {
             hour += 12
         }
         val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second, millisecond)
-        return dateTime.toOffsetBase(offset ?: 0)
+        return dateTime.toOffsetUnadjusted((offset ?: 0).minutes)
     }
 
     override fun toString(): String = format

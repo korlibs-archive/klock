@@ -172,8 +172,8 @@ inline class DateTime(
 
         /** Returns the current time as [DateTime]. Note that since [DateTime] is inline, this property doesn't allocate on JavaScript. */
         fun now(): DateTime = DateTime(KlockInternal.currentTime)
-        /** Returns the current local time as [DateTimeWithOffset]. */
-        fun nowLocal(): DateTimeWithOffset = DateTimeWithOffset.nowLocal()
+        /** Returns the current local time as [DateTimeTz]. */
+        fun nowLocal(): DateTimeTz = DateTimeTz.nowLocal()
 
         /** Returns the total milliseconds since unix epoch. The same as [nowUnixLong] but as double. To prevent allocation on targets without Long support. */
         fun nowUnix(): Double = KlockInternal.currentTime
@@ -249,10 +249,8 @@ inline class DateTime(
 
     /** The [Month] part */
     val month: Month get() = Month[month1]
-
     /** The [Month] part as [Int] where January is represented as 0 */
     val month0: Int get() = month1 - 1
-
     /** The [Month] part as [Int] where January is represented as 1 */
     val month1: Int get() = getDatePart(yearOneMillis, DatePart.Month)
 
@@ -264,7 +262,6 @@ inline class DateTime(
 
     /** The [dayOfWeek] part */
     val dayOfWeek: DayOfWeek get() = DayOfWeek[dayOfWeekInt]
-
     /** The [dayOfWeek] part as [Int] */
     val dayOfWeekInt: Int get() = ((yearOneMillis / MILLIS_PER_DAY + 1) % 7).toInt()
 
@@ -273,34 +270,26 @@ inline class DateTime(
 
     /** The [hours] part */
     val hours: Int get() = (((yearOneMillis / MILLIS_PER_HOUR) % 24).toInt())
-
     /** The [minutes] part */
     val minutes: Int get() = ((yearOneMillis / MILLIS_PER_MINUTE) % 60).toInt()
-
     /** The [seconds] part */
     val seconds: Int get() = ((yearOneMillis / MILLIS_PER_SECOND) % 60).toInt()
-
     /** The [milliseconds] part */
     val milliseconds: Int get() = ((yearOneMillis) % 1000).toInt()
 
     /** Returns a new local date that will match these components but with a different offset. */
-    val localBase: DateTimeWithOffset get() = DateTimeWithOffset(this, localOffset)
-    /** Returns this date with a local offset. Components might change because of the offset. */
-    val localAdjusted: DateTimeWithOffset get() = DateTimeWithOffset.adjusted(this, localOffset)
-
-    /** Returns a new local date that will match these components but with a different offset in [minutes]. */
-    fun toOffsetBase(minutes: Int) = toOffsetBase(minutes.minutes.offset)
+    val localUnadjusted: DateTimeTz get() = DateTimeTz.local(this, localOffset)
     /** Returns a new local date that will match these components but with a different [offset]. */
-    fun toOffsetBase(offset: TimezoneOffset) = DateTimeWithOffset(this, offset)
+    fun toOffsetUnadjusted(offset: TimeSpan) = toOffsetUnadjusted(offset.offset)
     /** Returns a new local date that will match these components but with a different [offset]. */
-    fun toOffsetBase(offset: TimeSpan) = DateTimeWithOffset(this, offset.offset)
+    fun toOffsetUnadjusted(offset: TimezoneOffset) = DateTimeTz.local(this, offset)
 
-    /** Returns this date with a local offset. Components might change because of the offset in [minutes]. */
-    fun toOffsetAdjusted(minutes: Int) = toOffsetAdjusted(minutes.minutes.offset)
+    /** Returns this date with the local offset of this device. Components might change because of the offset. */
+    val local: DateTimeTz get() = DateTimeTz.utc(this, localOffset)
     /** Returns this date with a local offset. Components might change because of the [offset]. */
-    fun toOffsetAdjusted(offset: TimezoneOffset) = DateTimeWithOffset.adjusted(this, offset)
+    fun toOffset(offset: TimeSpan) = toOffset(offset.offset)
     /** Returns this date with a local offset. Components might change because of the [offset]. */
-    fun toOffsetAdjusted(offset: TimeSpan) = DateTimeWithOffset.adjusted(this, offset.offset)
+    fun toOffset(offset: TimezoneOffset) = DateTimeTz.utc(this, offset)
 
     operator fun plus(delta: MonthSpan): DateTime = this.add(delta.totalMonths, 0.0)
     operator fun plus(delta: DateTimeSpan): DateTime = this.add(delta.totalMonths, delta.totalMilliseconds)
@@ -352,5 +341,6 @@ inline class DateTime(
     /** Converts this date to String using [format] for representing it */
     fun toString(format: DateFormat): String = format.format(this)
 
+    /** Converts this date to String using the [DateFormat.DEFAULT_FORMAT] for representing it */
     override fun toString(): String = DateFormat.DEFAULT_FORMAT.format(this)
 }

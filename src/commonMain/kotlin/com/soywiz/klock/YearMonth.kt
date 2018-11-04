@@ -7,28 +7,30 @@ package com.soywiz.klock
  */
 inline class YearMonth(internal val internalPackedInfo: Int) {
     companion object {
-        /** Constructs a new [YearMonth] from the [year] and [month] components */
+        /** Constructs a new [YearMonth] from the [year] and [month] components. */
         operator fun invoke(year: Year, month: Month) = YearMonth(year.year, month.index1)
-        /** Constructs a new [YearMonth] from the [year] and [month] components */
+        /** Constructs a new [YearMonth] from the [year] and [month] components. */
         operator fun invoke(year: Int, month: Month) = YearMonth(year, month.index1)
-        /** Constructs a new [YearMonth] from the [year] and [month] components */
+        /** Constructs a new [YearMonth] from the [year] and [month] components. */
         operator fun invoke(year: Int, month1: Int) = YearMonth((year shl 4) or (month1 and 15))
     }
 
-    /** The [year] part */
+    /** The [year] part. */
     val year: Year get() = Year(yearInt)
-
-    /** The [year] part as [Int] */
+    /** The [year] part as [Int]. */
     val yearInt: Int get() = internalPackedInfo ushr 4
 
-    /** The [month] part */
+    /** The [month] part. */
     val month: Month get() = Month[month1]
-
-    /** The [month] part as [Int] where [Month.January] is 1 */
+    /** The [month] part as [Int] where [Month.January] is 1. */
     val month1: Int get() = internalPackedInfo and 15
 
-    /** Days in this [month] of this [year] */
+    /** Days in this [month] of this [year]. */
     val days: Int get() = month.days(year)
+    /** Number of days since the start of the [year] to reach this [month]. */
+    val daysToStart: Int get() = month.daysToStart(year)
+    /** Number of days since the start of the [year] to reach next [month]. */
+    val daysToEnd: Int get() = month.daysToEnd(year)
 
     operator fun plus(span: MonthSpan): YearMonth {
         val newMonth = this.month1 + span.months

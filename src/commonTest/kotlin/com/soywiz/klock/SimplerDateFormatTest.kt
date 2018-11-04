@@ -45,7 +45,7 @@ class SimplerDateFormatTest {
         fun testParseWithOffsetAsUtc() {
             val offsetDateStr = "2016-05-04T19:29:34+05:00"
             val utcDateStr = "2016-05-04T14:29:34+00:00"
-            assertEquals(format.parse(offsetDateStr).adjusted, format.parse(utcDateStr).adjusted)
+            assertEquals(format.parse(offsetDateStr).utc, format.parse(utcDateStr).utc)
         }
 
         @Test

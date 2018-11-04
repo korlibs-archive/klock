@@ -1,8 +1,9 @@
 package com.soywiz.klock
 
+/** Allows to [format] and [parse], [DateTime] and [DateTimeTz] instances */
 interface DateFormat {
-    fun format(dd: DateTimeWithOffset): String
-    fun tryParse(str: String, doThrow: Boolean = false): DateTimeWithOffset?
+    fun format(dd: DateTimeTz): String
+    fun tryParse(str: String, doThrow: Boolean = false): DateTimeTz?
 
     companion object {
         val DEFAULT_FORMAT by lazy { DateFormat("EEE, dd MMM yyyy HH:mm:ss z") }
@@ -12,7 +13,7 @@ interface DateFormat {
 
         val FORMATS = listOf(DEFAULT_FORMAT, FORMAT1)
 
-        fun parse(date: String): DateTimeWithOffset {
+        fun parse(date: String): DateTimeTz {
             var lastError: Throwable? = null
             for (format in FORMATS) {
                 try {
@@ -28,10 +29,10 @@ interface DateFormat {
     }
 }
 
-fun DateFormat.parse(str: String): DateTimeWithOffset =
+fun DateFormat.parse(str: String): DateTimeTz =
     tryParse(str, doThrow = true) ?: throw DateException("Not a valid format: '$str' for '$this'")
 
 fun DateFormat.format(date: Double): String = format(DateTime.fromUnix(date))
 fun DateFormat.format(date: Long): String = format(DateTime.fromUnix(date))
 
-fun DateFormat.format(dd: DateTime): String = format(dd.toOffsetBase(0))
+fun DateFormat.format(dd: DateTime): String = format(dd.toOffsetUnadjusted(0.minutes))

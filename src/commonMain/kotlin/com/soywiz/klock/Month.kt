@@ -36,14 +36,14 @@ enum class Month(
     fun days(year: Year): Int = days(year.isLeap)
 
     /** Number of days since the start of the year is [leap] to reach this month. */
-    fun daysToStart(leap: Boolean): Int = DAYS_TO_START(leap)[index0]
+    fun daysToStart(leap: Boolean): Int = YEAR_DAYS(leap)[index0]
     /** Number of days since the start of the [year] to reach this month. */
     fun daysToStart(year: Int): Int = daysToStart(Year(year).isLeap)
     /** Number of days since the start of the [year] to reach this month. */
     fun daysToStart(year: Year): Int = daysToStart(year.isLeap)
 
     /** Number of days since the start of the year is [leap] to reach next month. */
-    fun daysToEnd(leap: Boolean): Int = DAYS_TO_START(leap)[index1]
+    fun daysToEnd(leap: Boolean): Int = YEAR_DAYS(leap)[index1]
     /** Number of days since the start of the [year] to reach next month. */
     fun daysToEnd(year: Int): Int = daysToEnd(Year(year).isLeap)
     /** Number of days since the start of the [year] to reach next month. */
@@ -88,7 +88,7 @@ enum class Month(
          * Returns null if the year doesn't contain that [dayOfYear].
          */
         fun fromDayOfYear(dayOfYear: Int, leap: Boolean): Month? {
-            val days = DAYS_TO_START(leap)
+            val days = YEAR_DAYS(leap)
             val day0 = dayOfYear - 1
             val guess = day0 / 32
 
@@ -106,9 +106,9 @@ enum class Month(
         fun fromDayOfYear(dayOfYear: Int, year: Year): Month? = fromDayOfYear(dayOfYear, year.isLeap)
 
         private val BY_INDEX0 = values()
-        private fun DAYS_TO_START(isLeap: Boolean): IntArray = if (isLeap) DAYS_TO_START_LEAP else DAYS_TO_START_COMMON
-        private val DAYS_TO_START_LEAP = generateDaysToStart(leap = true)
-        private val DAYS_TO_START_COMMON = generateDaysToStart(leap = false)
+        private fun YEAR_DAYS(isLeap: Boolean): IntArray = if (isLeap) YEAR_DAYS_LEAP else YEAR_DAYS_COMMON
+        private val YEAR_DAYS_LEAP = generateDaysToStart(leap = true)
+        private val YEAR_DAYS_COMMON = generateDaysToStart(leap = false)
 
         private fun generateDaysToStart(leap: Boolean): IntArray {
             var total = 0

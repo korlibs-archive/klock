@@ -310,7 +310,7 @@ class DateTimeTest {
     fun testBaseAdjust() {
         val date = DateTime(Year(2018), Month.November, 4, 5, 54, 30)
 
-        assertEquals("Sun, 04 Nov 2018 05:54:30 GMT+0100", date.toOffsetBase(+60).toString())
-        assertEquals("Sun, 04 Nov 2018 06:54:30 GMT+0100", date.toOffsetAdjusted(+60).toString())
+        assertEquals("Sun, 04 Nov 2018 05:54:30 GMT+0100", date.toOffsetUnadjusted((+60).minutes).toString())
+        assertEquals("Sun, 04 Nov 2018 06:54:30 GMT+0100", date.toOffset((+60).minutes).toString())
     }
 }

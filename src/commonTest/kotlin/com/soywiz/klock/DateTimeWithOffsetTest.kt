@@ -8,12 +8,12 @@ class DateTimeWithOffsetTest {
 
     @Test
     fun test1() {
-        assertEquals(date1.toOffsetBase(+60), date1.toOffsetBase(+60))
+        assertEquals(date1.toOffsetUnadjusted((+60).minutes), date1.toOffsetUnadjusted((+60).minutes))
     }
 
     @Test
     fun test2() {
-        assertEquals(date1.toOffsetBase(-60), date2.toOffsetBase(+0))
+        assertEquals(date1.toOffsetUnadjusted((-60).minutes), date2.toOffsetUnadjusted(0.minutes))
     }
 
     @Test
@@ -23,34 +23,34 @@ class DateTimeWithOffsetTest {
 
     @Test
     fun test5() {
-        assertTrue(date1.toOffsetBase(0.minutes) > date1.toOffsetBase(+60.minutes))
-        assertTrue(date1.toOffsetBase(0.minutes) < date1.toOffsetBase(-60.minutes))
+        assertTrue(date1.toOffsetUnadjusted(0.minutes) > date1.toOffsetUnadjusted((+60).minutes))
+        assertTrue(date1.toOffsetUnadjusted(0.minutes) < date1.toOffsetUnadjusted((-60).minutes))
     }
 
     @Test
     fun test6() {
-        assertEquals(date1.toOffsetBase(0.minutes), date1.toOffsetBase(+0.minutes))
+        assertEquals(date1.toOffsetUnadjusted(0.minutes), date1.toOffsetUnadjusted((+0).minutes))
     }
 
     @Test
     fun test7() {
-        assertEquals(date1.toOffsetAdjusted(+60.minutes), date1.toOffsetAdjusted(+0.minutes))
-        assertTrue(date1.toOffsetBase(-60.minutes) > date1.toOffsetBase(+0.minutes))
+        assertEquals(date1.toOffset((+60).minutes), date1.toOffset((+0).minutes))
+        assertTrue(date1.toOffsetUnadjusted((-60).minutes) > date1.toOffsetUnadjusted((+0).minutes))
     }
 
     @Test
     fun test8() {
         assertEquals(
-            DateTime(Year(2018), Month.March, 2).toOffsetBase(+60.minutes),
-            DateTime(Year(2018), Month.February, 2).toOffsetBase(+60.minutes) + 1.months
+            DateTime(Year(2018), Month.March, 2).toOffsetUnadjusted((+60).minutes),
+            DateTime(Year(2018), Month.February, 2).toOffsetUnadjusted((+60).minutes) + 1.months
         )
     }
 
     @Test
     fun test9() {
         val format = "yyyy-MM-dd HH:mm:ss z"
-        val date = DateTimeWithOffset(DateTime(Year(2018), Month.March, 2), offset = 60.minutes.offset)
+        val date = DateTimeTz.local(DateTime(Year(2018), Month.March, 2), offset = 60.minutes.offset)
         assertEquals("2018-03-02 00:00:00 GMT+0100", date.toString(format))
-        assertEquals("2018-03-02 00:00:00 GMT+0300", date.addOffset(120).toString(format))
+        assertEquals("2018-03-02 00:00:00 GMT+0300", date.addOffsetUnadjusted((+120).minutes).toString(format))
     }
 }
