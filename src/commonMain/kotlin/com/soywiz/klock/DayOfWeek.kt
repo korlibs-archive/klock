@@ -23,6 +23,11 @@ enum class DayOfWeek(
     val index1 get() = index0 + 1
 
     companion object {
+        /**
+         * Number of days in a wekk.
+         */
+        const val Count = 7
+
         private val BY_INDEX0 = values()
 
         /**
