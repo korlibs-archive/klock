@@ -102,7 +102,10 @@ task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskN
     args = ["--timeout", "15000", relativePath("${jsCompilations.test.output.classesDirs.first()}/${project.name}_test.js")]
 }
 
-jsTest.dependsOn runMocha
+// Only run JS tests if not in windows
+if (!org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
+    jsTest.dependsOn runMocha
+}
 
 // Fix for https://github.com/srs/gradle-node-plugin/issues/301
 repositories.whenObjectAdded {
