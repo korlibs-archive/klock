@@ -3,7 +3,7 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 
 data class DateTimeSpan(
-    val dateSpan: DateSpan,
+    val dateSpan: MonthSpan,
     val timeSpan: TimeSpan
 ) : Comparable<DateTimeSpan> {
     constructor(
@@ -24,11 +24,11 @@ data class DateTimeSpan(
     operator fun unaryPlus() = DateTimeSpan(+dateSpan, +timeSpan)
 
     operator fun plus(other: TimeSpan) = DateTimeSpan(dateSpan, timeSpan + other)
-    operator fun plus(other: DateSpan) = DateTimeSpan(dateSpan + other, timeSpan)
+    operator fun plus(other: MonthSpan) = DateTimeSpan(dateSpan + other, timeSpan)
     operator fun plus(other: DateTimeSpan) = DateTimeSpan(dateSpan + other.dateSpan, timeSpan + other.timeSpan)
 
     operator fun minus(other: TimeSpan) = this + -other
-    operator fun minus(other: DateSpan) = this + -other
+    operator fun minus(other: MonthSpan) = this + -other
     operator fun minus(other: DateTimeSpan) = this + -other
 
     inline operator fun times(times: Number) = times(times.toDouble())

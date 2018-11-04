@@ -232,11 +232,11 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
     fun toOffsetAdjusted(offset: TimeSpan) = DateTimeWithOffset.adjusted(this, offset)
     fun toOffsetAdjusted(minutes: Int) = toOffsetAdjusted(minutes.minutes)
 
-    operator fun plus(delta: DateSpan): DateTime = this.add(delta.totalMonths, 0.0)
+    operator fun plus(delta: MonthSpan): DateTime = this.add(delta.totalMonths, 0.0)
     operator fun plus(delta: DateTimeSpan): DateTime = this.add(delta.totalMonths, delta.totalMilliseconds)
     operator fun plus(delta: TimeSpan): DateTime = add(0, delta.milliseconds)
 
-    operator fun minus(delta: DateSpan): DateTime = this + -delta
+    operator fun minus(delta: MonthSpan): DateTime = this + -delta
     operator fun minus(delta: DateTimeSpan): DateTime = this + -delta
     operator fun minus(delta: TimeSpan): DateTime = this + (-delta)
 
@@ -269,7 +269,7 @@ inline class DateTime(val unixMillis: Double) : Comparable<DateTime> {
         }
     }
 
-    fun add(date: DateSpan, time: TimeSpan): DateTime = add(date.totalMonths, time.milliseconds)
+    fun add(date: MonthSpan, time: TimeSpan): DateTime = add(date.totalMonths, time.milliseconds)
 
     fun format(dt: SimplerDateFormat): String = dt.format(this)
     fun format(dt: String): String = SimplerDateFormat(dt).format(this)

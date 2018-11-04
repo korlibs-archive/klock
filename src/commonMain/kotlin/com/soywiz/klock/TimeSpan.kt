@@ -126,11 +126,11 @@ inline class TimeSpan(val milliseconds: Double) : Comparable<TimeSpan> {
     operator fun unaryPlus() = TimeSpan(+this.milliseconds)
 
     operator fun plus(other: TimeSpan): TimeSpan = TimeSpan(this.milliseconds + other.milliseconds)
-    operator fun plus(other: DateSpan): DateTimeSpan = DateTimeSpan(other, this)
+    operator fun plus(other: MonthSpan): DateTimeSpan = DateTimeSpan(other, this)
     operator fun plus(other: DateTimeSpan): DateTimeSpan = DateTimeSpan(other.dateSpan, other.timeSpan + this)
 
     operator fun minus(other: TimeSpan): TimeSpan = this + (-other)
-    operator fun minus(other: DateSpan): DateTimeSpan = this + (-other)
+    operator fun minus(other: MonthSpan): DateTimeSpan = this + (-other)
     operator fun minus(other: DateTimeSpan): DateTimeSpan = this + (-other)
 
     operator fun times(scale: Int): TimeSpan = TimeSpan(this.milliseconds * scale)

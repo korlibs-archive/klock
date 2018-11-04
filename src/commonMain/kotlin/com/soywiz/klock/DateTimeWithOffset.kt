@@ -53,13 +53,13 @@ data class DateTimeWithOffset(
     fun addOffset(offset: TimeSpan) = DateTimeWithOffset(this.base, (this.offset.time + offset).offset)
     fun addOffset(minutes: Int) = addOffset(minutes.minutes)
 
-    fun add(dateSpan: DateSpan, timeSpan: TimeSpan): DateTimeWithOffset = DateTimeWithOffset(base.add(dateSpan, timeSpan), offset)
+    fun add(dateSpan: MonthSpan, timeSpan: TimeSpan): DateTimeWithOffset = DateTimeWithOffset(base.add(dateSpan, timeSpan), offset)
 
-    operator fun plus(delta: DateSpan) = add(delta, 0.milliseconds)
+    operator fun plus(delta: MonthSpan) = add(delta, 0.milliseconds)
     operator fun plus(delta: DateTimeSpan) = add(delta.dateSpan, delta.timeSpan)
     operator fun plus(delta: TimeSpan) = add(0.months, delta)
 
-    operator fun minus(delta: DateSpan) = this + (-delta)
+    operator fun minus(delta: MonthSpan) = this + (-delta)
     operator fun minus(delta: DateTimeSpan) = this + (-delta)
     operator fun minus(delta: TimeSpan) = this + (-delta)
 
