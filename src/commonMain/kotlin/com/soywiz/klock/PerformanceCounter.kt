@@ -20,4 +20,9 @@ object PerformanceCounter {
      * Returns a performance counter measure in milliseconds.
      */
     val milliseconds: Double get() = KlockInternal.microClock / 1000.0
+
+    /**
+     * Returns a performance counter as a [TimeSpan].
+     */
+    val reference: TimeSpan get() = KlockInternal.microClock.microseconds
 }

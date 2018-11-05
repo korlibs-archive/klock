@@ -4,9 +4,9 @@ package com.soywiz.klock
  * Executes a [callback] and measure the time it takes to complete.
  */
 inline fun measureTime(callback: () -> Unit): TimeSpan {
-    val start = DateTime.now()
+    val start = PerformanceCounter.reference
     callback()
-    val end = DateTime.now()
+    val end = PerformanceCounter.reference
     return end - start
 }
 
