@@ -156,8 +156,7 @@ if (publishUser && publishPassword) {
                     username publishUser
                     password publishPassword
                 }
-                url 'https://api.bintray.com/maven/soywiz/soywiz/korlibs/'
-                //url "https://api.bintray.com/content/soywiz/soywiz/korlibs/$projectVersion"
+                url 'https://api.bintray.com/maven/soywiz/soywiz/klock/'
             }
         }
 
