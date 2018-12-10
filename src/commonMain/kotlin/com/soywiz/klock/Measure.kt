@@ -4,10 +4,10 @@ package com.soywiz.klock
  * Executes a [callback] and measure the time it takes to complete.
  */
 inline fun measureTime(callback: () -> Unit): TimeSpan {
-    val start = PerformanceCounter.reference
+    val start = PerformanceCounter.microseconds
     callback()
-    val end = PerformanceCounter.reference
-    return end - start
+    val end = PerformanceCounter.microseconds
+    return (end - start).microseconds
 }
 
 /**
