@@ -156,7 +156,7 @@ if (publishUser && publishPassword) {
                     username publishUser
                     password publishPassword
                 }
-                url 'https://api.bintray.com/maven/soywiz/soywiz/klock/'
+                url "https://api.bintray.com/maven/soywiz/soywiz/${project.property('project.package')}/"
             }
         }
 
