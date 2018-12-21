@@ -147,10 +147,6 @@ task populateNodeModules {
     }
 }
 
-//def dump(obj) { obj.properties.each { println "$it.key : ${it.value.class.name}   ->   $it.value" } }
-//println("-------------")
-//dump(jsCompilations.test.output)
-
 task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, installMocha, populateNodeModules]) {
     script = file("$buildDir/node_modules/mocha/bin/mocha")
     args = ["--timeout", "15000", relativePath("${jsCompilations.test.output.classesDirs.first()}/${project.name}_test.js")]
@@ -243,6 +239,7 @@ if (publishUser && publishPassword) {
                     password publishPassword
                 }
                 url "https://api.bintray.com/maven/soywiz/soywiz/${project.property('project.package')}/"
+                //url "https://api.bintray.com/content/soywiz/soywiz/korlibs/$projectVersion"
             }
         }
 
