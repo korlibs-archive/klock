@@ -61,4 +61,10 @@ class TimeSpanTest {
         assertTrue { TimeSpan.ZERO != TimeSpan.NULL }
         assertTrue { TimeSpan.NULL == TimeSpan.NULL }
     }
+
+    @Test
+    fun ratio() {
+        assertEquals(0.5, 0.5.seconds / 1.seconds)
+        assertEquals(5.0, 10.seconds / 2000.milliseconds)
+    }
 }
