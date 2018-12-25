@@ -67,4 +67,11 @@ class TimeSpanTest {
         assertEquals(0.5, 0.5.seconds / 1.seconds)
         assertEquals(5.0, 10.seconds / 2000.milliseconds)
     }
+
+    @Test
+    fun remaining() {
+        assertEquals(0.5.seconds, 0.5.seconds % 1.seconds)
+        assertEquals(0.seconds, 1.seconds % 1.seconds)
+        assertEquals(0.5.seconds, 1.5.seconds % 1.seconds)
+    }
 }

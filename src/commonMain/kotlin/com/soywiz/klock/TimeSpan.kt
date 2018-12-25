@@ -67,6 +67,7 @@ inline class TimeSpan(
     operator fun times(scale: Double): TimeSpan = TimeSpan((this.milliseconds * scale))
 
     operator fun div(other: TimeSpan): Double = this.milliseconds / other.milliseconds
+    operator fun rem(other: TimeSpan): TimeSpan = (this.milliseconds % other.milliseconds).milliseconds
 
     companion object {
         private const val MILLIS_PER_MICROSECOND = 1.0 / 1000.0
