@@ -74,4 +74,17 @@ class TimeSpanTest {
         assertEquals(0.seconds, 1.seconds % 1.seconds)
         assertEquals(0.5.seconds, 1.5.seconds % 1.seconds)
     }
+
+    @Test
+    fun clamp() {
+        assertEquals(1.seconds, min(1.seconds, 2.seconds))
+        assertEquals(2.seconds, max(1.seconds, 2.seconds))
+
+        assertEquals(1.seconds, min(2.seconds, 1.seconds))
+        assertEquals(2.seconds, max(2.seconds, 1.seconds))
+
+        assertEquals(1.seconds, 1.seconds.clamp(0.seconds, 2.seconds))
+        assertEquals(0.seconds, (-1).seconds.clamp(0.seconds, 2.seconds))
+        assertEquals(2.seconds, 2.1.seconds.clamp(0.seconds, 2.seconds))
+    }
 }
