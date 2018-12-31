@@ -67,22 +67,29 @@ dependencies {
 }
 
 // Javascript test configuration
+
+def korlibsDir = new File(System.getProperty("user.home"), ".korlibs")
+korlibsDir.mkdirs()
+
 node {
     version = '8.11.4'
     download = true
-    nodeModulesDir = file("$buildDir/npm")
+    workDir = new File(korlibsDir, "nodejs")
+    npmWorkDir = new File(korlibsDir, "npm")
+    yarnWorkDir = new File(korlibsDir, "yarn")
+    nodeModulesDir = new File(korlibsDir, "node_modules")
 }
 
 def jsCompilations = kotlin.targets.js.compilations
 task installMocha(type: NpmTask) {
-    onlyIf { !(new File(buildDir, "npm/node_modules/mocha")).exists() }
+    onlyIf { !(new File(node.nodeModulesDir, "node_modules/mocha")).exists() }
     args = ["install", "mocha@5.2.0"]
 }
 
 task populateNodeModules {
     doLast {
         copy {
-            from "${node.nodeModulesDir}/node_modules"
+            from "${node.nodeModulesDir}"
             from jsCompilations.main.output.allOutputs
             jsCompilations.test.runtimeDependencyFiles.each {
                 if (it.exists() && !it.isDirectory()) {
@@ -104,7 +111,7 @@ task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskN
 }
 
 task jsInstallMochaHeadlessChrome(type: NpmTask) {
-    onlyIf { !(new File("${node.nodeModulesDir}/node_modules/mocha-headless-chrome")).exists() }
+    onlyIf { !(new File("${node.nodeModulesDir}/mocha-headless-chrome")).exists() }
     args = ["install", "mocha-headless-chrome@2.0.1"]
 }
 
@@ -131,7 +138,7 @@ task jsTestChrome(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinT
             </html>
         """)
     }
-    script = file("${node.nodeModulesDir}/node_modules/mocha-headless-chrome/bin/start")
+    script = file("${node.nodeModulesDir}/mocha-headless-chrome/bin/start")
     args = ['-f', "$buildDir/node_modules/tests.html"]
 }
 
@@ -157,12 +164,12 @@ apply plugin: 'maven-publish'
 def pomBaseData = {
     licenses {
         license {
-            name "MIT License"
-            url "https://raw.githubusercontent.com/korlibs/klock/master/LICENSE"
+            name project.property("project.license.name")
+            url project.property("project.license.url")
         }
     }
     scm {
-        url "https://github.com/korlibs/klock"
+        url project.property("project.scm.url")
     }
 }
 
@@ -170,8 +177,8 @@ def generatePom = { pom ->
     pom.withXml {
         def root = it.asNode()
         root.appendNode('name', project.name)
-        root.appendNode('description', 'Consistent and portable date and time utilities for multiplatform kotlin (JVM, JS, Native and COMMON)')
-        root.appendNode('url', 'https://github.com/korlibs/klock')
+        root.appendNode('description', project.property("project.description"))
+        root.appendNode('url', project.property("project.scm.url"))
         root.children().last() + pomBaseData
     }
 }
