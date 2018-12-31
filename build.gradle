@@ -28,7 +28,7 @@ kotlin {
                 }
                 compileTestKotlinJs.kotlinOptions {
                     languageVersion = "1.3"
-                    moduleKind = "commonjs"
+                    moduleKind = "umd"
                 }
             }
         }
@@ -75,13 +75,14 @@ node {
 
 def jsCompilations = kotlin.targets.js.compilations
 task installMocha(type: NpmTask) {
+    onlyIf { !(new File(buildDir, "npm/node_modules/mocha")).exists() }
     args = ["install", "mocha@5.2.0"]
 }
 
 task populateNodeModules {
     doLast {
         copy {
-            from "$buildDir/npm/node_modules"
+            from "${node.nodeModulesDir}/node_modules"
             from jsCompilations.main.output.allOutputs
             jsCompilations.test.runtimeDependencyFiles.each {
                 if (it.exists() && !it.isDirectory()) {
@@ -100,6 +101,38 @@ task populateNodeModules {
 task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, installMocha, populateNodeModules]) {
     script = file("$buildDir/node_modules/mocha/bin/mocha")
     args = ["--timeout", "15000", relativePath("${jsCompilations.test.output.classesDirs.first()}/${project.name}_test.js")]
+}
+
+task jsInstallMochaHeadlessChrome(type: NpmTask) {
+    onlyIf { !(new File("${node.nodeModulesDir}/node_modules/mocha-headless-chrome")).exists() }
+    args = ["install", "mocha-headless-chrome@2.0.1"]
+}
+
+task jsTestChrome(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, jsInstallMochaHeadlessChrome, installMocha, populateNodeModules]) {
+    doFirst {
+        new File("$buildDir/node_modules/tests.html").write("""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Mocha Tests</title>
+                <meta charset="utf-8">
+                <link rel="stylesheet" href="mocha/mocha.css">
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+            </head>
+            <body>
+            <div id="mocha"></div>
+            <script src="mocha/mocha.js"></script>
+            <script>
+                requirejs.config({'baseUrl': '.', 'paths': { 'tests': '../classes/kotlin/js/test/${project.name}_test' }});
+                mocha.setup('bdd');
+                require(['tests'], function() { mocha.run(); });
+            </script>
+            </body>
+            </html>
+        """)
+    }
+    script = file("${node.nodeModulesDir}/node_modules/mocha-headless-chrome/bin/start")
+    args = ['-f', "$buildDir/node_modules/tests.html"]
 }
 
 // Only run JS tests if not in windows
