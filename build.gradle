@@ -82,7 +82,7 @@ node {
 
 def jsCompilations = kotlin.targets.js.compilations
 task installMocha(type: NpmTask) {
-    onlyIf { !(new File(node.nodeModulesDir, "node_modules/mocha")).exists() }
+    onlyIf { !(new File(node.nodeModulesDir, "mocha")).exists() }
     args = ["install", "mocha@5.2.0"]
 }
 
@@ -204,4 +204,8 @@ if (publishUser && publishPassword) {
             generatePom(pom)
         }
     }
+}
+
+if (project.file('build.project.gradle').exists()) {
+    apply from: project.file('build.project.gradle')
 }
