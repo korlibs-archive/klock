@@ -58,6 +58,12 @@ kotlin {
         nativeCommonMain
         nativeCommonTest
         nativePosixMain
+        androidMain {
+            dependsOn jvmMain
+        }
+        androidTest {
+            dependsOn jvmTest
+        }
         mingwX64Main {
             dependsOn nativeCommonMain
         }
@@ -78,7 +84,11 @@ dependencies {
     commonMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-common"
     commonTestImplementation "org.jetbrains.kotlin:kotlin-test-annotations-common"
     commonTestImplementation "org.jetbrains.kotlin:kotlin-test-common"
-
+    
+    androidMainImplementation "org.jetbrains.kotlin:kotlin-stdlib"
+    androidTestImplementation "org.jetbrains.kotlin:kotlin-test"
+    androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit"
+    
     jsMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-js"
     jsTestImplementation "org.jetbrains.kotlin:kotlin-test-js"
 
