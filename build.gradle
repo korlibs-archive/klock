@@ -1,11 +1,15 @@
 buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        google()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+    ext.hasAndroid = (System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null)
+
+    if (ext.hasAndroid) {
+        repositories {
+            mavenLocal()
+            mavenCentral()
+            google()
+        }
+        dependencies {
+            classpath 'com.android.tools.build:gradle:3.2.1'
+        }
     }
 }
 
@@ -14,7 +18,7 @@ plugins {
     id 'com.moowork.node' version '1.2.0'
 }
 
-def hasAndroid = (System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null)
+def hasAndroid = ext.hasAndroid
 
 if (hasAndroid) {
     apply plugin: 'com.android.library'
