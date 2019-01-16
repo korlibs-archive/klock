@@ -32,15 +32,20 @@ kotlin {
                 }
             }
         }
-        if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
-            fromPreset(presets.mingwX64, 'nativeCommon')
-            fromPreset(presets.mingwX64, 'nativePosix')
-        } else if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC)) {
-            fromPreset(presets.macosX64, 'nativeCommon')
-            fromPreset(presets.macosX64, 'nativePosix')
-        } else {
-            fromPreset(presets.linuxX64, 'nativeCommon')
-            fromPreset(presets.linuxX64, 'nativePosix')
+
+        // Only enable when loaded in IDEA (we use a property for detection). In CLI that would produce an "expect" error.
+
+        if (System.getProperty("idea.version") != null) {
+            if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
+                kotlin.targets.fromPreset(kotlin.presets.mingwX64, 'nativeCommon')
+                kotlin.targets.fromPreset(kotlin.presets.mingwX64, 'nativePosix')
+            } else if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC)) {
+                kotlin.targets.fromPreset(kotlin.presets.macosX64, 'nativeCommon')
+                kotlin.targets.fromPreset(kotlin.presets.macosX64, 'nativePosix')
+            } else {
+                kotlin.targets.fromPreset(kotlin.presets.linuxX64, 'nativeCommon')
+                kotlin.targets.fromPreset(kotlin.presets.linuxX64, 'nativePosix')
+            }
         }
     }
     sourceSets {
