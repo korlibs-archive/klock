@@ -12,13 +12,17 @@ plugins {
     id 'com.moowork.node' version '1.2.0'
 }
 
-apply plugin: 'com.android.library'
+def hasAndroid = (System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null)
 
-android {
-    compileSdkVersion 28
-    defaultConfig {
-        minSdkVersion 18
-        targetSdkVersion 28
+if (hasAndroid) {
+    apply plugin: 'com.android.library'
+
+    android {
+        compileSdkVersion 28
+        defaultConfig {
+            minSdkVersion 18
+            targetSdkVersion 28
+        }
     }
 }
 
@@ -31,7 +35,9 @@ repositories {
 
 kotlin {
     targets {
-        fromPreset(presets.android, 'android')
+        if (hasAndroid) {
+            fromPreset(presets.android, 'android')
+        }
         fromPreset(presets.iosX64, 'iosX64')
         fromPreset(presets.iosArm32, 'iosArm32')
         fromPreset(presets.iosArm64, 'iosArm64')
@@ -73,11 +79,13 @@ kotlin {
         nativeCommonMain
         nativeCommonTest
         nativePosixMain
-        androidMain {
-            dependsOn jvmMain
-        }
-        androidTest {
-            dependsOn jvmTest
+        if (hasAndroid) {
+            androidMain {
+                dependsOn jvmMain
+            }
+            androidTest {
+                dependsOn jvmTest
+            }
         }
         mingwX64Main {
             dependsOn nativeCommonMain
@@ -99,10 +107,12 @@ dependencies {
     commonMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-common"
     commonTestImplementation "org.jetbrains.kotlin:kotlin-test-annotations-common"
     commonTestImplementation "org.jetbrains.kotlin:kotlin-test-common"
-    
-    androidMainImplementation "org.jetbrains.kotlin:kotlin-stdlib"
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-test"
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit"
+
+    if (hasAndroid) {
+        androidMainImplementation "org.jetbrains.kotlin:kotlin-stdlib"
+        androidTestImplementation "org.jetbrains.kotlin:kotlin-test"
+        androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit"
+    }
     
     jsMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-js"
     jsTestImplementation "org.jetbrains.kotlin:kotlin-test-js"
