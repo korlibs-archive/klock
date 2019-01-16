@@ -126,6 +126,8 @@ inline class TimeSpan(
             return if (addMilliseconds) "$out.$milliseconds" else out
         }
     }
+
+    override fun toString(): String = "${milliseconds.niceStr}ms"
 }
 
 /**

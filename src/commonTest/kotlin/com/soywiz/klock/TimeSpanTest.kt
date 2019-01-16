@@ -87,4 +87,10 @@ class TimeSpanTest {
         assertEquals(0.seconds, (-1).seconds.clamp(0.seconds, 2.seconds))
         assertEquals(2.seconds, 2.1.seconds.clamp(0.seconds, 2.seconds))
     }
+
+    @Test
+    fun testToString() {
+        assertEquals("1000ms", 1.seconds.toString())
+        assertEquals("0.5ms", 0.5.milliseconds.toString())
+    }
 }
