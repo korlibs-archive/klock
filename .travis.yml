@@ -31,4 +31,12 @@ matrix:
     - cp $(/usr/libexec/java_home)/lib/security/cacerts "${JAVA_HOME}/lib/security/cacerts"
     script:
     - ./gradlew -s -i check build
+  - os: linux
+    language: android
+    jdk: oraclejdk8
+    env:
+      KBUILD=android
+      JAVA_OPTS=-Xmx2g
+    script:
+      - ./gradlew -s -i check build
 
