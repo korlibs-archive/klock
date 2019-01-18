@@ -1,6 +1,14 @@
 buildscript {
     ext.hasAndroid = (System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null)
 
+    if (!ext.hasAndroid) {
+        def trySdkDir = new File(System.getProperty("user.home") + "/Library/Android/sdk")
+        if (trySdkDir.exists()) {
+            new File(rootDir, "local.properties").write("sdk.dir=${trySdkDir.absolutePath}")
+            ext.hasAndroid = true
+        }
+    }
+
     if (ext.hasAndroid) {
         repositories {
             mavenLocal()
@@ -17,6 +25,7 @@ plugins {
     id 'kotlin-multiplatform' version '1.3.20-eap-100'
     id 'com.moowork.node' version '1.2.0'
 }
+
 
 def hasAndroid = ext.hasAndroid
 
