@@ -1,8 +1,8 @@
 #!/bin/bash
 HOME=`echo ~` docker run --rm -it \
 	-v "$PWD:/work:delegated" \
-	-v "$HOME/.gradle:/home/user/.wine/drive_c/users/user/.gradle:delegated" \
 	-v "$HOME/.m2:/home/user/.wine/drive_c/users/user/.m2:delegated" \
+	-v "gradlew_gradle_win:/home/user/.wine/drive_c/users/user/.gradle:delegated" \
 	-v "gradlew_konan_win:/home/user/.wine/drive_c/users/user/.konan:delegated" \
 	soywiz/kotlin-native-win:java8 \
 	wine $*
