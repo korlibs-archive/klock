@@ -5,4 +5,4 @@ HOME=`echo ~` docker run --rm -it \
 	-v "$HOME/.m2:/home/user/.m2:delegated" \
 	-v "gradlew_konan_linux:/home/user/.konan:delegated" \
 	soywiz/kotlin-native-win:java8 \
-	./gradlew --no-daemon $*
+	$*

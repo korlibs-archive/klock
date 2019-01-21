@@ -5,5 +5,4 @@ HOME=`echo ~` docker run --rm -it \
 	-v "$HOME/.m2:/home/user/.wine/drive_c/users/user/.m2:delegated" \
 	-v "gradlew_konan_win:/home/user/.wine/drive_c/users/user/.konan:delegated" \
 	soywiz/kotlin-native-win:java8 \
-	winecmd gradlew.bat --no-daemon $*
-
+	wine $*
