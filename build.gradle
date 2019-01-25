@@ -181,9 +181,11 @@ subprojects {
                         from zipTree(it.absolutePath).matching { include '*.js' }
                     }
                 }
+		afterEvaluate {
 				for (sourceSet in kotlin.sourceSets) {
 					from sourceSet.resources
 				}
+		}
                 into "$buildDir/node_modules"
             }
         }
