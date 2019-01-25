@@ -42,6 +42,8 @@ allprojects {
 def hasAndroid = ext.hasAndroid
 
 subprojects {
+    if (project.name == "template") return
+
     apply plugin: 'kotlin-multiplatform'
     apply plugin: 'com.moowork.node'
 
@@ -173,11 +175,15 @@ subprojects {
             copy {
                 from "${node.nodeModulesDir}"
                 from jsCompilations.main.output.allOutputs
+				from jsCompilations.test.output.allOutputs
                 jsCompilations.test.runtimeDependencyFiles.each {
                     if (it.exists() && !it.isDirectory()) {
                         from zipTree(it.absolutePath).matching { include '*.js' }
                     }
                 }
+				for (sourceSet in kotlin.sourceSets) {
+					from sourceSet.resources
+				}
                 into "$buildDir/node_modules"
             }
         }
@@ -185,7 +191,8 @@ subprojects {
 
     task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, installMocha, populateNodeModules]) {
         script = file("$buildDir/node_modules/mocha/bin/mocha")
-        args = ["--timeout", "15000", relativePath("${jsCompilations.test.output.classesDirs.first()}/${project.name}_test.js")]
+		workingDir = file("$buildDir/node_modules")
+		args = ["--timeout", "15000", "${project.name}_test.js"]
     }
 
     task jsInstallMochaHeadlessChrome(type: NpmTask) {
@@ -208,7 +215,7 @@ subprojects {
             <div id="mocha"></div>
             <script src="mocha/mocha.js"></script>
             <script>
-                requirejs.config({'baseUrl': '.', 'paths': { 'tests': '../classes/kotlin/js/test/${project.name}_test' }});
+                requirejs.config({'baseUrl': '.', 'paths': { 'tests': '${project.name}_test' }});
                 mocha.setup('bdd');
                 require(['tests'], function() { mocha.run(); });
             </script>
@@ -216,9 +223,36 @@ subprojects {
             </html>
         """)
         }
-        script = file("${node.nodeModulesDir}/mocha-headless-chrome/bin/start")
-        args = ['-f', "$buildDir/node_modules/tests.html"]
+		script = file("${node.nodeModulesDir}/mocha-headless-chrome/bin/start")
+		args = ['-f', "$buildDir/node_modules/tests.html", "-a", "no-sandbox", "-a", "disable-setuid-sandbox", "-a", "allow-file-access-from-files"]
     }
+
+	afterEvaluate {
+		//println(macosX64Test.outputDir)
+		//println(macosX64Test)
+		//println(macosX64Test.class)
+
+		for (target in ["macosX64", "linuxX64", "mingwX64"]) {
+			String taskName = "copyResourcesToExecutable_${target}"
+			def targetTestTask = tasks.getByName("${target}Test")
+			tasks.create(name: taskName, type: Copy) {
+				for (sourceSet in kotlin.sourceSets) {
+					from sourceSet.resources
+				}
+				into new File(targetTestTask.inputs.properties.executable).parentFile
+			}
+
+			//println()
+			//dump(linkTestMacosX64.outputs)
+			targetTestTask.dependsOn(taskName)
+		}
+	}
+
+	[kotlin.targets.js, kotlin.targets.metadata].each { target ->
+		target.compilations.main.kotlinSourceSets.resources.collectMany { it.srcDirs }.each {
+			tasks.jsJar.from it
+		}
+	}
 
 // Only run JS tests if not in windows
     if (!org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
@@ -275,7 +309,6 @@ subprojects {
                         password publishPassword
                     }
                     url "https://api.bintray.com/maven/soywiz/soywiz/${project.property('project.package')}/"
-                    //url "https://api.bintray.com/content/soywiz/soywiz/korlibs/$projectVersion"
                 }
             }
 
