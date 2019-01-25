@@ -26,168 +26,176 @@ plugins {
     id 'com.moowork.node' version '1.2.0'
 }
 
+allprojects {
+    repositories {
+        mavenLocal()
+        maven { url "https://dl.bintray.com/soywiz/soywiz" }
+        jcenter()
+        google()
+    }
+
+    if (project.file('build.project.gradle').exists()) {
+        apply from: project.file('build.project.gradle')
+    }
+}
 
 def hasAndroid = ext.hasAndroid
 
-if (hasAndroid) {
-    apply plugin: 'com.android.library'
-
-    android {
-        compileSdkVersion 28
-        defaultConfig {
-            minSdkVersion 18
-            targetSdkVersion 28
-        }
-    }
-}
-
-repositories {
-    mavenLocal()
-    maven { url "https://dl.bintray.com/soywiz/soywiz" }
-    maven { url "https://dl.bintray.com/kotlin/kotlin-eap" }
-    jcenter()
-    google()
-}
-
-kotlin {
-    targets {
-        if (hasAndroid) {
-            fromPreset(presets.android, 'android') {
-                publishLibraryVariants("release", "debug")
-            }
-        }
-        fromPreset(presets.iosX64, 'iosX64')
-        fromPreset(presets.iosArm32, 'iosArm32')
-        fromPreset(presets.iosArm64, 'iosArm64')
-        fromPreset(presets.macosX64, 'macosX64')
-        fromPreset(presets.linuxX64, 'linuxX64')
-        fromPreset(presets.mingwX64, 'mingwX64')
-        fromPreset(presets.jvm, 'jvm')
-        fromPreset(presets.js, 'js') {
-            compilations.main {
-                compileKotlinJs.kotlinOptions {
-                    languageVersion = "1.3"
-                    sourceMap = true
-                    metaInfo = true
-                    moduleKind = "umd"
-                }
-                compileTestKotlinJs.kotlinOptions {
-                    languageVersion = "1.3"
-                    moduleKind = "umd"
-                }
-            }
-        }
-
-        // Only enable when loaded in IDEA (we use a property for detection). In CLI that would produce an "expect" error.
-
-        if (System.getProperty("idea.version") != null) {
-            if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
-                kotlin.targets.fromPreset(kotlin.presets.mingwX64, 'nativeCommon')
-                kotlin.targets.fromPreset(kotlin.presets.mingwX64, 'nativePosix')
-            } else if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC)) {
-                kotlin.targets.fromPreset(kotlin.presets.macosX64, 'nativeCommon')
-                kotlin.targets.fromPreset(kotlin.presets.macosX64, 'nativePosix')
-            } else {
-                kotlin.targets.fromPreset(kotlin.presets.linuxX64, 'nativeCommon')
-                kotlin.targets.fromPreset(kotlin.presets.linuxX64, 'nativePosix')
-            }
-        }
-    }
-    sourceSets {
-        nativeCommonMain
-        nativeCommonTest
-        nativePosixMain
-        if (hasAndroid) {
-            androidMain {
-                dependsOn jvmMain
-            }
-            androidTest {
-                dependsOn jvmTest
-            }
-        }
-        mingwX64Main {
-            dependsOn nativeCommonMain
-        }
-        mingwX64Test {
-            dependsOn nativeCommonTest
-        }
-        configure([iosX64Main, iosArm32Main, iosArm64Main, macosX64Main, linuxX64Main]) {
-            dependsOn nativeCommonMain
-            dependsOn nativePosixMain
-        }
-        configure([iosX64Test, iosArm32Test, iosArm64Test, macosX64Test, linuxX64Test]) {
-            dependsOn nativeCommonTest
-        }
-    }
-}
-
-dependencies {
-    commonMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-common"
-    commonTestImplementation "org.jetbrains.kotlin:kotlin-test-annotations-common"
-    commonTestImplementation "org.jetbrains.kotlin:kotlin-test-common"
+subprojects {
+    apply plugin: 'kotlin-multiplatform'
+    apply plugin: 'com.moowork.node'
 
     if (hasAndroid) {
-        androidMainImplementation "org.jetbrains.kotlin:kotlin-stdlib"
-        androidTestImplementation "org.jetbrains.kotlin:kotlin-test"
-        androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit"
-    }
-    
-    jsMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-js"
-    jsTestImplementation "org.jetbrains.kotlin:kotlin-test-js"
+        apply plugin: 'com.android.library'
 
-    jvmMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    jvmTestImplementation "org.jetbrains.kotlin:kotlin-test"
-    jvmTestImplementation "org.jetbrains.kotlin:kotlin-test-junit"
-}
+        android {
+            compileSdkVersion 28
+            defaultConfig {
+                minSdkVersion 18
+                targetSdkVersion 28
+            }
+        }
+    }
+
+    kotlin {
+        targets {
+            if (hasAndroid) {
+                fromPreset(presets.android, 'android') {
+                    publishLibraryVariants("release", "debug")
+                }
+            }
+            fromPreset(presets.iosX64, 'iosX64')
+            fromPreset(presets.iosArm32, 'iosArm32')
+            fromPreset(presets.iosArm64, 'iosArm64')
+            fromPreset(presets.macosX64, 'macosX64')
+            fromPreset(presets.linuxX64, 'linuxX64')
+            fromPreset(presets.mingwX64, 'mingwX64')
+            fromPreset(presets.jvm, 'jvm')
+            fromPreset(presets.js, 'js') {
+                compilations.main {
+                    compileKotlinJs.kotlinOptions {
+                        languageVersion = "1.3"
+                        sourceMap = true
+                        metaInfo = true
+                        moduleKind = "umd"
+                    }
+                    compileTestKotlinJs.kotlinOptions {
+                        languageVersion = "1.3"
+                        moduleKind = "umd"
+                    }
+                }
+            }
+
+            // Only enable when loaded in IDEA (we use a property for detection). In CLI that would produce an "expect" error.
+
+            if (System.getProperty("idea.version") != null) {
+                if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
+                    kotlin.targets.fromPreset(kotlin.presets.mingwX64, 'nativeCommon')
+                    kotlin.targets.fromPreset(kotlin.presets.mingwX64, 'nativePosix')
+                } else if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC)) {
+                    kotlin.targets.fromPreset(kotlin.presets.macosX64, 'nativeCommon')
+                    kotlin.targets.fromPreset(kotlin.presets.macosX64, 'nativePosix')
+                } else {
+                    kotlin.targets.fromPreset(kotlin.presets.linuxX64, 'nativeCommon')
+                    kotlin.targets.fromPreset(kotlin.presets.linuxX64, 'nativePosix')
+                }
+            }
+        }
+        sourceSets {
+            nativeCommonMain
+            nativeCommonTest
+            nativePosixMain
+            if (hasAndroid) {
+                androidMain {
+                    dependsOn jvmMain
+                }
+                androidTest {
+                    dependsOn jvmTest
+                }
+            }
+            mingwX64Main {
+                dependsOn nativeCommonMain
+            }
+            mingwX64Test {
+                dependsOn nativeCommonTest
+            }
+            configure([iosX64Main, iosArm32Main, iosArm64Main, macosX64Main, linuxX64Main]) {
+                dependsOn nativeCommonMain
+                dependsOn nativePosixMain
+            }
+            configure([iosX64Test, iosArm32Test, iosArm64Test, macosX64Test, linuxX64Test]) {
+                dependsOn nativeCommonTest
+            }
+        }
+    }
+
+    dependencies {
+        commonMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-common"
+        commonTestImplementation "org.jetbrains.kotlin:kotlin-test-annotations-common"
+        commonTestImplementation "org.jetbrains.kotlin:kotlin-test-common"
+
+        if (hasAndroid) {
+            androidMainImplementation "org.jetbrains.kotlin:kotlin-stdlib"
+            androidTestImplementation "org.jetbrains.kotlin:kotlin-test"
+            androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit"
+        }
+
+        jsMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-js"
+        jsTestImplementation "org.jetbrains.kotlin:kotlin-test-js"
+
+        jvmMainImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        jvmTestImplementation "org.jetbrains.kotlin:kotlin-test"
+        jvmTestImplementation "org.jetbrains.kotlin:kotlin-test-junit"
+    }
 
 // Javascript test configuration
 
-def korlibsDir = new File(System.getProperty("user.home"), ".korlibs")
-korlibsDir.mkdirs()
+    def korlibsDir = new File(System.getProperty("user.home"), ".korlibs")
+    korlibsDir.mkdirs()
 
-node {
-    version = '8.11.4'
-    download = true
-    workDir = new File(korlibsDir, "nodejs")
-    npmWorkDir = new File(korlibsDir, "npm")
-    yarnWorkDir = new File(korlibsDir, "yarn")
-    nodeModulesDir = new File(korlibsDir, "node_modules")
-}
+    node {
+        version = '8.11.4'
+        download = true
+        workDir = new File(korlibsDir, "nodejs")
+        npmWorkDir = new File(korlibsDir, "npm")
+        yarnWorkDir = new File(korlibsDir, "yarn")
+        nodeModulesDir = new File(korlibsDir, "node_modules")
+    }
 
-def jsCompilations = kotlin.targets.js.compilations
-task installMocha(type: NpmTask) {
-    onlyIf { !(new File(node.nodeModulesDir, "mocha")).exists() }
-    args = ["install", "mocha@5.2.0"]
-}
+    def jsCompilations = kotlin.targets.js.compilations
+    task installMocha(type: NpmTask) {
+        onlyIf { !(new File(node.nodeModulesDir, "mocha")).exists() }
+        args = ["install", "mocha@5.2.0"]
+    }
 
-task populateNodeModules {
-    doLast {
-        copy {
-            from "${node.nodeModulesDir}"
-            from jsCompilations.main.output.allOutputs
-            jsCompilations.test.runtimeDependencyFiles.each {
-                if (it.exists() && !it.isDirectory()) {
-                    from zipTree(it.absolutePath).matching { include '*.js' }
+    task populateNodeModules {
+        doLast {
+            copy {
+                from "${node.nodeModulesDir}"
+                from jsCompilations.main.output.allOutputs
+                jsCompilations.test.runtimeDependencyFiles.each {
+                    if (it.exists() && !it.isDirectory()) {
+                        from zipTree(it.absolutePath).matching { include '*.js' }
+                    }
                 }
+                into "$buildDir/node_modules"
             }
-            into "$buildDir/node_modules"
         }
     }
-}
 
-task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, installMocha, populateNodeModules]) {
-    script = file("$buildDir/node_modules/mocha/bin/mocha")
-    args = ["--timeout", "15000", relativePath("${jsCompilations.test.output.classesDirs.first()}/${project.name}_test.js")]
-}
+    task runMocha(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, installMocha, populateNodeModules]) {
+        script = file("$buildDir/node_modules/mocha/bin/mocha")
+        args = ["--timeout", "15000", relativePath("${jsCompilations.test.output.classesDirs.first()}/${project.name}_test.js")]
+    }
 
-task jsInstallMochaHeadlessChrome(type: NpmTask) {
-    onlyIf { !(new File("${node.nodeModulesDir}/mocha-headless-chrome")).exists() }
-    args = ["install", "mocha-headless-chrome@2.0.1"]
-}
+    task jsInstallMochaHeadlessChrome(type: NpmTask) {
+        onlyIf { !(new File("${node.nodeModulesDir}/mocha-headless-chrome")).exists() }
+        args = ["install", "mocha-headless-chrome@2.0.1"]
+    }
 
-task jsTestChrome(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, jsInstallMochaHeadlessChrome, installMocha, populateNodeModules]) {
-    doFirst {
-        new File("$buildDir/node_modules/tests.html").write("""
+    task jsTestChrome(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinTaskName, jsInstallMochaHeadlessChrome, installMocha, populateNodeModules]) {
+        doFirst {
+            new File("$buildDir/node_modules/tests.html").write("""
             <!DOCTYPE html>
             <html>
             <head>
@@ -207,76 +215,77 @@ task jsTestChrome(type: NodeTask, dependsOn: [jsCompilations.test.compileKotlinT
             </body>
             </html>
         """)
+        }
+        script = file("${node.nodeModulesDir}/mocha-headless-chrome/bin/start")
+        args = ['-f', "$buildDir/node_modules/tests.html"]
     }
-    script = file("${node.nodeModulesDir}/mocha-headless-chrome/bin/start")
-    args = ['-f', "$buildDir/node_modules/tests.html"]
-}
 
 // Only run JS tests if not in windows
-if (!org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
-    jsTest.dependsOn runMocha
-}
+    if (!org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
+        jsTest.dependsOn runMocha
+    }
 
 // Fix for https://github.com/srs/gradle-node-plugin/issues/301
-repositories.whenObjectAdded {
-    if (it instanceof IvyArtifactRepository) {
-        metadataSources {
-            artifact()
-        }
-    }
-}
-
-// Publishing
-group 'com.soywiz'
-version projectVersion
-apply plugin: 'maven-publish'
-
-def pomBaseData = {
-    licenses {
-        license {
-            name project.property("project.license.name")
-            url project.property("project.license.url")
-        }
-    }
-    scm {
-        url project.property("project.scm.url")
-    }
-}
-
-def generatePom = { pom ->
-    pom.withXml {
-        def root = it.asNode()
-        root.appendNode('name', project.name)
-        root.appendNode('description', project.property("project.description"))
-        root.appendNode('url', project.property("project.scm.url"))
-        root.children().last() + pomBaseData
-    }
-}
-
-ext.generatePom = generatePom
-
-def publishUser = rootProject.findProperty('BINTRAY_USER') ?: project.findProperty('bintrayUser') ?: System.getenv('BINTRAY_USER')
-def publishPassword = rootProject.findProperty('BINTRAY_KEY') ?: project.findProperty('bintrayApiKey') ?: System.getenv('BINTRAY_API_KEY')
-
-if (publishUser && publishPassword) {
-    publishing {
-        repositories {
-            maven {
-                credentials {
-                    username publishUser
-                    password publishPassword
-                }
-                url "https://api.bintray.com/maven/soywiz/soywiz/${project.property('project.package')}/"
-                //url "https://api.bintray.com/content/soywiz/soywiz/korlibs/$projectVersion"
+    repositories.whenObjectAdded {
+        if (it instanceof IvyArtifactRepository) {
+            metadataSources {
+                artifact()
             }
         }
+    }
 
-        configure(publications) {
-            generatePom(pom)
+// Publishing
+    group 'com.soywiz'
+    version projectVersion
+    apply plugin: 'maven-publish'
+
+    def pomBaseData = {
+        licenses {
+            license {
+                name project.property("project.license.name")
+                url project.property("project.license.url")
+            }
+        }
+        scm {
+            url project.property("project.scm.url")
         }
     }
-}
 
-if (project.file('build.project.gradle').exists()) {
-    apply from: project.file('build.project.gradle')
+    def generatePom = { pom ->
+        pom.withXml {
+            def root = it.asNode()
+            root.appendNode('name', project.name)
+            root.appendNode('description', project.property("project.description"))
+            root.appendNode('url', project.property("project.scm.url"))
+            root.children().last() + pomBaseData
+        }
+    }
+
+    ext.generatePom = generatePom
+
+    def publishUser = rootProject.findProperty('BINTRAY_USER') ?: project.findProperty('bintrayUser') ?: System.getenv('BINTRAY_USER')
+    def publishPassword = rootProject.findProperty('BINTRAY_KEY') ?: project.findProperty('bintrayApiKey') ?: System.getenv('BINTRAY_API_KEY')
+
+    if (publishUser && publishPassword) {
+        publishing {
+            repositories {
+                maven {
+                    credentials {
+                        username publishUser
+                        password publishPassword
+                    }
+                    url "https://api.bintray.com/maven/soywiz/soywiz/${project.property('project.package')}/"
+                    //url "https://api.bintray.com/content/soywiz/soywiz/korlibs/$projectVersion"
+                }
+            }
+
+            configure(publications) {
+                generatePom(pom)
+            }
+        }
+    }
+
+    if (project.file('build.project.gradle').exists()) {
+        apply from: project.file('build.project.gradle')
+    }
 }
