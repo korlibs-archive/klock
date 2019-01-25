@@ -284,8 +284,4 @@ subprojects {
             }
         }
     }
-
-    if (project.file('build.project.gradle').exists()) {
-        apply from: project.file('build.project.gradle')
-    }
 }
