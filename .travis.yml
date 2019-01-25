@@ -37,9 +37,6 @@ matrix:
       components:
         - build-tools-28.0.3
         - android-28
-      licenses:
-        - 'android-sdk-license-.+'
-        - 'google-gdk-license-.+'
     jdk: oraclejdk8
     env:
       KBUILD=android
