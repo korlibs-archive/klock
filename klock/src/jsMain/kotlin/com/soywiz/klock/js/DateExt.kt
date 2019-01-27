@@ -1,4 +1,4 @@
-package com.soywiz.klock.internal
+package com.soywiz.klock.js
 
 import com.soywiz.klock.DateTime
 import kotlin.js.Date
