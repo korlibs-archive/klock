@@ -6,6 +6,7 @@ import groovy.xml.*
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import kotlin.reflect.KClass
 
 buildscript {
     repositories {
@@ -127,10 +128,12 @@ subprojects {
             val nativePosixMain = create("nativePosixMain")
             if (hasAndroid) {
                 this.maybeCreate("androidMain").apply {
-                    dependsOn(jvmMain)
+                    // Allow to have different code than for the JVM
+                    //dependsOn(jvmMain)
                 }
                 this.maybeCreate("androidTest").apply {
-                    dependsOn(jvmMain)
+                    // Allow to have different code than for the JVM
+                    //dependsOn(jvmMain)
                 }
             }
             maybeCreate("mingwX64Main").apply {
@@ -208,15 +211,14 @@ subprojects {
 
     }
 
-
     val jsCompilations = kotlin.targets.js.compilations
 
-
-    tasks.create<NpmTask>("installMocha") {
+    val installMocha by tasks.registering(NpmTask::class) {
         onlyIf { !node.nodeModulesDir["mocha"].exists() }
         setArgs(listOf("install", "mocha@5.2.0"))
     }
-    tasks.create<DefaultTask>("populateNodeModules") {
+
+    val populateNodeModules by tasks.registering(DefaultTask::class) {
         doLast {
             copy {
                 from("${node.nodeModulesDir}")
@@ -237,18 +239,20 @@ subprojects {
         }
     }
 
-    val jsTestNode = tasks.create<NodeTask>("jsTestNode") {
-        dependsOn(jsCompilations.test.compileKotlinTaskName, "installMocha", "populateNodeModules")
+    val jsTestNode by tasks.registering(NodeTask::class) {
+        dependsOn(jsCompilations.test.compileKotlinTaskName, installMocha, populateNodeModules)
         setScript(file("$buildDir/node_modules/mocha/bin/mocha"))
         setWorkingDir(file("$buildDir/node_modules"))
         setArgs(listOf("--timeout", "15000", "${project.name}_test.js"))
     }
-    tasks.create<NpmTask>("jsInstallMochaHeadlessChrome") {
+
+    val jsInstallMochaHeadlessChrome by tasks.registering(NpmTask::class) {
         onlyIf { !node.nodeModulesDir["mocha-headless-chrome"].exists() }
         setArgs(listOf("install", "mocha-headless-chrome@2.0.1"))
     }
-    tasks.create<NodeTask>("jsTestChrome") {
-        dependsOn(jsCompilations.test.compileKotlinTaskName, "jsInstallMochaHeadlessChrome", "installMocha", "populateNodeModules")
+
+    val jsTestChrome by tasks.registering(NodeTask::class) {
+        dependsOn(jsCompilations.test.compileKotlinTaskName, jsInstallMochaHeadlessChrome, installMocha, populateNodeModules)
         doFirst {
             buildDir["node_modules/tests.html"].text = """
                 <!DOCTYPE html>
@@ -278,13 +282,15 @@ subprojects {
     afterEvaluate {
         for (target in listOf("macosX64", "linuxX64", "mingwX64")) {
             val taskName = "copyResourcesToExecutable_$target"
-            val targetTestTask = tasks.getByName("${target}Test")
+            val targetTestTask = tasks.getByName("${target}Test") as Exec
+
             tasks {
                 create<Copy>(taskName) {
                     for (sourceSet in kotlin.sourceSets) {
                         from(sourceSet.resources)
                     }
-                    into(File(targetTestTask.inputs.properties["executable"].toString()).parentFile)
+
+                    into(File(targetTestTask.executable).parentFile)
                 }
             }
 
@@ -293,21 +299,24 @@ subprojects {
     }
 
     // Include resources from JS and Metadata (common) into the JS JAR
+    val jsJar = tasks.getByName<Jar>("jsJar")
+    val jsTest = tasks.getByName<Test>("jsTest")
+
     for (target in listOf(kotlin.targets.js, kotlin.targets.metadata)) {
         for (sourceSet in target.compilations.main.kotlinSourceSets) {
             for (it in sourceSet.resources.srcDirs) {
-                tasks.getByName<Jar>("jsJar").from(it)
+                jsJar.from(it)
             }
         }
     }
 
     // Only run JS tests if not in windows
     if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-        tasks.getByName("jsTest").dependsOn(jsTestNode)
+        jsTest.dependsOn(jsTestNode)
 
         // Except on travis (we have a separate target for it)
         if (System.getenv("TRAVIS") != null) {
-            tasks.getByName("jsTest").dependsOn("jsTestChrome")
+            jsTest.dependsOn(jsTestChrome)
         }
     }
 
@@ -364,8 +373,10 @@ subprojects {
     }
 
     // Headless testing on JVM (so we can use GWT)
-    tasks.getByName<Test>("jvmTest") {
-        jvmArgs = (jvmArgs ?: arrayListOf()) + arrayListOf("-Djava.awt.headless=true")
+    tasks {
+        "jvmTest"(Test::class) {
+            jvmArgs = (jvmArgs ?: arrayListOf()) + arrayListOf("-Djava.awt.headless=true")
+        }
     }
 }
 
