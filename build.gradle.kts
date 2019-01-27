@@ -32,10 +32,28 @@ if (!hasAndroid) {
 
 allprojects {
     repositories {
-        mavenLocal()
-        maven { url = uri("https://dl.bintray.com/soywiz/soywiz") }
-        jcenter()
-        google()
+        mavenLocal().apply {
+            content {
+                excludeGroup("Kotlin/Native")
+            }
+        }
+        maven {
+            url = uri("https://dl.bintray.com/soywiz/soywiz")
+            content {
+                includeGroup("com.soywiz")
+                excludeGroup("Kotlin/Native")
+            }
+        }
+        jcenter() {
+            content {
+                excludeGroup("Kotlin/Native")
+            }
+        }
+        google().apply {
+            content {
+                excludeGroup("Kotlin/Native")
+            }
+        }
     }
 }
 
@@ -43,19 +61,6 @@ plugins {
     id("kotlin-multiplatform").version("1.3.20")
     id("com.moowork.node").version("1.2.0")
     id("maven-publish")
-}
-
-allprojects {
-    repositories {
-        mavenLocal()
-        maven { url = uri("https://dl.bintray.com/soywiz/soywiz") }
-        jcenter()
-        google()
-    }
-
-    if (project.file("build.project.gradle.kts").exists()) {
-        apply(from = project.file("build.project.gradle.kts"))
-    }
 }
 
 operator fun File.get(name: String) = File(this, name)
@@ -127,44 +132,35 @@ subprojects {
         }
 
         sourceSets {
-            val jvmMain = this["jvmMain"]
-            val nativeCommonMain = maybeCreate("nativeCommonMain")
-            val nativeCommonTest = maybeCreate("nativeCommonTest")
-            val nativePosixMain = maybeCreate("nativePosixMain")
-            if (hasAndroid) {
-                maybeCreate("androidMain").apply {
-                    // Allow to have different code than for the JVM
-                    //dependsOn(jvmMain)
-                }
-                maybeCreate("androidTest").apply {
-                    // Allow to have different code than for the JVM
-                    //dependsOn(jvmMain)
+            fun dependants(name: String, on: Set<String>) {
+                val main = maybeCreate("${name}Main")
+                val test = maybeCreate("${name}Test")
+                for (o in on) {
+                    maybeCreate("${o}Main").dependsOn(main)
+                    maybeCreate("${o}Test").dependsOn(test)
                 }
             }
-            maybeCreate("mingwX64Main").apply {
-                dependsOn(nativeCommonMain)
-            }
-            maybeCreate("mingwX64Test").apply {
-                dependsOn(nativeCommonTest)
-            }
 
-            val iosTargets = listOf(this["iosX64Main"], this["iosArm32Main"], this["iosArm64Main"])
+            val none = setOf<String>()
+            val android = if (hasAndroid) setOf() else setOf("android")
+            val jvm = setOf("jvm")
+            val js = setOf("js")
+            val ios = setOf("iosX64", "iosArm32", "iosArm64")
+            val macos = setOf("macosX64")
+            val linux = setOf("linuxX64")
+            val mingw = setOf("mingwX64")
+            val apple = ios + macos
+            val allNative = apple + linux + mingw
+            val jvmAndroid = jvm + android
+            val allTargets = allNative + js + jvm + android
 
-            configure(iosTargets + listOf(this["macosX64Main"], this["linuxX64Main"])) {
-                dependsOn(nativeCommonMain)
-                dependsOn(nativePosixMain)
-            }
-
-            configure(iosTargets + listOf(this["macosX64Test"], this["linuxX64Test"])) {
-                dependsOn(nativeCommonTest)
-            }
-
-            val iosCommonMain = create("iosCommonMain")
-            val iosCommonTest = create("iosCommonTest")
-
-            configure(iosTargets) { dependsOn(iosCommonMain) }
-            configure(iosTargets) { dependsOn(iosCommonTest) }
-
+            dependants("iosCommon", ios)
+            dependants("nativeCommon", allNative)
+            dependants("nonNativeCommon", allTargets - allNative)
+            dependants("nativePosix", allNative - mingw)
+            dependants("nativePosixNonApple", allNative - mingw - apple)
+            dependants("nativePosixApple", apple)
+            dependants("nonJs", allTargets - js)
         }
     }
 
