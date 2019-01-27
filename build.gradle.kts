@@ -275,7 +275,7 @@ subprojects {
                 </html>
             """.trimIndent()
         }
-        setScript(node.nodeModulesDir["/mocha-headless-chrome/bin/start"])
+        setScript(node.nodeModulesDir["mocha-headless-chrome/bin/start"])
         setArgs(listOf("-f", "$buildDir/node_modules/tests.html", "-a", "no-sandbox", "-a", "disable-setuid-sandbox", "-a", "allow-file-access-from-files"))
     }
 
@@ -315,7 +315,7 @@ subprojects {
         jsTest.dependsOn(jsTestNode)
 
         // Except on travis (we have a separate target for it)
-        if (System.getenv("TRAVIS") != null) {
+        if (System.getenv("TRAVIS") == null) {
             jsTest.dependsOn(jsTestChrome)
         }
     }
