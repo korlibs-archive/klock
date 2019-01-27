@@ -236,7 +236,8 @@ subprojects {
             }
         }
     }
-    tasks.create<NodeTask>("runMocha") {
+
+    val jsTestNode = tasks.create<NodeTask>("jsTestNode") {
         dependsOn(jsCompilations.test.compileKotlinTaskName, "installMocha", "populateNodeModules")
         setScript(file("$buildDir/node_modules/mocha/bin/mocha"))
         setWorkingDir(file("$buildDir/node_modules"))
@@ -274,10 +275,9 @@ subprojects {
         setArgs(listOf("-f", "$buildDir/node_modules/tests.html", "-a", "no-sandbox", "-a", "disable-setuid-sandbox", "-a", "allow-file-access-from-files"))
     }
 
-
     afterEvaluate {
         for (target in listOf("macosX64", "linuxX64", "mingwX64")) {
-            val taskName = "copyResourcesToExecutable_${target}"
+            val taskName = "copyResourcesToExecutable_$target"
             val targetTestTask = tasks.getByName("${target}Test")
             tasks {
                 create<Copy>(taskName) {
@@ -303,7 +303,12 @@ subprojects {
 
     // Only run JS tests if not in windows
     if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-        tasks.getByName("jsTest").dependsOn("runMocha")
+        tasks.getByName("jsTest").dependsOn(jsTestNode)
+
+        // Except on travis (we have a separate target for it)
+        if (System.getenv("TRAVIS") != null) {
+            tasks.getByName("jsTest").dependsOn("jsTestChrome")
+        }
     }
 
     group = "com.soywiz"
