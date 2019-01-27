@@ -15,11 +15,10 @@ buildscript {
         val trySdkDir = File(System.getProperty("user.home") + "/Library/Android/sdk")
         if (trySdkDir.exists()) {
             File(rootDir, "local.properties").writeText("sdk.dir=${trySdkDir.absolutePath}")
-            hasAndroid = true
         }
     }
 
-    if (hasAndroid) {
+    //if (hasAndroid) {
         repositories {
             mavenLocal()
             mavenCentral()
@@ -29,7 +28,7 @@ buildscript {
             classpath("com.android.tools.build:gradle:3.3.0")
             classpath(kotlin("gradle-plugin", version = "1.3.20"))
         }
-    }
+    //}
 }
 
 // @TODO: Can we pass information from buildscript to here with kotlin-dsl?
