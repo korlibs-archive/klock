@@ -6,6 +6,7 @@ import groovy.xml.*
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import java.io.*
 
 buildscript {
     repositories {
@@ -52,8 +53,8 @@ allprojects {
         google()
     }
 
-    if (project.file("build.project.gradle").exists()) {
-        apply(from = project.file("build.project.gradle"))
+    if (project.file("build.project.gradle.kts").exists()) {
+        apply(from = project.file("build.project.gradle.kts"))
     }
 }
 
@@ -66,6 +67,13 @@ val NamedDomainObjectCollection<KotlinTarget>.metadata get() = this["metadata"] 
 val <T : KotlinCompilation<*>> NamedDomainObjectContainer<T>.main get() = this["main"]
 val <T : KotlinCompilation<*>> NamedDomainObjectContainer<T>.test get() = this["test"]
 
+class MultiOutputStream(val outs: List<OutputStream>) : OutputStream() {
+    override fun write(b: Int) = run { for (out in outs) out.write(b) }
+    override fun write(b: ByteArray, off: Int, len: Int) = run { for (out in outs) out.write(b, off, len) }
+    override fun flush()  = run { for (out in outs) out.flush() }
+    override fun close()  = run { for (out in outs) out.close() }
+}
+
 subprojects {
     if (project.name == "template") return@subprojects
 
@@ -74,8 +82,6 @@ subprojects {
 
     if (hasAndroid) {
         apply(plugin = "com.android.library")
-        //apply(plugin = "org.jetbrains.kotlin.android")
-        //apply(plugin = "org.jetbrains.kotlin.android.extensions")
         extensions.getByType<com.android.build.gradle.LibraryExtension>().apply {
             compileSdkVersion(28)
             defaultConfig {
@@ -286,6 +292,8 @@ subprojects {
         for (target in listOf("macosX64", "linuxX64", "mingwX64")) {
             val taskName = "copyResourcesToExecutable_$target"
             val targetTestTask = tasks.getByName("${target}Test") as Exec
+            val compileTestTask = tasks.getByName("compileTestKotlin${target.capitalize()}")
+            val compileMainask = tasks.getByName("compileKotlin${target.capitalize()}")
 
             tasks {
                 create<Copy>(taskName) {
@@ -296,6 +304,17 @@ subprojects {
                     into(File(targetTestTask.executable).parentFile)
                 }
             }
+
+            val reportFile = buildDir["test-results/nativeTest/text/output.txt"].apply { parentFile.mkdirs() }
+            val fout = FileOutputStream(reportFile).buffered()
+            targetTestTask.standardOutput = MultiOutputStream(listOf(targetTestTask.standardOutput, fout))
+            targetTestTask.doLast { fout.close() }
+
+            targetTestTask.inputs.files(
+                *compileTestTask.outputs.files.files.toTypedArray(),
+                *compileMainask.outputs.files.files.toTypedArray()
+            )
+            targetTestTask.outputs.file(reportFile)
 
             targetTestTask.dependsOn(taskName)
         }
