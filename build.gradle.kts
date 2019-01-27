@@ -235,11 +235,13 @@ subprojects {
     }
 
     val jsTestNode = tasks.create<NodeTask>("jsTestNode") {
+        dependsOn(jsCompilations.test.compileKotlinTask, installMocha, populateNodeModules)
+
         val resultsFile = buildDir["node-results/results.json"]
-        dependsOn(jsCompilations.test.compileKotlinTaskName, installMocha, populateNodeModules)
         setScript(file("$buildDir/node_modules/mocha/bin/mocha"))
         setWorkingDir(file("$buildDir/node_modules"))
         setArgs(listOf("--timeout", "15000", "${project.name}_test.js", "-o", resultsFile))
+        inputs.file(jsCompilations.test.compileKotlinTask.outputFile)
         outputs.file(resultsFile)
     }
 
@@ -249,7 +251,8 @@ subprojects {
     }
 
     val jsTestChrome = tasks.create<NodeTask>("jsTestChrome") {
-        dependsOn(jsCompilations.test.compileKotlinTaskName, jsInstallMochaHeadlessChrome, installMocha, populateNodeModules)
+        dependsOn(jsCompilations.test.compileKotlinTask, jsInstallMochaHeadlessChrome, installMocha, populateNodeModules)
+
         val resultsFile = buildDir["chrome-results/results.json"]
         doFirst {
             buildDir["node_modules/tests.html"].text = """
@@ -275,6 +278,7 @@ subprojects {
         }
         setScript(node.nodeModulesDir["mocha-headless-chrome/bin/start"])
         setArgs(listOf("-f", "$buildDir/node_modules/tests.html", "-a", "no-sandbox", "-a", "disable-setuid-sandbox", "-a", "allow-file-access-from-files", "-o", resultsFile))
+        inputs.file(jsCompilations.test.compileKotlinTask.outputFile)
         outputs.file(resultsFile)
     }
 
