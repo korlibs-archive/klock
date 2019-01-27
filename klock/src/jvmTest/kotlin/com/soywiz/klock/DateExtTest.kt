@@ -1,5 +1,6 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.jvm.*
 import org.junit.Test
 import java.util.*
 import kotlin.test.assertEquals
