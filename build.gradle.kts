@@ -306,9 +306,11 @@ subprojects {
             }
 
             val reportFile = buildDir["test-results/nativeTest/text/output.txt"].apply { parentFile.mkdirs() }
-            val fout = FileOutputStream(reportFile).buffered()
+            val fout = ByteArrayOutputStream()
             targetTestTask.standardOutput = MultiOutputStream(listOf(targetTestTask.standardOutput, fout))
-            targetTestTask.doLast { fout.close() }
+            targetTestTask.doLast {
+                reportFile.writeBytes(fout.toByteArray())
+            }
 
             targetTestTask.inputs.files(
                 *compileTestTask.outputs.files.files.toTypedArray(),
