@@ -4,39 +4,30 @@ import com.moowork.gradle.node.task.*
 import groovy.util.*
 import groovy.xml.*
 import org.apache.tools.ant.taskdefs.condition.Os
-import org.jetbrains.kotlin.backend.common.*
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 
 buildscript {
-    var hasAndroid = (System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null)
-
-    if (!hasAndroid) {
-        val trySdkDir = File(System.getProperty("user.home") + "/Library/Android/sdk")
-        if (trySdkDir.exists()) {
-            File(rootDir, "local.properties").writeText("sdk.dir=${trySdkDir.absolutePath}")
-            hasAndroid = true
-        }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
     }
-
-    if (hasAndroid) {
-        repositories {
-            mavenLocal()
-            mavenCentral()
-            google()
-        }
-        dependencies {
-            classpath("com.android.tools.build:gradle:3.3.0")
-            classpath(kotlin("gradle-plugin", version = "1.3.20"))
-        }
+    dependencies {
+        classpath("com.android.tools.build:gradle:3.3.0")
+        classpath(kotlin("gradle-plugin", version = "1.3.20"))
     }
 }
 
-// @TODO: Can we pass information from buildscript to here with kotlin-dsl?
-var hasAndroid = (System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null) || File(
-    rootDir,
-    "local.properties"
-).exists()
+var hasAndroid = (System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null)
+
+if (!hasAndroid) {
+    val trySdkDir = File(System.getProperty("user.home") + "/Library/Android/sdk")
+    if (trySdkDir.exists()) {
+        File(rootDir, "local.properties").writeText("sdk.dir=${trySdkDir.absolutePath}")
+        hasAndroid = true
+    }
+}
 
 allprojects {
     repositories {
