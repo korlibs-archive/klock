@@ -70,7 +70,7 @@ operator fun File.get(name: String) = File(this, name)
 var File.text get() = this.readText(); set(value) = run { this.writeText(value) }
 val NamedDomainObjectCollection<KotlinTarget>.js get() = this["js"] as KotlinOnlyTarget<KotlinJsCompilation>
 val NamedDomainObjectCollection<KotlinTarget>.jvm get() = this["jvm"] as KotlinOnlyTarget<KotlinJvmCompilation>
-val NamedDomainObjectCollection<KotlinTarget>.metadata get() = this["jvm"] as KotlinOnlyTarget<KotlinCommonCompilation>
+val NamedDomainObjectCollection<KotlinTarget>.metadata get() = this["metadata"] as KotlinOnlyTarget<KotlinCommonCompilation>
 
 val <T : KotlinCompilation<*>> NamedDomainObjectContainer<T>.main get() = this["main"]
 val <T : KotlinCompilation<*>> NamedDomainObjectContainer<T>.test get() = this["test"]
