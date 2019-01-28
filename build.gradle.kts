@@ -20,14 +20,19 @@ buildscript {
     }
 }
 
-var hasAndroid = (System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null)
-
+var hasAndroid: Boolean by extra
+hasAndroid = (System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null)
 if (!hasAndroid) {
-    val trySdkDir = File(System.getProperty("user.home") + "/Library/Android/sdk")
-    if (trySdkDir.exists()) {
-        File(rootDir, "local.properties").writeText("sdk.dir=${trySdkDir.absolutePath}")
-        hasAndroid = true
-    }
+	val trySdkDir = File(System.getProperty("user.home") + "/Library/Android/sdk")
+	if (trySdkDir.exists()) {
+		File(rootDir, "local.properties").writeText("sdk.dir=${trySdkDir.absolutePath}")
+		hasAndroid = true
+	}
+}
+
+plugins {
+    id("kotlin-multiplatform").version("1.3.20")
+    id("com.moowork.node").version("1.2.0")
 }
 
 allprojects {
@@ -55,12 +60,6 @@ allprojects {
             }
         }
     }
-}
-
-plugins {
-    id("kotlin-multiplatform").version("1.3.20")
-    id("com.moowork.node").version("1.2.0")
-    id("maven-publish")
 }
 
 operator fun File.get(name: String) = File(this, name)
@@ -145,11 +144,11 @@ subprojects {
             val android = if (hasAndroid) setOf() else setOf("android")
             val jvm = setOf("jvm")
             val js = setOf("js")
-            val ios = setOf("iosX64", "iosArm32", "iosArm64")
+			val ios = setOf("iosX64", "iosArm32", "iosArm64")
             val macos = setOf("macosX64")
             val linux = setOf("linuxX64")
             val mingw = setOf("mingwX64")
-            val apple = ios + macos
+			val apple = ios + macos
             val allNative = apple + linux + mingw
             val jvmAndroid = jvm + android
             val allTargets = allNative + js + jvm + android
@@ -161,7 +160,7 @@ subprojects {
             dependants("nativePosixNonApple", allNative - mingw - apple)
             dependants("nativePosixApple", apple)
             dependants("nonJs", allTargets - js)
-        }
+		}
     }
 
     dependencies {
@@ -399,3 +398,17 @@ subprojects {
         }
     }
 }
+
+if (project.file("build.project.gradle.kts").exists()) {
+	apply(from = project.file("build.project.gradle.kts"))
+}
+
+subprojects {
+    val installJsCanvas = tasks.create<NpmTask>("installJsCanvas") {
+        onlyIf { !File(node.nodeModulesDir, "canvas").exists() }
+        setArgs(arrayListOf("install", "canvas@2.2.0"))
+    }
+
+    tasks.getByName("jsTestNode").dependsOn(installJsCanvas)
+}
+
