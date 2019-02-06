@@ -15,8 +15,6 @@ pluginManagement {
     }
 }
 
-enableFeaturePreview("GRADLE_METADATA")
-
 rootProject.name = java.util.Properties().apply { load(File(rootProject.projectDir, "gradle.properties").readText().reader()) }.getProperty("project.name")
 
 include(":klock")

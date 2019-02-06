@@ -16,7 +16,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.3.0")
-        classpath(kotlin("gradle-plugin", version = "1.3.20"))
+        classpath(kotlin("gradle-plugin", version = "1.3.21"))
     }
 }
 
@@ -338,9 +338,6 @@ subprojects {
             jsTest.dependsOn(jsTestChrome)
         }
     }
-
-    group = "com.soywiz"
-    version = properties["projectVersion"].toString()
 
     // Publishing
     val publishUser = (rootProject.findProperty("BINTRAY_USER") ?: project.findProperty("bintrayUser") ?: System.getenv("BINTRAY_USER"))?.toString()
