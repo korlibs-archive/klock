@@ -1,0 +1,3 @@
+rootProject.name = rootDir.name + "-root"
+
+include(":klock")
