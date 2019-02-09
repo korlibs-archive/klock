@@ -27,8 +27,8 @@ fun Project.configurePublishing() {
             }
             afterEvaluate {
                 configure(publications) {
-                    this as MavenPublication
-                    pom.withXml {
+                    val publication = it as MavenPublication
+                    publication.pom.withXml {
                         it.asNode().apply {
                             appendNode("name", project.name)
                             appendNode("description", project.property("project.description"))
@@ -44,7 +44,7 @@ fun Project.configurePublishing() {
                             }
 
                             // Changes runtime -> compile in Android's AAR publications
-                            if (pom.packaging == "aar") {
+                            if (publication.pom.packaging == "aar") {
                                 val nodes = this.getAt(QName("dependencies")).getAt("dependency").getAt("scope")
                                 for (node in nodes) {
                                     (node as Node).setValue("compile")
@@ -55,5 +55,7 @@ fun Project.configurePublishing() {
                 }
             }
         }
+    } else {
+        println("Publishing is not enabled. Was not able to determine either `publishUser` or `publishPassword`")
     }
 }

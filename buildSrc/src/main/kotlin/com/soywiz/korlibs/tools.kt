@@ -18,7 +18,7 @@ class MultiOutputStream(val outs: List<OutputStream>) : OutputStream() {
 // Extensions
 operator fun File.get(name: String) = File(this, name)
 
-var File.text get() = this.readText(); set(value) = run { this.writeText(value) }
+var File.text get() = this.readText(); set(value) = run { this.also { it.parentFile.mkdirs() }.writeText(value) }
 
 // Gradle extensions
 operator fun Project.invoke(callback: Project.() -> Unit) = callback(this)
