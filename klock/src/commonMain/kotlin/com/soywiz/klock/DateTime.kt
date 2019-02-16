@@ -1,6 +1,7 @@
 package com.soywiz.klock
 
 import com.soywiz.klock.internal.*
+import kotlin.math.*
 
 /**
  * Represents a Date in UTC (GMT+00) with millisecond precision.
@@ -343,4 +344,12 @@ inline class DateTime(
 
     /** Converts this date to String using the [DateFormat.DEFAULT_FORMAT] for representing it */
     override fun toString(): String = DateFormat.DEFAULT_FORMAT.format(this)
+}
+
+fun max(a: DateTime, b: DateTime): DateTime = DateTime.fromUnix(max(a.unixMillis, b.unixMillis))
+fun min(a: DateTime, b: DateTime): DateTime = DateTime.fromUnix(min(a.unixMillis, b.unixMillis))
+fun DateTime.clamp(min: DateTime, max: DateTime): DateTime = when {
+    this < min -> min
+    this > max -> max
+    else -> this
 }

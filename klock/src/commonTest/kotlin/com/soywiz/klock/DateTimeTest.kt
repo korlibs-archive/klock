@@ -313,4 +313,17 @@ class DateTimeTest {
         assertEquals("Sun, 04 Nov 2018 05:54:30 GMT+0100", date.toOffsetUnadjusted((+60).minutes).toString())
         assertEquals("Sun, 04 Nov 2018 06:54:30 GMT+0100", date.toOffset((+60).minutes).toString())
     }
+
+    @Test
+    fun testMinMaxClamp() {
+        val a = DateTime(Year(2018), Month.November, 4, 5, 54, 30)
+        val b = DateTime(Year(2018), Month.November, 4, 6, 54, 30)
+        val c = DateTime(Year(2018), Month.November, 4, 7, 54, 30)
+        assertEquals(a, min(a, b))
+        assertEquals(b, max(a, b))
+        assertEquals(b, a.clamp(b, c))
+        assertEquals(b, b.clamp(a, c))
+        assertEquals(a, a.clamp(a, c))
+        assertEquals(c, c.clamp(a, c))
+    }
 }
