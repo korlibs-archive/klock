@@ -1,5 +1,7 @@
 package com.soywiz.korlibs.modules
 
+import com.soywiz.korlibs.korlibs
+import com.soywiz.korlibs.toXmlString
 import groovy.util.*
 import groovy.xml.*
 import org.gradle.api.*
@@ -41,6 +43,31 @@ fun Project.configurePublishing() {
                             }
                             appendNode("scm").apply {
                                 appendNode("url").setValue(project.property("project.scm.url"))
+                            }
+
+                            // Workaround for kotlin-native cinterops without gradle metadata
+                            if (korlibs.cinterops.isNotEmpty()) {
+                                val dependenciesList = (this.get("dependencies") as NodeList)
+                                if (dependenciesList.isNotEmpty()) {
+                                    (dependenciesList.first() as Node).apply {
+                                        for (cinterop in korlibs.cinterops.filter { it.targets.contains(publication.name) }) {
+                                            appendNode("dependency").apply {
+                                                appendNode("groupId").setValue("${project.group}")
+                                                appendNode("artifactId").setValue("${project.name}-${publication.name.toLowerCase()}")
+                                                appendNode("version").setValue("${project.version}")
+                                                appendNode("type").setValue("klib")
+                                                appendNode("classifier").setValue("cinterop-${cinterop.name}")
+                                                appendNode("scope").setValue("compile")
+                                                appendNode("exclusions").apply {
+                                                    appendNode("exclusion").apply {
+                                                        appendNode("artifactId").setValue("*")
+                                                        appendNode("groupId").setValue("*")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
                             // Changes runtime -> compile in Android's AAR publications

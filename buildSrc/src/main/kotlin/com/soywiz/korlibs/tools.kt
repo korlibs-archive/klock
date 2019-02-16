@@ -1,5 +1,7 @@
 package com.soywiz.korlibs
 
+import groovy.util.Node
+import groovy.xml.XmlUtil
 import org.gradle.api.*
 import org.gradle.api.artifacts.dsl.*
 import org.gradle.api.tasks.*
@@ -40,3 +42,6 @@ fun Project.gkotlin(callback: KotlinMultiplatformExtension.() -> Unit) = gkotlin
 
 val Project.kotlin get() = extensions.getByType(KotlinMultiplatformExtension::class.java)
 fun Project.kotlin(callback: KotlinMultiplatformExtension.() -> Unit) = gkotlin.apply(callback)
+
+// Groovy tools
+fun Node.toXmlString() = XmlUtil.serialize(this)

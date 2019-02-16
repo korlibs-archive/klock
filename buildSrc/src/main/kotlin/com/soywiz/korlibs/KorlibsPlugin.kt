@@ -1,8 +1,11 @@
 package com.soywiz.korlibs
 
+import com.moowork.gradle.node.NodeExtension
+import com.moowork.gradle.node.npm.NpmTask
 import com.soywiz.korlibs.modules.*
 import com.soywiz.korlibs.targets.*
 import org.gradle.api.*
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import java.io.*
 
 class KorlibsPlugin : Plugin<Project> {
@@ -43,10 +46,12 @@ class KorlibsExtension(val project: Project) {
     fun dependencyProject(name: String) = project {
         dependencies {
             add("commonMainApi", project(name))
+            add("commonTestImplementation", project(name))
         }
     }
 
-    val ALL_TARGETS = listOf("android", "iosArm64", "iosArm32", "iosX64", "js", "jvm", "linuxX64", "macosX64", "mingwX64", "metadata")
+    val ALL_NATIVE_TARGETS = listOf("iosArm64", "iosArm32", "iosX64", "linuxX64", "macosX64", "mingwX64")
+    val ALL_TARGETS = listOf("android", "js", "jvm", "metadata") + ALL_NATIVE_TARGETS
 
     @JvmOverloads
     fun dependencyMulti(group: String, name: String, version: String, targets: List<String> = ALL_TARGETS, suffixCommonRename: Boolean = false, androidIsJvm: Boolean = false) = project {
@@ -73,6 +78,41 @@ class KorlibsExtension(val project: Project) {
     fun dependencyMulti(dependency: String, targets: List<String> = ALL_TARGETS) {
         val (group, name, version) = dependency.split(":", limit = 3)
         return dependencyMulti(group, name, version, targets)
+    }
+
+    @JvmOverloads
+    fun dependencyNodeModule(name: String, version: String) = project {
+        val node = extensions.getByType(NodeExtension::class.java)
+
+        val installNodeModule = tasks.create<NpmTask>("installJs${name.capitalize()}") {
+            onlyIf { !File(node.nodeModulesDir, name).exists() }
+            setArgs(arrayListOf("install", "$name@$version"))
+        }
+
+        tasks.getByName("jsTestNode").dependsOn(installNodeModule)
+    }
+
+    data class CInteropTargets(val name: String, val targets: List<String>)
+
+    val cinterops = arrayListOf<CInteropTargets>()
+
+
+    @JvmOverloads
+    fun dependencyCInterops(name: String, targets: List<String>) = project {
+        cinterops += CInteropTargets(name, targets)
+        for (target in targets) {
+            (kotlin.targets[target].compilations["main"] as KotlinNativeCompilation).apply {
+                cinterops.apply {
+                    maybeCreate(name).apply {
+                    }
+                }
+            }
+        }
+    }
+
+    @JvmOverloads
+    fun dependencyCInteropsExternal(dependency: String, cinterop: String, targets: List<String> = ALL_NATIVE_TARGETS) {
+        dependencyMulti("$dependency:cinterop-$cinterop@klib", targets)
     }
 
     @JvmOverloads
