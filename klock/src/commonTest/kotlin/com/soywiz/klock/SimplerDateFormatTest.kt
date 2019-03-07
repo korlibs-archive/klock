@@ -36,6 +36,22 @@ class SimplerDateFormatTest {
         }
 
         @Test
+        fun testFormatWithNegativeOffset() {
+            val now = DateTime.fromUnix(1462390174000)
+                .toOffsetUnadjusted((-3.5).hours)
+            val formatted = now.format(format)
+            assertEquals("2016-05-04T19:29:34-03:30", formatted)
+        }
+
+        @Test
+        fun testFormatWithPositiveOffset() {
+            val now = DateTime.fromUnix(1462390174000)
+                .toOffsetUnadjusted(4.5.hours)
+            val formatted = now.format(format)
+            assertEquals("2016-05-04T19:29:34+04:30", formatted)
+        }
+
+        @Test
         fun testParseFormatUtc() {
             val dateStr = "2016-05-04T19:29:34+00:00"
             assertEquals(dateStr, format.format(format.parseDouble(dateStr)))
