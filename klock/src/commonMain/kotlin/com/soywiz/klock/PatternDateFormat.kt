@@ -84,8 +84,8 @@ class PatternDateFormat(val format: String) : DateFormat {
                         name.startsWith("X") && dd.offset.totalMinutesInt == 0 -> "Z"
                         else -> {
                             val p = if (dd.offset.totalMinutesInt >= 0) "+" else "-"
-                            val hours = dd.offset.totalMinutesInt / 60
-                            val minutes = dd.offset.totalMinutesInt % 60
+                            val hours = (dd.offset.totalMinutesInt / 60).absoluteValue
+                            val minutes = (dd.offset.totalMinutesInt % 60).absoluteValue
                             when (name) {
                                 "X", "x" -> "$p${hours.padded(2)}"
                                 "XX", "xx" -> "$p${hours.padded(2)}${minutes.padded(2)}"
