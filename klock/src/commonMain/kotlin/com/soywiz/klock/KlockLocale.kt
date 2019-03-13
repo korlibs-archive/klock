@@ -17,7 +17,7 @@ abstract class KlockLocale {
 			set(value) = run { KlockLocale_default = value }
 			get() = KlockLocale_default
 
-		inline fun <R> temporalSet(locale: KlockLocale, callback: () -> R): R {
+		inline fun <R> setTemporarily(locale: KlockLocale, callback: () -> R): R {
 			val old = default
 			default = locale
 			try {

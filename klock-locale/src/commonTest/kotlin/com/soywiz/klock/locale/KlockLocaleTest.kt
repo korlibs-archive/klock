@@ -21,7 +21,7 @@ class KlockLocaleTest {
 	@Test
 	fun testTemporalSetDefault() {
 		assertEquals("Wed, 13 Mar 2019 00:00:00 UTC", date.toString())
-		KlockLocale.temporalSet(SpanishKlockLocale) {
+		KlockLocale.setTemporarily(SpanishKlockLocale) {
 			assertEquals("Mié, 13 Mar 2019 00:00:00 UTC", date.toString())
 		}
 		assertEquals("Wed, 13 Mar 2019 00:00:00 UTC", date.toString())
