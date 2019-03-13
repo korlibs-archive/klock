@@ -18,6 +18,9 @@ enum class DayOfWeek(
      */
     val index1 get() = index0 + 1
 
+    /** Returns if this day of the week is weekend for a specific [locale]  */
+    fun isWeekend(locale: KlockLocale = KlockLocale.default) = locale.isWeekend(this)
+
     companion object {
         /**
          * Number of days in a wekk.
@@ -30,5 +33,10 @@ enum class DayOfWeek(
          * 0: [Sunday], 1: [Monday], 2: [Tuesday], 3: [Wednesday], 4: [Thursday], 5: [Friday], 6: [Saturday]
          */
         operator fun get(index0: Int) = BY_INDEX0[index0]
+
+        /**
+         * Returns the first day of the week for a specific [locale].
+         */
+        fun firstDayOfWeek(locale: KlockLocale = KlockLocale.default) = locale.firstDayOfWeek
     }
 }
