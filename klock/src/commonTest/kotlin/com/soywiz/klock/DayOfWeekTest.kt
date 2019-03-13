@@ -12,7 +12,7 @@ class DayOfWeekTest {
 	@Test
 	fun testIsWeekend() {
 		assertEquals(
-			listOf(false, false, false, false, false, true, true),
+			listOf(true, false, false, false, false, false, true),
 			DayOfWeek.values().map { it.isWeekend(KlockLocale.english) }
 		)
 	}
