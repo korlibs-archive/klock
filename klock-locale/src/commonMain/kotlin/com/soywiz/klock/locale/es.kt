@@ -22,14 +22,14 @@ open class SpanishKlockLocale : KlockLocale() {
 		"julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
 	)
 
-	override val formatDateTimeMediumStr = "dd/MM/yyyy HH:mm:ss"
-	override val formatDateTimeShortStr = "dd/MM/yy HH:mm"
+	override val formatDateTimeMedium = format("dd/MM/yyyy HH:mm:ss")
+	override val formatDateTimeShort = format("dd/MM/yy HH:mm")
 
-	override val formatDateFullStr = "EEEE, d 'de' MMMM 'de' y"
-	override val formatDateLongStr = "d 'de' MMMM 'de' y"
-	override val formatDateMediumStr = "dd/MM/yyyy"
-	override val formatDateShortStr = "dd/MM/yy"
+	override val formatDateFull = format("EEEE, d 'de' MMMM 'de' y")
+	override val formatDateLong = format("d 'de' MMMM 'de' y")
+	override val formatDateMedium = format("dd/MM/yyyy")
+	override val formatDateShort = format("dd/MM/yy")
 
-	override val formatTimeMediumStr = "HH:mm:ss"
-	override val formatTimeShortStr = "HH:mm"
+	override val formatTimeMedium = format("HH:mm:ss")
+	override val formatTimeShort = format("HH:mm")
 }

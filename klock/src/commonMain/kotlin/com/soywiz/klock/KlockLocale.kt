@@ -14,27 +14,21 @@ abstract class KlockLocale {
 	open val months3 by lazy { months.map { it.substr(0, 3) } }
 	open val h12Marker = listOf("AM", "OM")
 
-	protected open val formatDateTimeMediumStr = "MMM d, y h:mm:ss a"
-	protected open val formatDateTimeShortStr = "M/d/yy h:mm a"
-
-	protected open val formatDateFullStr = "EEEE, MMMM d, y"
-	protected open val formatDateLongStr = "MMMM d, y"
-	protected open val formatDateMediumStr = "MMM d, y"
-	protected open val formatDateShortStr = "M/d/yy"
-
-	protected open val formatTimeMediumStr = "h:mm:ss a"
-	protected open val formatTimeShortStr = "h:mm a"
 
 	open fun isWeekend(dayOfWeek: DayOfWeek): Boolean = dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday
 
-	val formatDateFull by lazy { PatternDateFormat(formatDateFullStr, this) }
-	val formatDateLong by lazy { PatternDateFormat(formatDateLongStr, this) }
-	val formatDateTimeMedium by lazy { PatternDateFormat(formatDateTimeMediumStr, this) }
-	val formatDateMedium by lazy { PatternDateFormat(formatDateMediumStr, this) }
-	val formatTimeMedium by lazy { PatternDateFormat(formatTimeMediumStr, this) }
-	val formatDateTimeShort by lazy { PatternDateFormat(formatDateTimeShortStr, this) }
-	val formatDateShort by lazy { PatternDateFormat(formatDateShortStr, this) }
-	val formatTimeShort by lazy { PatternDateFormat(formatTimeShortStr, this) }
+	protected fun format(str: String) = PatternDateFormat(str, this)
+
+	open val formatDateTimeMedium = format("MMM d, y h:mm:ss a")
+	open val formatDateTimeShort = format("M/d/yy h:mm a")
+
+	open val formatDateFull = format("EEEE, MMMM d, y")
+	open val formatDateLong = format("MMMM d, y")
+	open val formatDateMedium = format("MMM d, y")
+	open val formatDateShort = format("M/d/yy")
+
+	open val formatTimeMedium = format("h:mm:ss a")
+	open val formatTimeShort = format("h:mm a")
 
 	companion object {
 		val english get() = English
