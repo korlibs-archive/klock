@@ -3,18 +3,15 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
-class PatternDateFormat(val format: String) : DateFormat {
+class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateFormat {
+    val realLocale get() = locale ?: KlockLocale.default
+
+    constructor(format: String) : this(format, null)
     companion object {
         private val rx by lazy { Regex("""('[\w]+'|[\w]+\B[^Xx]|[Xx]{1,3}|[\w]+)""") }
-        private val englishDaysOfWeek = listOf(
-            "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
-        )
-        private val englishMonths = listOf(
-            "january", "february", "march", "april", "may", "june",
-            "july", "august", "september", "october", "november", "december"
-        )
-        private val englishMonths3 = englishMonths.map { it.substr(0, 3) }
     }
+
+    fun withLocale(locale: KlockLocale?) = PatternDateFormat(format, locale)
 
     private val parts = arrayListOf<String>()
     //val escapedFormat = Regex.escape(format)
@@ -43,18 +40,18 @@ class PatternDateFormat(val format: String) : DateFormat {
         for (name2 in parts2) {
             val name = name2.trim('\'')
             out += when (name) {
-                "EEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].substr(0, 3).capitalize()
-                "EEEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].capitalize()
-                "EEEEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].substr(0, 1).capitalize()
-                "EEEEEE" -> englishDaysOfWeek[utc.dayOfWeek.index0].substr(0, 2).capitalize()
+                "EEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].substr(0, 3).capitalize()
+                "EEEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].capitalize()
+                "EEEEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].substr(0, 1).capitalize()
+                "EEEEEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].substr(0, 2).capitalize()
                 "z", "zzz" -> dd.offset.timeZone
                 "d" -> utc.dayOfMonth.toString()
                 "dd" -> utc.dayOfMonth.padded(2)
                 "M" -> utc.month1.padded(1)
                 "MM" -> utc.month1.padded(2)
-                "MMM" -> englishMonths[utc.month0].substr(0, 3).capitalize()
-                "MMMM" -> englishMonths[utc.month0].capitalize()
-                "MMMMM" -> englishMonths[utc.month0].substr(0, 1).capitalize()
+                "MMM" -> realLocale.months[utc.month0].substr(0, 3).capitalize()
+                "MMMM" -> realLocale.months[utc.month0].capitalize()
+                "MMMMM" -> realLocale.months[utc.month0].substr(0, 1).capitalize()
                 "y" -> utc.yearInt
                 "yy" -> (utc.yearInt % 100).padded(2)
                 "yyy" -> (utc.yearInt % 1000).padded(3)
@@ -121,7 +118,7 @@ class PatternDateFormat(val format: String) : DateFormat {
                 "z", "zzz" -> Unit // timezone (GMT)
                 "d", "dd" -> day = value.toInt()
                 "M", "MM" -> month = value.toInt()
-                "MMM" -> month = englishMonths3.indexOf(value.toLowerCase()) + 1
+                "MMM" -> month = realLocale.months3.indexOf(value.toLowerCase()) + 1
                 "y", "yyyy", "YYYY" -> fullYear = value.toInt()
                 "yy" -> if (doThrow) throw RuntimeException("Not guessing years from two digits.") else return null
                 "yyy" -> fullYear = value.toInt() + if (value.toInt() < 800) 2000 else 1000 // guessing year...
@@ -151,7 +148,7 @@ class PatternDateFormat(val format: String) : DateFormat {
                         }
                     }
                 }
-                "MMMM" -> month = englishMonths.indexOf(value.toLowerCase()) + 1
+                "MMMM" -> month = realLocale.months.indexOf(value.toLowerCase()) + 1
                 "MMMMM" -> if (doThrow) throw RuntimeException("Not possible to get the month from one letter.") else return null
                 "h", "hh" -> {
                     hour = value.toInt()
