@@ -21,6 +21,12 @@ enum class DayOfWeek(
     /** Returns if this day of the week is weekend for a specific [locale]  */
     fun isWeekend(locale: KlockLocale = KlockLocale.default) = locale.isWeekend(this)
 
+    val localName get() = localName(KlockLocale.default)
+    fun localName(locale: KlockLocale) = locale.daysOfWeek[index0]
+
+    val localShortName get() = localShortName(KlockLocale.default)
+    fun localShortName(locale: KlockLocale) = locale.daysOfWeekShort[index0]
+
     companion object {
         /**
          * Number of days in a wekk.

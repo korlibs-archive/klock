@@ -11,9 +11,15 @@ abstract class KlockLocale {
 	abstract val daysOfWeek: List<String>
 	abstract val months: List<String>
 	abstract val firstDayOfWeek: DayOfWeek
-	open val months3 by lazy { months.map { it.substr(0, 3) } }
+	open val monthsShort by lazy { months.map { it.substr(0, 3) } }
+
+	open val daysOfWeekShort: List<String> by lazy { daysOfWeek.map { it.substr(0, 3) } }
+	@Deprecated("Use months3", ReplaceWith("monthsShort"))
+	val months3 get() = monthsShort
 	open val h12Marker = listOf("AM", "OM")
 
+	// This might be required for some languages like chinese?
+	open fun intToString(value: Int) = "$value"
 
 	open fun isWeekend(dayOfWeek: DayOfWeek): Boolean = dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday
 
@@ -27,8 +33,8 @@ abstract class KlockLocale {
 	open val formatDateMedium = format("MMM d, y")
 	open val formatDateShort = format("M/d/yy")
 
-	open val formatTimeMedium = format("h:mm:ss a")
-	open val formatTimeShort = format("h:mm a")
+	open val formatTimeMedium = format("HH:mm:ss")
+	open val formatTimeShort = format("HH:mm")
 
 	companion object {
 		val english get() = English
@@ -62,5 +68,8 @@ abstract class KlockLocale {
 			"january", "february", "march", "april", "may", "june",
 			"july", "august", "september", "october", "november", "december"
 		)
+
+		override val formatTimeMedium = format("h:mm:ss a")
+		override val formatTimeShort = format("h:mm a")
 	}
 }

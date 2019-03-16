@@ -40,10 +40,8 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
         for (name2 in parts2) {
             val name = name2.trim('\'')
             out += when (name) {
-                "EEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].substr(0, 3).capitalize()
-                "EEEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].capitalize()
-                "EEEEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].substr(0, 1).capitalize()
-                "EEEEEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].substr(0, 2).capitalize()
+                "E", "EE", "EEE" -> realLocale.daysOfWeekShort[utc.dayOfWeek.index0].capitalize()
+                "EEEE", "EEEEE", "EEEEEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].capitalize()
                 "z", "zzz" -> dd.offset.timeZone
                 "d" -> utc.dayOfMonth.toString()
                 "dd" -> utc.dayOfMonth.padded(2)
@@ -114,11 +112,11 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
         val result = rx2.find(str) ?: return null
         for ((name, value) in parts.zip(result.groupValues.drop(1))) {
             when (name) {
-                "EEE", "EEEE" -> Unit // day of week (Sun | Sunday)
+                "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> Unit // day of week (Sun | Sunday)
                 "z", "zzz" -> Unit // timezone (GMT)
                 "d", "dd" -> day = value.toInt()
                 "M", "MM" -> month = value.toInt()
-                "MMM" -> month = realLocale.months3.indexOf(value.toLowerCase()) + 1
+                "MMM" -> month = realLocale.monthsShort.indexOf(value.toLowerCase()) + 1
                 "y", "yyyy", "YYYY" -> fullYear = value.toInt()
                 "yy" -> if (doThrow) throw RuntimeException("Not guessing years from two digits.") else return null
                 "yyy" -> fullYear = value.toInt() + if (value.toInt() < 800) 2000 else 1000 // guessing year...
