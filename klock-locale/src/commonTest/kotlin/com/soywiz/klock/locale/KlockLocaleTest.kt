@@ -24,6 +24,22 @@ class KlockLocaleTest {
 	}
 
 	@Test
+	fun testGermanLocale() {
+		assertEquals(
+			"Mit, 13 Mär 2019 21:36:45 UTC",
+			date.toString(com.soywiz.klock.DateFormat.DEFAULT_FORMAT.withLocale(KlockLocale.german))
+		)
+		assertEquals("13.03.2019 21:36:45", GermanKlockLocale.formatDateTimeMedium.format(date))
+		assertEquals("13.03.19 21:36", GermanKlockLocale.formatDateTimeShort.format(date))
+		assertEquals("Mittwoch, 13. März 2019", GermanKlockLocale.formatDateFull.format(date))
+		assertEquals("13. März 2019", GermanKlockLocale.formatDateLong.format(date))
+		assertEquals("13.03.2019", GermanKlockLocale.formatDateMedium.format(date))
+		assertEquals("13.03.19", GermanKlockLocale.formatDateShort.format(date))
+		assertEquals("21:36:45", GermanKlockLocale.formatTimeMedium.format(date))
+		assertEquals("21:36", GermanKlockLocale.formatTimeShort.format(date))
+	}
+
+	@Test
 	fun testTemporalSetDefault() {
 		assertEquals("Wed, 13 Mar 2019 21:36:45 UTC", date.toString())
 		KlockLocale.setTemporarily(KlockLocale.spanish) {
