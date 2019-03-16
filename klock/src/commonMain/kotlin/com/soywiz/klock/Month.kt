@@ -59,6 +59,12 @@ enum class Month(
 
     operator fun minus(other: Month): Int = abs(this.index0 - other.index0)
 
+    val localName get() = localName(KlockLocale.default)
+    fun localName(locale: KlockLocale) = locale.months[index0]
+
+    val localShortName get() = localShortName(KlockLocale.default)
+    fun localShortName(locale: KlockLocale) = locale.monthsShort[index0]
+
     companion object {
         /**
          * Number of months in a year (12).
