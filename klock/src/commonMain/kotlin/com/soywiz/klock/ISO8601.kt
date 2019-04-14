@@ -1,7 +1,10 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.MicroStrReader
 import com.soywiz.klock.internal.fastForEach
+import com.soywiz.klock.internal.padded
 
+// https://en.wikipedia.org/wiki/ISO_8601
 object ISO8601 {
     class IsoIntervalFormat(val format: String) : DateTimeSpanFormat {
         override fun format(dd: DateTimeSpan): String {
@@ -23,14 +26,29 @@ object ISO8601 {
         }
     }
 
-    class BaseIsoDateTimeFormat(val format: String) : DateFormat {
-        override fun format(dd: DateTimeTz): String {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    class BaseIsoDateTimeFormat(val format: String, val twoDigitBaseYear: Int = 1900) : DateFormat {
+        override fun format(dd: DateTimeTz): String = buildString {
+            val reader = MicroStrReader(format)
+            while (reader.hasMore) {
+                when {
+                    reader.tryRead("YYYYYY") -> append(dd.yearInt.padded(6))
+                    reader.tryRead("YYYY") -> append(dd.yearInt.padded(4))
+                    reader.tryRead("YY") -> append((dd.yearInt % 100).padded(2))
+                    reader.tryRead("MM") -> append(dd.month1.padded(2))
+                    reader.tryRead("DD") -> append(dd.dayOfMonth.padded(2))
+                    reader.tryRead("DDD") -> append(dd.dayOfWeekInt.padded(3))
+                    reader.tryRead("ww") -> append(dd.weekOfYear1.padded(2))
+                    reader.tryRead("D") -> append(dd.dayOfWeek.index1Monday)
+                    else -> append(reader.readChar())
+                }
+            }
         }
 
         override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
+
+        fun withTwoDigitBaseYear(twoDigitBaseYear: Int = 1900) = BaseIsoDateTimeFormat(format, twoDigitBaseYear)
     }
 
     class IsoTimeFormat(val basicFormat: String?, val extendedFormat: String?) : TimeFormat {
@@ -182,3 +200,19 @@ object ISO8601 {
         }
     }
 }
+
+// ISO 8601 (first week is the one after 1 containing a thursday)
+val DateTime.weekOfYear0: Int get() {
+    var offset = 0
+    for (n in 0 until 7) {
+        if ((this + n.days).dayOfWeek == DayOfWeek.Thursday) {
+            offset = n - 3
+            break
+        }
+    }
+    return (dayOfYear - offset) / 7
+}
+val DateTime.weekOfYear1: Int get() = weekOfYear0 + 1
+
+val DateTimeTz.weekOfYear0: Int get() = local.weekOfYear0
+val DateTimeTz.weekOfYear1: Int get() = local.weekOfYear1
