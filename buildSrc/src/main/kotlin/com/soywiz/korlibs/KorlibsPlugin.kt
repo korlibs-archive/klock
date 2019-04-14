@@ -50,8 +50,15 @@ class KorlibsExtension(val project: Project) {
         }
     }
 
-    val ALL_NATIVE_TARGETS = listOf("iosArm64", "iosArm32", "iosX64", "linuxX64", "macosX64", "mingwX64")
-    val ALL_TARGETS = listOf("android", "js", "jvm", "metadata") + ALL_NATIVE_TARGETS
+    companion object {
+        val LINUX_DESKTOP_NATIVE_TARGETS = listOf("linuxX64")
+        val MACOS_DESKTOP_NATIVE_TARGETS = listOf("macosX64")
+        //val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64", "mingwX86")
+        val WINDOWS_DESKTOP_NATIVE_TARGETS = listOf("mingwX64")
+        val DESKTOP_NATIVE_TARGETS = LINUX_DESKTOP_NATIVE_TARGETS + MACOS_DESKTOP_NATIVE_TARGETS + WINDOWS_DESKTOP_NATIVE_TARGETS
+        val ALL_NATIVE_TARGETS = listOf("iosArm64", "iosArm32", "iosX64") + DESKTOP_NATIVE_TARGETS
+        val ALL_TARGETS = listOf("android", "js", "jvm", "metadata") + ALL_NATIVE_TARGETS
+    }
 
     @JvmOverloads
     fun dependencyMulti(group: String, name: String, version: String, targets: List<String> = ALL_TARGETS, suffixCommonRename: Boolean = false, androidIsJvm: Boolean = false) = project {
