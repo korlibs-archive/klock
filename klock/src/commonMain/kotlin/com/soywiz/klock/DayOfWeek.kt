@@ -49,7 +49,7 @@ enum class DayOfWeek(
         /**
          * 0: [Sunday], 1: [Monday], 2: [Tuesday], 3: [Wednesday], 4: [Thursday], 5: [Friday], 6: [Saturday]
          */
-        operator fun get(index0: Int) = BY_INDEX0[index0]
+        operator fun get(index0: Int) = BY_INDEX0[index0 umod 7]
 
         /**
          * Returns the first day of the week for a specific [locale].

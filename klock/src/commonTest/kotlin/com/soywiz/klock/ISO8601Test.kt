@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 
 class ISO8601Test {
     @Test
-    fun test() {
+    fun testDate() {
         val date = DateTime(2019, Month.April, 14)
         assertEquals("2019-04-14", date.format(ISO8601.DATE_CALENDAR_COMPLETE))
         assertEquals("2019-04-14", date.format(ISO8601.DATE_CALENDAR_COMPLETE.extended))
@@ -24,6 +24,9 @@ class ISO8601Test {
         assertEquals("19", date.format(ISO8601.DATE_CALENDAR_REDUCED2.basic))
 
         assertEquals("2019-W15-7", date.format(ISO8601.DATE_WEEK_COMPLETE))
+
+        assertEquals(date, ISO8601.DATE.parse("2019-04-14").utc)
+        assertEquals(date, ISO8601.DATE.parse("2019-W15-7").utc)
     }
 
 

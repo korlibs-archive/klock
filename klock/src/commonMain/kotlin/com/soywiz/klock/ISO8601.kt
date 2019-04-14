@@ -1,8 +1,7 @@
 package com.soywiz.klock
 
-import com.soywiz.klock.internal.MicroStrReader
-import com.soywiz.klock.internal.fastForEach
-import com.soywiz.klock.internal.padded
+import com.soywiz.klock.internal.*
+import kotlin.math.absoluteValue
 
 // https://en.wikipedia.org/wiki/ISO_8601
 object ISO8601 {
@@ -28,24 +27,75 @@ object ISO8601 {
 
     class BaseIsoDateTimeFormat(val format: String, val twoDigitBaseYear: Int = 1900) : DateFormat {
         override fun format(dd: DateTimeTz): String = buildString {
-            val reader = MicroStrReader(format)
-            while (reader.hasMore) {
+            val fmtReader = MicroStrReader(format)
+            while (fmtReader.hasMore) {
                 when {
-                    reader.tryRead("YYYYYY") -> append(dd.yearInt.padded(6))
-                    reader.tryRead("YYYY") -> append(dd.yearInt.padded(4))
-                    reader.tryRead("YY") -> append((dd.yearInt % 100).padded(2))
-                    reader.tryRead("MM") -> append(dd.month1.padded(2))
-                    reader.tryRead("DD") -> append(dd.dayOfMonth.padded(2))
-                    reader.tryRead("DDD") -> append(dd.dayOfWeekInt.padded(3))
-                    reader.tryRead("ww") -> append(dd.weekOfYear1.padded(2))
-                    reader.tryRead("D") -> append(dd.dayOfWeek.index1Monday)
-                    else -> append(reader.readChar())
+                    fmtReader.tryRead("YYYYYY") -> append(dd.yearInt.absoluteValue.padded(6))
+                    fmtReader.tryRead("YYYY") -> append(dd.yearInt.absoluteValue.padded(4))
+                    fmtReader.tryRead("YY") -> append((dd.yearInt.absoluteValue % 100).padded(2))
+                    fmtReader.tryRead("MM") -> append(dd.month1.padded(2))
+                    fmtReader.tryRead("DD") -> append(dd.dayOfMonth.padded(2))
+                    fmtReader.tryRead("DDD") -> append(dd.dayOfWeekInt.padded(3))
+                    fmtReader.tryRead("ww") -> append(dd.weekOfYear1.padded(2))
+                    fmtReader.tryRead("D") -> append(dd.dayOfWeek.index1Monday)
+                    fmtReader.tryRead("±") -> append(if (dd.yearInt < 0) "-" else "+")
+                    else -> append(fmtReader.readChar())
                 }
             }
         }
 
         override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            return tryParse(str).also {
+                if (doThrow && it == null) throw DateException("Can't parse $str with $format")
+            }
+        }
+
+        private fun tryParse(str: String): DateTimeTz? {
+            var sign = +1
+            var year = -1
+            var month = -1
+            var dayOfYear = -1
+            var dayOfMonth = -1
+            var dayOfWeek = -1
+            var weekOfYear = -1
+            val reader = MicroStrReader(str)
+            val fmtReader = MicroStrReader(format)
+            while (fmtReader.hasMore) {
+                when {
+                    fmtReader.tryRead("YYYYYY") -> year = reader.tryReadInt(6) ?: return null
+                    fmtReader.tryRead("YYYY") -> year = reader.tryReadInt(4) ?: return null
+                    //fmtReader.tryRead("YY") -> year = twoDigitBaseYear + (reader.tryReadInt(2) ?: return null) // @TODO: Kotlin compiler BUG?
+                    fmtReader.tryRead("YY") -> {
+                        val base = reader.tryReadInt(2) ?: return null
+                        year = twoDigitBaseYear + base
+                    }
+                    fmtReader.tryRead("MM") -> month = reader.tryReadInt(2) ?: return null
+                    fmtReader.tryRead("DD") -> dayOfMonth = reader.tryReadInt(4) ?: return null
+                    fmtReader.tryRead("DDD") -> dayOfYear = reader.tryReadInt(3) ?: return null
+                    fmtReader.tryRead("ww") -> weekOfYear = reader.tryReadInt(2) ?: return null
+                    fmtReader.tryRead("D") -> dayOfWeek = reader.tryReadInt(1) ?: return null
+                    fmtReader.tryRead("±") -> {
+                        when (reader.readChar()) {
+                            '+' -> sign = +1
+                            '-' -> sign = -1
+                            else -> return null
+                        }
+                    }
+                    else -> if (fmtReader.readChar() != reader.readChar()) return null
+                }
+            }
+            if (reader.hasMore) return null
+
+            val dateTime = when {
+                dayOfYear >= 0 -> DateTime(year, 1, 1) + (dayOfYear - 1).days
+                weekOfYear >= 0 -> {
+                    val reference = Year(year).first(DayOfWeek.Thursday) - 3.days
+                    val days = ((weekOfYear - 1) * 7 + (dayOfWeek - 1))
+                    reference + days.days
+                }
+                else -> DateTime(year, month, dayOfMonth)
+            }
+            return dateTime.local
         }
 
         fun withTwoDigitBaseYear(twoDigitBaseYear: Int = 1900) = BaseIsoDateTimeFormat(format, twoDigitBaseYear)
@@ -58,7 +108,7 @@ object ISO8601 {
         override fun format(dd: TimeSpan): String = extended.format(dd)
         override fun tryParse(str: String, doThrow: Boolean): TimeSpan? =
             basic.tryParse(str, false) ?: extended.tryParse(str, false)
-                ?: (if (doThrow) throw DateException("Invalid format $str") else null)
+            ?: (if (doThrow) throw DateException("Invalid format $str") else null)
     }
 
     class IsoDateTimeFormat(val basicFormat: String?, val extendedFormat: String?) : DateFormat {
@@ -68,7 +118,7 @@ object ISO8601 {
         override fun format(dd: DateTimeTz): String = extended.format(dd)
         override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? =
             basic.tryParse(str, false) ?: extended.tryParse(str, false)
-                ?: (if (doThrow) throw DateException("Invalid format $str") else null)
+            ?: (if (doThrow) throw DateException("Invalid format $str") else null)
     }
 
     // Date Calendar Variants
@@ -123,9 +173,19 @@ object ISO8601 {
     val TIME_ALL by lazy {
         listOf(
             TIME_LOCAL_COMPLETE,
-            TIME_LOCAL_REDUCED0, TIME_LOCAL_REDUCED1, TIME_LOCAL_FRACTION0, TIME_LOCAL_FRACTION1, TIME_LOCAL_FRACTION2,
-            TIME_UTC_COMPLETE, TIME_UTC_REDUCED0, TIME_UTC_REDUCED1, TIME_UTC_FRACTION0, TIME_UTC_FRACTION1, TIME_UTC_FRACTION2,
-            TIME_RELATIVE0, TIME_RELATIVE1
+            TIME_LOCAL_REDUCED0,
+            TIME_LOCAL_REDUCED1,
+            TIME_LOCAL_FRACTION0,
+            TIME_LOCAL_FRACTION1,
+            TIME_LOCAL_FRACTION2,
+            TIME_UTC_COMPLETE,
+            TIME_UTC_REDUCED0,
+            TIME_UTC_REDUCED1,
+            TIME_UTC_FRACTION0,
+            TIME_UTC_FRACTION1,
+            TIME_UTC_FRACTION2,
+            TIME_RELATIVE0,
+            TIME_RELATIVE1
         )
     }
 
@@ -171,7 +231,11 @@ object ISO8601 {
 
         override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? {
             DATE_ALL.fastForEach { format ->
-                val result = format.tryParse(str, false)
+                val result = format.extended.tryParse(str, false)
+                if (result != null) return result
+            }
+            DATE_ALL.fastForEach { format ->
+                val result = format.basic.tryParse(str, false)
                 if (result != null) return result
             }
             return if (doThrow) throw DateException("Invalid format") else null
@@ -182,7 +246,11 @@ object ISO8601 {
 
         override fun tryParse(str: String, doThrow: Boolean): TimeSpan? {
             TIME_ALL.fastForEach { format ->
-                val result = format.tryParse(str, false)
+                val result = format.extended.tryParse(str, false)
+                if (result != null) return result
+            }
+            TIME_ALL.fastForEach { format ->
+                val result = format.basic.tryParse(str, false)
                 if (result != null) return result
             }
             return if (doThrow) throw DateException("Invalid format") else null
@@ -202,17 +270,23 @@ object ISO8601 {
 }
 
 // ISO 8601 (first week is the one after 1 containing a thursday)
-val DateTime.weekOfYear0: Int get() {
-    var offset = 0
-    for (n in 0 until 7) {
-        if ((this + n.days).dayOfWeek == DayOfWeek.Thursday) {
-            offset = n - 3
-            break
-        }
+fun Year.first(dayOfWeek: DayOfWeek): DateTime {
+    val start = DateTime(this.year, 1, 1)
+    var n = 0
+    while (true) {
+        val time = (start + n.days)
+        if (time.dayOfWeek == dayOfWeek) return time
+        n++
     }
-    return (dayOfYear - offset) / 7
 }
-val DateTime.weekOfYear1: Int get() = weekOfYear0 + 1
 
+val DateTime.weekOfYear0: Int
+    get() {
+        val firstThursday = year.first(DayOfWeek.Thursday)
+        val offset = firstThursday.dayOfMonth - 3
+        return (dayOfYear - offset) / 7
+    }
+
+val DateTime.weekOfYear1: Int get() = weekOfYear0 + 1
 val DateTimeTz.weekOfYear0: Int get() = local.weekOfYear0
 val DateTimeTz.weekOfYear1: Int get() = local.weekOfYear1
