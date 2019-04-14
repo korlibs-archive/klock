@@ -60,6 +60,8 @@ data class DateTimeSpan(
     /** The [weeks] part as an integer. */
     val weeks: Int get() = computed.weeks
 
+    val daysNotIncludingWeeks: Int get() = days
+
     /** The [daysIncludingWeeks] part as an integer including days and weeks. */
     val daysIncludingWeeks: Int get() = computed.days + (computed.weeks * DayOfWeek.Count)
 
