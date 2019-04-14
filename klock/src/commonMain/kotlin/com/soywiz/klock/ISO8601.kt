@@ -5,40 +5,42 @@ import kotlin.math.absoluteValue
 
 // https://en.wikipedia.org/wiki/ISO_8601
 object ISO8601 {
-    class IsoIntervalFormat(val format: String) : DateTimeSpanFormat {
-        override fun format(dd: DateTimeSpan): String {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    data class BaseIsoTimeFormat(val format: String) : TimeFormat {
+        companion object {
+            private val ref = DateTime(1900, 1, 1)
         }
+        private val dateTimeFormat = BaseIsoDateTimeFormat(format)
 
-        override fun tryParse(str: String, doThrow: Boolean): DateTimeSpan? {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
+        override fun format(dd: TimeSpan): String = dateTimeFormat.format(ref + dd)
+
+        override fun tryParse(str: String, doThrow: Boolean): TimeSpan? =
+            dateTimeFormat.tryParse(str, doThrow)?.let { it.utc - ref }
     }
 
-    class BaseIsoTimeFormat(val format: String) : TimeFormat {
-        override fun format(dd: TimeSpan): String {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
-        override fun tryParse(str: String, doThrow: Boolean): TimeSpan? {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-    }
-
-    class BaseIsoDateTimeFormat(val format: String, val twoDigitBaseYear: Int = 1900) : DateFormat {
+    data class BaseIsoDateTimeFormat(val format: String, val twoDigitBaseYear: Int = 1900) : DateFormat {
         override fun format(dd: DateTimeTz): String = buildString {
+            val isUtc = format.endsWith('Z')
+            val d = if (isUtc) dd.utc else dd.local
+            val s = d.copyDayOfMonth(hours = 0, minutes = 0, seconds = 0, milliseconds = 0)
+            val time = d - s
             val fmtReader = MicroStrReader(format)
             while (fmtReader.hasMore) {
                 when {
-                    fmtReader.tryRead("YYYYYY") -> append(dd.yearInt.absoluteValue.padded(6))
-                    fmtReader.tryRead("YYYY") -> append(dd.yearInt.absoluteValue.padded(4))
-                    fmtReader.tryRead("YY") -> append((dd.yearInt.absoluteValue % 100).padded(2))
-                    fmtReader.tryRead("MM") -> append(dd.month1.padded(2))
-                    fmtReader.tryRead("DD") -> append(dd.dayOfMonth.padded(2))
-                    fmtReader.tryRead("DDD") -> append(dd.dayOfWeekInt.padded(3))
-                    fmtReader.tryRead("ww") -> append(dd.weekOfYear1.padded(2))
-                    fmtReader.tryRead("D") -> append(dd.dayOfWeek.index1Monday)
-                    fmtReader.tryRead("±") -> append(if (dd.yearInt < 0) "-" else "+")
+                    fmtReader.tryRead("YYYYYY") -> append(d.yearInt.absoluteValue.padded(6))
+                    fmtReader.tryRead("YYYY") -> append(d.yearInt.absoluteValue.padded(4))
+                    fmtReader.tryRead("YY") -> append((d.yearInt.absoluteValue % 100).padded(2))
+                    fmtReader.tryRead("MM") -> append(d.month1.padded(2))
+                    fmtReader.tryRead("DD") -> append(d.dayOfMonth.padded(2))
+                    fmtReader.tryRead("DDD") -> append(d.dayOfWeekInt.padded(3))
+                    fmtReader.tryRead("ww") -> append(d.weekOfYear1.padded(2))
+                    fmtReader.tryRead("D") -> append(d.dayOfWeek.index1Monday)
+                    fmtReader.tryRead("hh,hh") -> append(time.hours.padded(2, 2).replace('.', ','))
+                    fmtReader.tryRead("hh") -> append(d.hours.padded(2))
+                    fmtReader.tryRead("mm,mm") -> append((time.minutes % 60.0).padded(2, 2).replace('.', ','))
+                    fmtReader.tryRead("mm") -> append(d.minutes.padded(2))
+                    fmtReader.tryRead("ss,ss") -> append(time.seconds.padded(2, 2).replace('.', ','))
+                    fmtReader.tryRead("ss") -> append(d.seconds.padded(2))
+                    fmtReader.tryRead("±") -> append(if (d.yearInt < 0) "-" else "+")
                     else -> append(fmtReader.readChar())
                 }
             }
@@ -51,17 +53,26 @@ object ISO8601 {
         }
 
         private fun tryParse(str: String): DateTimeTz? {
+            var isUtc = false
             var sign = +1
-            var year = -1
-            var month = -1
-            var dayOfYear = -1
-            var dayOfMonth = -1
+            var year = twoDigitBaseYear
+            var month = 1
+            var dayOfMonth = 1
+
             var dayOfWeek = -1
+            var dayOfYear = -1
             var weekOfYear = -1
+
+            var hours = 0.0
+            var minutes = 0.0
+            var seconds = 0.0
+
             val reader = MicroStrReader(str)
             val fmtReader = MicroStrReader(format)
+
             while (fmtReader.hasMore) {
                 when {
+                    fmtReader.tryRead("Z") -> isUtc = true
                     fmtReader.tryRead("YYYYYY") -> year = reader.tryReadInt(6) ?: return null
                     fmtReader.tryRead("YYYY") -> year = reader.tryReadInt(4) ?: return null
                     //fmtReader.tryRead("YY") -> year = twoDigitBaseYear + (reader.tryReadInt(2) ?: return null) // @TODO: Kotlin compiler BUG?
@@ -74,6 +85,14 @@ object ISO8601 {
                     fmtReader.tryRead("DDD") -> dayOfYear = reader.tryReadInt(3) ?: return null
                     fmtReader.tryRead("ww") -> weekOfYear = reader.tryReadInt(2) ?: return null
                     fmtReader.tryRead("D") -> dayOfWeek = reader.tryReadInt(1) ?: return null
+
+                    fmtReader.tryRead("hh,hh") -> hours = reader.tryReadDouble(5) ?: return null
+                    fmtReader.tryRead("hh") -> hours = reader.tryReadDouble(2) ?: return null
+                    fmtReader.tryRead("mm,mm") -> minutes = reader.tryReadDouble(5) ?: return null
+                    fmtReader.tryRead("mm") -> minutes = reader.tryReadDouble(2) ?: return null
+                    fmtReader.tryRead("ss,ss") -> seconds = reader.tryReadDouble(5) ?: return null
+                    fmtReader.tryRead("ss") -> seconds = reader.tryReadDouble(2) ?: return null
+
                     fmtReader.tryRead("±") -> {
                         when (reader.readChar()) {
                             '+' -> sign = +1
@@ -95,13 +114,80 @@ object ISO8601 {
                 }
                 else -> DateTime(year, month, dayOfMonth)
             }
-            return dateTime.local
+            return (dateTime + hours.hours + minutes.minutes + seconds.seconds).local
         }
 
         fun withTwoDigitBaseYear(twoDigitBaseYear: Int = 1900) = BaseIsoDateTimeFormat(format, twoDigitBaseYear)
     }
 
-    class IsoTimeFormat(val basicFormat: String?, val extendedFormat: String?) : TimeFormat {
+    class IsoIntervalFormat(val format: String) : DateTimeSpanFormat {
+        override fun format(dd: DateTimeSpan): String = buildString {
+            val fmtReader = MicroStrReader(format)
+            var time = false
+            while (fmtReader.hasMore) {
+                when {
+                    fmtReader.tryRead("T") -> append('T').also { time = true }
+                    fmtReader.tryRead("nnY") -> append(dd.years).append('Y')
+                    fmtReader.tryRead("nnM") -> append(if (time) dd.minutes else dd.months).append('M')
+                    fmtReader.tryRead("nnD") -> append(dd.daysIncludingWeeks).append('D')
+                    fmtReader.tryRead("nnH") -> append(dd.hours).append('H')
+                    fmtReader.tryRead("nnS") -> append(dd.seconds).append('S')
+                    else -> append(fmtReader.readChar())
+                }
+            }
+        }
+
+        override fun tryParse(str: String, doThrow: Boolean): DateTimeSpan? {
+            var time = false
+            var years = 0.0
+            var months = 0.0
+            var days = 0.0
+            var hours = 0.0
+            var minutes = 0.0
+            var seconds = 0.0
+
+            val reader = MicroStrReader(str)
+            val fmtReader = MicroStrReader(format)
+
+            while (fmtReader.hasMore) {
+                when {
+                    fmtReader.tryRead("nn,nnY") || fmtReader.tryRead("nnY") -> {
+                        years = reader.tryReadDouble() ?: return null
+                        if (!reader.tryRead("Y")) return null
+                    }
+                    fmtReader.tryRead("nn,nnM") || fmtReader.tryRead("nnM") -> {
+                        if (time) {
+                            minutes = reader.tryReadDouble() ?: return null
+                        } else {
+                            months = reader.tryReadDouble() ?: return null
+                        }
+                        if (!reader.tryRead("M")) return null
+                    }
+                    fmtReader.tryRead("nn,nnD") || fmtReader.tryRead("nnD") -> {
+                        days = reader.tryReadDouble() ?: return null
+                        if (!reader.tryRead("D")) return null
+                    }
+                    fmtReader.tryRead("nn,nnH") || fmtReader.tryRead("nnH") -> {
+                        hours = reader.tryReadDouble() ?: return null
+                        if (!reader.tryRead("H")) return null
+                    }
+                    fmtReader.tryRead("nn,nnS") || fmtReader.tryRead("nnS") -> {
+                        seconds = reader.tryReadDouble() ?: return null
+                        if (!reader.tryRead("S")) return null
+                    }
+                    else -> {
+                        val char = fmtReader.readChar()
+                        if (char != reader.readChar()) return null
+                        if (char == 'T') time = true
+                    }
+                }
+            }
+            return ((years * 12) + months).toInt().months + (days.days + hours.hours + minutes.minutes + seconds.seconds)
+        }
+    }
+
+
+    data class IsoTimeFormat(val basicFormat: String?, val extendedFormat: String?) : TimeFormat {
         val basic = BaseIsoTimeFormat(basicFormat ?: extendedFormat ?: TODO())
         val extended = BaseIsoTimeFormat(extendedFormat ?: basicFormat ?: TODO())
 
@@ -111,7 +197,7 @@ object ISO8601 {
             ?: (if (doThrow) throw DateException("Invalid format $str") else null)
     }
 
-    class IsoDateTimeFormat(val basicFormat: String?, val extendedFormat: String?) : DateFormat {
+    data class IsoDateTimeFormat(val basicFormat: String?, val extendedFormat: String?) : DateFormat {
         val basic = BaseIsoDateTimeFormat(basicFormat ?: extendedFormat ?: TODO())
         val extended = BaseIsoDateTimeFormat(extendedFormat ?: basicFormat ?: TODO())
 

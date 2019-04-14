@@ -332,6 +332,16 @@ inline class DateTime(
     /** Constructs a new [DateTime] after adding [dateSpan] and [timeSpan] */
     fun add(dateSpan: MonthSpan, timeSpan: TimeSpan): DateTime = add(dateSpan.totalMonths, timeSpan.milliseconds)
 
+    fun copyDayOfMonth(
+        year: Year = this.year,
+        month: Month = this.month,
+        dayOfMonth: Int = this.dayOfMonth,
+        hours: Int = this.hours,
+        minutes: Int = this.minutes,
+        seconds: Int = this.seconds,
+        milliseconds: Int = this.milliseconds
+    ) = DateTime(year, month, dayOfMonth, hours, minutes, seconds, milliseconds)
+
     /** Converts this date to String using [format] for representing it */
     fun format(format: DateFormat): String = format.format(this)
     /** Converts this date to String using [format] for representing it */

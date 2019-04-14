@@ -9,6 +9,11 @@ internal const val MILLIS_PER_DAY = MILLIS_PER_HOUR * 24 // 86400_000
 internal const val MILLIS_PER_WEEK = MILLIS_PER_DAY * 7 // 604800_000
 
 internal fun Int.padded(count: Int) = this.toString().padStart(count, '0')
+internal fun Double.padded(intCount: Int, decCount: Int): String {
+    val intPart = floor(this).toInt()
+    val decPart = round((this - intPart) * 10.0.pow(decCount)).toInt()
+    return "${intPart.padded(intCount).substr(-intCount, intCount)}.${decPart.toString().padEnd(decCount, '0').substr(0, decCount)}"
+}
 
 internal fun String.substr(start: Int, length: Int): String {
     val low = (if (start >= 0) start else this.length + start).clamp(0, this.length)
