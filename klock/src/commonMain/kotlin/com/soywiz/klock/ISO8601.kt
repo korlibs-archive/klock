@@ -1,5 +1,7 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.fastForEach
+
 object ISO8601 {
     class IsoIntervalFormat(val format: String) : DateTimeSpanFormat {
         override fun format(dd: DateTimeSpan): String {
@@ -11,7 +13,7 @@ object ISO8601 {
         }
     }
 
-    class IsoTimeFormat(val basic: String?, val extended: String?) : TimeFormat {
+    class BaseIsoTimeFormat(val format: String) : TimeFormat {
         override fun format(dd: TimeSpan): String {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
@@ -21,7 +23,7 @@ object ISO8601 {
         }
     }
 
-    class IsoDateTimeFormat(val basic: String?, val extended: String?) : DateFormat {
+    class BaseIsoDateTimeFormat(val format: String) : DateFormat {
         override fun format(dd: DateTimeTz): String {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
@@ -29,6 +31,26 @@ object ISO8601 {
         override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
+    }
+
+    class IsoTimeFormat(val basicFormat: String?, val extendedFormat: String?) : TimeFormat {
+        val basic = BaseIsoTimeFormat(basicFormat ?: extendedFormat ?: TODO())
+        val extended = BaseIsoTimeFormat(extendedFormat ?: basicFormat ?: TODO())
+
+        override fun format(dd: TimeSpan): String = extended.format(dd)
+        override fun tryParse(str: String, doThrow: Boolean): TimeSpan? =
+            basic.tryParse(str, false) ?: extended.tryParse(str, false)
+                ?: (if (doThrow) throw DateException("Invalid format $str") else null)
+    }
+
+    class IsoDateTimeFormat(val basicFormat: String?, val extendedFormat: String?) : DateFormat {
+        val basic = BaseIsoDateTimeFormat(basicFormat ?: extendedFormat ?: TODO())
+        val extended = BaseIsoDateTimeFormat(extendedFormat ?: basicFormat ?: TODO())
+
+        override fun format(dd: DateTimeTz): String = extended.format(dd)
+        override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? =
+            basic.tryParse(str, false) ?: extended.tryParse(str, false)
+                ?: (if (doThrow) throw DateException("Invalid format $str") else null)
     }
 
     // Date Calendar Variants
@@ -51,6 +73,15 @@ object ISO8601 {
     val DATE_WEEK_EXPANDED0 = IsoDateTimeFormat("±YYYYYYWwwD", "±YYYYYY-Www-D")
     val DATE_WEEK_EXPANDED1 = IsoDateTimeFormat("±YYYYYYWww", "±YYYYYY-Www")
 
+    val DATE_ALL by lazy {
+        listOf(
+            DATE_CALENDAR_COMPLETE, DATE_CALENDAR_REDUCED0, DATE_CALENDAR_REDUCED1, DATE_CALENDAR_REDUCED2,
+            DATE_CALENDAR_EXPANDED0, DATE_CALENDAR_EXPANDED1, DATE_CALENDAR_EXPANDED2, DATE_CALENDAR_EXPANDED3,
+            DATE_ORDINAL_COMPLETE, DATE_ORDINAL_EXPANDED,
+            DATE_WEEK_COMPLETE, DATE_WEEK_REDUCED, DATE_WEEK_EXPANDED0, DATE_WEEK_EXPANDED1
+        )
+    }
+
     // Time Variants
     val TIME_LOCAL_COMPLETE = IsoTimeFormat("hhmmss", "hh:mm:ss")
     val TIME_LOCAL_REDUCED0 = IsoTimeFormat("hhmm", "hh:mm")
@@ -70,6 +101,15 @@ object ISO8601 {
     // Time Relative Variants
     val TIME_RELATIVE0 = IsoTimeFormat("±hhmm", "±hh:mm")
     val TIME_RELATIVE1 = IsoTimeFormat("±hh", null)
+
+    val TIME_ALL by lazy {
+        listOf(
+            TIME_LOCAL_COMPLETE,
+            TIME_LOCAL_REDUCED0, TIME_LOCAL_REDUCED1, TIME_LOCAL_FRACTION0, TIME_LOCAL_FRACTION1, TIME_LOCAL_FRACTION2,
+            TIME_UTC_COMPLETE, TIME_UTC_REDUCED0, TIME_UTC_REDUCED1, TIME_UTC_FRACTION0, TIME_UTC_FRACTION1, TIME_UTC_FRACTION2,
+            TIME_RELATIVE0, TIME_RELATIVE1
+        )
+    }
 
     // Date + Time Variants
     val DATETIME_COMPLETE = IsoDateTimeFormat("YYYYMMDDTHHMMSS", "YYYY-MM-DDTHH:MM:SS")
@@ -97,32 +137,48 @@ object ISO8601 {
     val INTERVAL_ZERO_OMIT2 = IsoIntervalFormat("PnnYnnDTnnH")
     val INTERVAL_ZERO_OMIT3 = IsoIntervalFormat("PnnYnnD")
 
+    val INTERVAL_ALL by lazy {
+        listOf(
+            INTERVAL_COMPLETE0, INTERVAL_COMPLETE1,
+            INTERVAL_REDUCED0, INTERVAL_REDUCED1, INTERVAL_REDUCED2, INTERVAL_REDUCED3, INTERVAL_REDUCED4,
+            INTERVAL_DECIMAL0, INTERVAL_DECIMAL1, INTERVAL_DECIMAL2, INTERVAL_DECIMAL3, INTERVAL_DECIMAL4,
+            INTERVAL_DECIMAL5, INTERVAL_DECIMAL6,
+            INTERVAL_ZERO_OMIT0, INTERVAL_ZERO_OMIT1, INTERVAL_ZERO_OMIT2, INTERVAL_ZERO_OMIT3
+        )
+    }
+
     // Detects and parses all the variants
     val DATE = object : DateFormat {
-        override fun format(dd: DateTimeTz): String {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
+        override fun format(dd: DateTimeTz): String = DATE_CALENDAR_COMPLETE.format(dd)
 
         override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            DATE_ALL.fastForEach { format ->
+                val result = format.tryParse(str, false)
+                if (result != null) return result
+            }
+            return if (doThrow) throw DateException("Invalid format") else null
         }
     }
     val TIME = object : TimeFormat {
-        override fun format(dd: TimeSpan): String {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
+        override fun format(dd: TimeSpan): String = TIME_LOCAL_FRACTION0.format(dd)
 
         override fun tryParse(str: String, doThrow: Boolean): TimeSpan? {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            TIME_ALL.fastForEach { format ->
+                val result = format.tryParse(str, false)
+                if (result != null) return result
+            }
+            return if (doThrow) throw DateException("Invalid format") else null
         }
     }
     val INTERVAL = object : DateTimeSpanFormat {
-        override fun format(dd: DateTimeSpan): String {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
+        override fun format(dd: DateTimeSpan): String = INTERVAL_DECIMAL0.format(dd)
 
         override fun tryParse(str: String, doThrow: Boolean): DateTimeSpan? {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            INTERVAL_ALL.fastForEach { format ->
+                val result = format.tryParse(str, false)
+                if (result != null) return result
+            }
+            return if (doThrow) throw DateException("Invalid format") else null
         }
     }
 }
