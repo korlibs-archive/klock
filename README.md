@@ -27,7 +27,7 @@ val daysInNextMonth = (now.yearMonth + 1.months).days
 ### Usage with gradle:
 
 ```
-def klockVersion = "1.3.1"
+def klockVersion = "1.4.0"
 
 repositories {
     maven { url "https://dl.bintray.com/soywiz/soywiz" }
@@ -39,12 +39,12 @@ dependencies {
     jvmMainApi "com.soywiz:klock-jvm:$klockVersion" // JVM
     jsMainApi "com.soywiz:klock-js:$klockVersion" // JavaScript
     androidMainApi "com.soywiz:klock-android:$klockVersion" // Android
-    iosX64MainApi "com.soywiz:klock-iosx64:$libraryVersion" // iOS Simulator
-    iosArm32MainApi "com.soywiz:klock-iosarm32:$libraryVersion" // Older iOS 32-bit devices
-    iosArm64MainApi "com.soywiz:klock-iosarm64:$libraryVersion" // Newer iOS 64-bit devices
-    macosX64MainApi "com.soywiz:klock-macosx64:$libraryVersion" // MacOS
-    linuxX64MainApi "com.soywiz:klock-linuxx64:$libraryVersion" // Linux x64
-    mingwX64MainApi "com.soywiz:klock-mingwx64:$libraryVersion" // Windows x64
+    iosX64MainApi "com.soywiz:klock-iosx64:$klockVersion" // iOS Simulator
+    iosArm32MainApi "com.soywiz:klock-iosarm32:$klockVersion" // Older iOS 32-bit devices
+    iosArm64MainApi "com.soywiz:klock-iosarm64:$klockVersion" // Newer iOS 64-bit devices
+    macosX64MainApi "com.soywiz:klock-macosx64:$klockVersion" // MacOS
+    linuxX64MainApi "com.soywiz:klock-linuxx64:$klockVersion" // Linux x64
+    mingwX64MainApi "com.soywiz:klock-mingwx64:$klockVersion" // Windows x64
 }
 ```
 
