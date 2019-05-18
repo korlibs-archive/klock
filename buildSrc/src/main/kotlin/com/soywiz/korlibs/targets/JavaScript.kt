@@ -4,11 +4,8 @@ import com.soywiz.korlibs.*
 import org.gradle.api.*
 import org.gradle.api.artifacts.repositories.*
 import java.io.*
-import com.moowork.gradle.node.*
-import com.moowork.gradle.node.exec.NodeExecRunner
-import com.moowork.gradle.node.npm.*
-import com.moowork.gradle.node.task.*
 import com.soywiz.korlibs.modules.staticHttpServer
+import com.soywiz.korlibs.nodejs.*
 import org.apache.tools.ant.taskdefs.condition.*
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.bundling.*
@@ -34,12 +31,14 @@ fun Project.configureTargetJavaScript() {
     }
 
     // Javascript test configuration
-    val korlibsDir = File(System.getProperty("user.home"), ".korlibs").apply { mkdirs() }
+    val korlibsDir = korlibs.korlibsDir
+
     val node = extensions.getByType(NodeExtension::class.java)
     val globalNodeModulesDir = korlibsDir["node_modules"]
     val localNodeModulesDir = buildDir["node_modules"]
 
     run {
+        //println("EXECUTED node configuration")
         node.apply {
             version = "8.11.4"
             download = true
@@ -59,7 +58,7 @@ fun Project.configureTargetJavaScript() {
         }
 
         // Small optimization
-        project.tasks.getByName("nodeSetup").onlyIf { !korlibsDir["nodejs"].exists() }
+        //project.tasks.getByName(NodePlugin.NODE_SETUP_TASK_NAME).onlyIf { !korlibsDir["nodejs"].exists() }
     }
 
     val jsCompilations = gkotlin.targets.js.compilations
@@ -168,6 +167,3 @@ fun Project.configureTargetJavaScript() {
     }
 }
 
-fun Project.nodeExec(vararg args: Any) {
-    NodeExecRunner(this).apply { this.arguments += args }.execute()
-}

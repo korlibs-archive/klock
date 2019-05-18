@@ -95,7 +95,7 @@ fun HttpExchange.respond(content: RangedContent, headers: List<Pair<String, Stri
         if (partial) {
             responseHeaders.set(
                 "Content-Range",
-                "bytes ${reqRange!!.start}-${reqRange!!.endInclusive}/${content.length}"
+                "bytes ${reqRange!!.start}-${reqRange.endInclusive}/${content.length}"
             )
         }
 

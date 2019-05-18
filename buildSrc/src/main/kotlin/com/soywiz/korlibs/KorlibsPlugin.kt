@@ -1,8 +1,9 @@
 package com.soywiz.korlibs
 
-import com.moowork.gradle.node.NodeExtension
-import com.moowork.gradle.node.npm.NpmTask
 import com.soywiz.korlibs.modules.*
+import com.soywiz.korlibs.nodejs.NodeExtension
+import com.soywiz.korlibs.nodejs.NodePlugin
+import com.soywiz.korlibs.nodejs.NpmTask
 import com.soywiz.korlibs.targets.*
 import org.gradle.api.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
@@ -18,7 +19,7 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boo
         extensions.add("korlibs", korlibs)
 
         plugins.apply("kotlin-multiplatform")
-        plugins.apply("com.moowork.node")
+        plugins.apply(NodePlugin::class.java)
 
         configureKorlibsRepos()
 
@@ -37,6 +38,8 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boo
 }
 
 class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val androidEnabled: Boolean) {
+    val korlibsDir: File by lazy { File(System.getProperty("user.home"), ".korlibs").apply { mkdirs() } }
+
     //init { println("KorlibsExtension:${project.name},nativeEnabled=$nativeEnabled,androidEnabled=$androidEnabled") }
     var hasAndroid = androidEnabled && ((System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null))
 
@@ -97,7 +100,6 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
         return dependencyMulti(group, name, version, targets)
     }
 
-    @JvmOverloads
     fun dependencyNodeModule(name: String, version: String) = project {
         val node = extensions.getByType(NodeExtension::class.java)
 
@@ -114,7 +116,6 @@ class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val and
     val cinterops = arrayListOf<CInteropTargets>()
 
 
-    @JvmOverloads
     fun dependencyCInterops(name: String, targets: List<String>) = project {
         cinterops += CInteropTargets(name, targets)
         for (target in targets) {
