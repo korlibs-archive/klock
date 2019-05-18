@@ -34,10 +34,6 @@ open class NodePlugin : Plugin<Project> {
             }
         }
 
-        project.afterEvaluate {
-            project.nodeExec(project.node.npmCli, "--prefix", project.node.npmPrefix, "install", "mocha@5.2.0")
-        }
-
         //project.afterEvaluate {
         //    println(node.nodeCommand)
         //    project.nodeExec("--version")
@@ -78,7 +74,8 @@ open class NodeExtension(val project: Project) {
     val downloadBaseUrl get() = "https://nodejs.org/dist/v$version"
 
     val nodeRootDir get() = workDir[target.base]
-    val nodeCommand get() = listOf(nodeRootDir["bin/${target.nodeExe}"])
+    val nodeBinDir get() = nodeRootDir["bin"]
+    val nodeCommand get() = listOf(nodeBinDir[target.nodeExe])
     val npmCli get() = nodeRootDir["lib/node_modules/npm/bin/npm-cli.js"]
     val npmCommand get() = nodeCommand + listOf(npmCli)
 
@@ -92,6 +89,7 @@ fun Project.nodeExec(vararg args: Any, workingDir: File? = null) {
         val commandLineArgs = node.nodeCommand + args.map { "$it" }
         println("Executing<$workingDir>... ${commandLineArgs.joinToString(" ")}")
         //it.environment("NPM_CONFIG_PREFIX", node.npmPrefix)
+        it.environment("PATH", "${node.nodeBinDir}${File.pathSeparator}${System.getenv("PATH")}")
         it.setCommandLine(commandLineArgs)
     }
 }
