@@ -21,30 +21,47 @@ val later = now + 1.months + duration
 val is2018Leap = Year(2018).isLeap
 val daysInCurrentMonth = now.yearMonth.days
 val daysInNextMonth = (now.yearMonth + 1.months).days
-
 ```
 
 ### Usage with gradle:
 
-```
+(Compiled and tested with Gradle 5.4.1, JVM 12.0.1 and Kotlin 1.3.31)
+
+```groovy
 def klockVersion = "1.4.0"
 
 repositories {
-    maven { url "https://dl.bintray.com/soywiz/soywiz" }
+    maven { url "https://dl.bintray.com/korlibs/korlibs" }
 }
 
-dependencies {
-    // For multiplatform projects, since klock is published without metadata
-    commonMainApi "com.soywiz:klock-metadata:$klockVersion" // Common 
-    jvmMainApi "com.soywiz:klock-jvm:$klockVersion" // JVM
-    jsMainApi "com.soywiz:klock-js:$klockVersion" // JavaScript
-    androidMainApi "com.soywiz:klock-android:$klockVersion" // Android
-    iosX64MainApi "com.soywiz:klock-iosx64:$klockVersion" // iOS Simulator
-    iosArm32MainApi "com.soywiz:klock-iosarm32:$klockVersion" // Older iOS 32-bit devices
-    iosArm64MainApi "com.soywiz:klock-iosarm64:$klockVersion" // Newer iOS 64-bit devices
-    macosX64MainApi "com.soywiz:klock-macosx64:$klockVersion" // MacOS
-    linuxX64MainApi "com.soywiz:klock-linuxx64:$klockVersion" // Linux x64
-    mingwX64MainApi "com.soywiz:klock-mingwx64:$klockVersion" // Windows x64
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation "com.soywiz.korlibs.klock:klock:$klockVersion" // Common 
+            }
+        }
+    }
 }
 ```
 
+#### `settings.gradle`
+
+```groovy
+enableFeaturePreview('GRADLE_METADATA')
+```
+
+### Use with Kotlin-JVM
+
+```groovy
+def klockVersion = "1.4.0"
+
+repositories {
+    jcenter();
+    maven { url = uri("https://dl.bintray.com/korlibs/korlibs/") }
+}
+
+dependencies {
+    implementation "com.soywiz.korlibs.klock:klock-jvm:$klockVersion"
+}
+```

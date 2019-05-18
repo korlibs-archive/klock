@@ -12,3 +12,7 @@ buildscript {
     }
 }
 
+//// Also published on plugins.gradle.org
+//plugins {
+//    id "com.soywiz.korlibs.easy-kotlin-mpp-gradle-plugin" version "0.0.3" apply false
+//}
