@@ -37,9 +37,10 @@ open class BaseKorlibsPlugin(val nativeEnabled: Boolean, val androidEnabled: Boo
     }
 }
 
-class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val androidEnabled: Boolean) {
-    val korlibsDir: File by lazy { File(System.getProperty("user.home"), ".korlibs").apply { mkdirs() } }
+val globalKorlibsDir: File by lazy { File(System.getProperty("user.home"), ".korlibs").apply { mkdirs() } }
 
+class KorlibsExtension(val project: Project, val nativeEnabled: Boolean, val androidEnabled: Boolean) {
+    val korlibsDir: File get() = globalKorlibsDir
     //init { println("KorlibsExtension:${project.name},nativeEnabled=$nativeEnabled,androidEnabled=$androidEnabled") }
     var hasAndroid = androidEnabled && ((System.getProperty("sdk.dir") != null) || (System.getenv("ANDROID_HOME") != null))
 

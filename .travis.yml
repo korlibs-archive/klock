@@ -11,7 +11,7 @@ matrix:
       KBUILD=linux-chrome-android
       JAVA_OPTS=-Xmx2g
     script:
-    - ./gradlew -s -i check jsTestChrome lint testDebugUnitTest build
+    - ./gradlew -s -i assemble check jsTestChrome lint testDebugUnitTest
   - os: windows
     env: KBUILD=windows
     language: shell # java is not supported but jdk is installed

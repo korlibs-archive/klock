@@ -50,11 +50,9 @@ class NodeTarget(val base: String, val ext: String, val nodeExe: String = "node"
 open class NodeExtension(val project: Project) {
     // https://nodejs.org/dist/v8.11.4/
     var version: String = "8.11.4"
-    var download: Boolean = false
-    var workDir: File = File(".")
-    var npmWorkDir: File = File("npm")
-    var yarnWorkDir: File = File("yarn")
-    var nodeModulesDir: File = File("node_modules")
+    val download: Boolean = true
+    val workDir: File = globalKorlibsDir["nodejs"].apply { mkdirs() }
+    val nodeModulesDir: File = workDir["node_modules"].apply { mkdirs() }
 
     val winTarget get() = NodeTarget("node-v$version-win-x64", "zip", "node.exe")
     val linuxTarget get() = NodeTarget("node-v$version-linux-x64", "tar.gz")
@@ -79,7 +77,7 @@ open class NodeExtension(val project: Project) {
     val npmCli get() = nodeRootDir["lib/node_modules/npm/bin/npm-cli.js"]
     val npmCommand get() = nodeCommand + listOf(npmCli)
 
-    val npmPrefix get() = if (nodeModulesDir.name == "node_modules") nodeModulesDir.parentFile else nodeModulesDir
+    val npmPrefix get() = if (nodeModulesDir.name == "node_modules") nodeModulesDir.absoluteFile.parentFile else nodeModulesDir
 }
 
 fun Project.nodeExec(vararg args: Any, workingDir: File? = null) {

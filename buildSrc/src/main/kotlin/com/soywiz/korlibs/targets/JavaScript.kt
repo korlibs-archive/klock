@@ -3,13 +3,13 @@ package com.soywiz.korlibs.targets
 import com.soywiz.korlibs.*
 import org.gradle.api.*
 import org.gradle.api.artifacts.repositories.*
-import java.io.*
 import com.soywiz.korlibs.modules.staticHttpServer
 import com.soywiz.korlibs.nodejs.*
 import org.apache.tools.ant.taskdefs.condition.*
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.bundling.*
 import org.gradle.api.tasks.testing.*
+import java.io.*
 
 fun Project.configureTargetJavaScript() {
     gkotlin.apply {
@@ -34,32 +34,8 @@ fun Project.configureTargetJavaScript() {
     val korlibsDir = korlibs.korlibsDir
 
     val node = extensions.getByType(NodeExtension::class.java)
-    val globalNodeModulesDir = korlibsDir["node_modules"]
+    val globalNodeModulesDir: File = node.nodeModulesDir
     val localNodeModulesDir = buildDir["node_modules"]
-
-    run {
-        //println("EXECUTED node configuration")
-        node.apply {
-            version = "8.11.4"
-            download = true
-            workDir = korlibsDir["nodejs"]
-            npmWorkDir = korlibsDir["npm"]
-            yarnWorkDir = korlibsDir["yarn"]
-            nodeModulesDir = globalNodeModulesDir
-        }
-
-        // Fix for https://github.com/srs/gradle-node-plugin/issues/301
-        repositories.whenObjectAdded {
-            if (this is IvyArtifactRepository) {
-                metadataSources {
-                    it.artifact()
-                }
-            }
-        }
-
-        // Small optimization
-        //project.tasks.getByName(NodePlugin.NODE_SETUP_TASK_NAME).onlyIf { !korlibsDir["nodejs"].exists() }
-    }
 
     val jsCompilations = gkotlin.targets.js.compilations
 
@@ -68,29 +44,42 @@ fun Project.configureTargetJavaScript() {
         setArgs(listOf("install", "mocha@5.2.0"))
     }
 
-    val populateNodeModules = tasks.create<Copy>("populateNodeModules") {
-        afterEvaluate {
-            from(globalNodeModulesDir)
+    val jsInstallMochaHeadlessChrome = tasks.create<NpmTask>("jsInstallMochaHeadlessChrome") {
+        onlyIf { !node.nodeModulesDir["mocha-headless-chrome"].exists() }
+        setArgs(listOf("install", "mocha-headless-chrome@2.0.1"))
+    }
 
-            from(jsCompilations.main.output.allOutputs)
-            from(jsCompilations.test.output.allOutputs)
-            for (f in jsCompilations.test.runtimeDependencyFiles) {
+    val populateNodeModules = tasks.create<Copy>("populateNodeModules") {
+        dependsOn(jsCompilations.main.compileKotlinTask, jsCompilations.test.compileKotlinTask, installMocha)
+        //println("jsCompilations.main.output.allOutputs: ${jsCompilations.main.output.allOutputs.files}")
+        //println("jsCompilations.test.output.allOutputs: ${jsCompilations.test.output.allOutputs.files}")
+        //println("jsCompilations.test.runtimeDependencyFiles.files: ${jsCompilations.test.runtimeDependencyFiles.files}")
+
+        from({ globalNodeModulesDir })
+        from({ jsCompilations.main.output.allOutputs })
+        from({ jsCompilations.test.output.allOutputs })
+        from({
+            jsCompilations.test.runtimeDependencyFiles.flatMap { f ->
                 if (f.exists() && !f.isDirectory) {
-                    from(zipTree(f.absolutePath).matching { it.include("*.js") })
+                    listOf(zipTree(f.absolutePath).matching { it.include("*.js") })
+                } else {
+                    listOf()
                 }
             }
-            for (sourceSet in gkotlin.sourceSets) {
-                from(sourceSet.resources)
+        })
+        from({
+            gkotlin.sourceSets.flatMap { sourceSet ->
+                listOf(sourceSet.resources)
             }
+        })
 
-            //println(node.nodeModulesDir)
-            //println("$buildDir/node_modules")
-            into(localNodeModulesDir)
-        }
+        //println(node.nodeModulesDir)
+        //println("$buildDir/node_modules")
+        into(localNodeModulesDir)
     }
 
     val jsTestNode = tasks.create<NodeTask>("jsTestNode") {
-        dependsOn(jsCompilations.test.compileKotlinTask, installMocha, populateNodeModules)
+        dependsOn(populateNodeModules)
 
         val resultsFile = buildDir["node-results/results.json"]
         setScript(file("$buildDir/node_modules/mocha/bin/mocha"))
@@ -100,13 +89,8 @@ fun Project.configureTargetJavaScript() {
         outputs.file(resultsFile)
     }
 
-    val jsInstallMochaHeadlessChrome = tasks.create<NpmTask>("jsInstallMochaHeadlessChrome") {
-        onlyIf { !node.nodeModulesDir["mocha-headless-chrome"].exists() }
-        setArgs(listOf("install", "mocha-headless-chrome@2.0.1"))
-    }
-
     val jsTestChrome = tasks.create<Task>("jsTestChrome") {
-        dependsOn(jsCompilations.test.compileKotlinTask, jsInstallMochaHeadlessChrome, installMocha, populateNodeModules)
+        dependsOn(populateNodeModules, jsInstallMochaHeadlessChrome)
 
         val resultsFile = buildDir["chrome-results/results.json"]
         inputs.files(jsCompilations.test.compileKotlinTask.outputFile, jsCompilations.main.compileKotlinTask.outputFile)
