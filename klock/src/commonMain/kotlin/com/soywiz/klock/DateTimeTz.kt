@@ -95,6 +95,8 @@ class DateTimeTz private constructor(
     operator fun minus(delta: DateTimeSpan) = this + (-delta)
     operator fun minus(delta: TimeSpan) = this + (-delta)
 
+    operator fun minus(other: DateTimeTz) = (this.utc.unixMillisDouble - other.utc.unixMillisDouble).milliseconds
+
     override fun hashCode(): Int = this.local.hashCode() + offset.totalMinutesInt
     override fun equals(other: Any?): Boolean = other is DateTimeTz && this.utc.unixMillisDouble == other.utc.unixMillisDouble
     override fun compareTo(other: DateTimeTz): Int = this.utc.unixMillis.compareTo(other.utc.unixMillis)
