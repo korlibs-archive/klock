@@ -2,13 +2,14 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        jcenter()
         google()
         maven { url = uri("https://dl.bintray.com/korlibs/korlibs/") }
         maven { url = uri("https://plugins.gradle.org/m2/") }
     }
 
     dependencies {
-        classpath "com.soywiz.korlibs:easy-kotlin-mpp-gradle-plugin:0.0.3"
+        classpath "com.soywiz.korlibs:easy-kotlin-mpp-gradle-plugin:0.0.6"
     }
 }
 
