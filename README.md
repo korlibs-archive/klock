@@ -25,13 +25,14 @@ val daysInNextMonth = (now.yearMonth + 1.months).days
 
 ### Usage with gradle:
 
-(Compiled and tested with Gradle 5.4.1, JVM 12.0.1 and Kotlin 1.3.31)
+(Compiled and tested with Gradle 5.4.1, JVM 12.0.1 and Kotlin 1.3.31).
+Starting with Klock 1.4.0, the library is available at jcenter.
 
 ```groovy
 def klockVersion = "1.4.0"
 
 repositories {
-    maven { url "https://dl.bintray.com/korlibs/korlibs" }
+    jcenter()
 }
 
 kotlin {
@@ -57,8 +58,7 @@ enableFeaturePreview('GRADLE_METADATA')
 def klockVersion = "1.4.0"
 
 repositories {
-    jcenter();
-    maven { url = uri("https://dl.bintray.com/korlibs/korlibs/") }
+    jcenter()
 }
 
 dependencies {
