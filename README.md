@@ -65,3 +65,11 @@ dependencies {
     implementation "com.soywiz.korlibs.klock:klock-jvm:$klockVersion"
 }
 ```
+
+### Versions
+
+| Klock  | Kotlin | Gradle Metadata  |
+|--------|--------|------------------|
+| 1.5.0  | 1.3.40 | 1.0              |
+| 1.4.0  | 1.3.21 | 1.0              |
+
