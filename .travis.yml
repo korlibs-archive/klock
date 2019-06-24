@@ -1,6 +1,7 @@
 matrix:
   include:
   - os: linux
+    dist: bionic
     language: android
     android:
       components:
