@@ -14,6 +14,8 @@ matrix:
     env:
       KBUILD=linux-chrome-android
       JAVA_OPTS=-Xmx2g
+    before_install:
+      - yes | /usr/local/android-sdk/tools/bin/sdkmanager --licenses
     script:
     - ./gradlew -s -i assemble check jsTestChrome lint testDebugUnitTest
   - os: windows
