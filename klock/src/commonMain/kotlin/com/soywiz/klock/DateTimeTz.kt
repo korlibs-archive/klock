@@ -20,7 +20,7 @@ class DateTimeTz private constructor(
         fun fromUnixLocal(unix: Double): DateTimeTz = DateTime(unix).localUnadjusted
 
         /** Returns the current local [DateTimeTz] */
-        fun nowLocal(): DateTimeTz = DateTime.fromUnix(DateTime.nowUnix()).localUnadjusted
+        fun nowLocal(): DateTimeTz = DateTime.now().local
     }
 
     /** Returns a new UTC date that will match these components without being the same time */
