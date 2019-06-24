@@ -6,8 +6,10 @@ matrix:
       components:
         - build-tools-28.0.3
         - android-28
-    before_install:
-      - yes | sdkmanager "platforms;android-28"
+      licenses:
+        - 'android-sdk-preview-license-52d11cd2'
+        - 'android-sdk-license-.+'
+        - 'google-gdk-license-.+'
     jdk: oraclejdk8
     env:
       KBUILD=linux-chrome-android
