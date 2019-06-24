@@ -1,7 +1,7 @@
 matrix:
   include:
   - os: linux
-    dist: xenial
+    dist: trusty
     language: android
     addons:
       apt:
