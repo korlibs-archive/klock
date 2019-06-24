@@ -1,8 +1,7 @@
 matrix:
   include:
-  - os: linux
+  - language: android
     dist: trusty
-    language: android
     addons:
       apt:
         update: true
