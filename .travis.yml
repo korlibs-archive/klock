@@ -19,7 +19,7 @@ matrix:
       - ls -la /usr/local/android-sdk/tools/bin/ || true
       #- yes | /usr/local/android-sdk/tools/bin/sdkmanager --licenses
     script:
-    - ./gradlew -s -i assemble check jsTestChrome lint testDebugUnitTest
+    - ./gradlew -s -i assemble check lint testDebugUnitTest
   - os: windows
     env: KBUILD=windows
     language: shell # java is not supported but jdk is installed
