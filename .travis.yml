@@ -1,7 +1,7 @@
 matrix:
   include:
   - os: linux
-    dist: bionic
+    dist: xenial
     language: android
     addons:
       apt:
