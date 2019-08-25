@@ -41,7 +41,7 @@ jobs:
     before_script:
       - echo before_script
     script:
-    - ./gradlew -s -i check build localPublishToBintrayIfRequired
+    - ./gradlew -s -i check
   - os: windows
     stage: bintray
     env: KBUILD=windows
