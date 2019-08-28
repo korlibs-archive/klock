@@ -276,7 +276,7 @@ object ISO8601 {
     }
 
     // Date + Time Variants
-    val DATETIME_COMPLETE = IsoDateTimeFormat("YYYYMMDDTHHMMSS", "YYYY-MM-DDTHH:MM:SS")
+    val DATETIME_COMPLETE = IsoDateTimeFormat("YYYYMMDDThhmmss", "YYYY-MM-DDThh:mm:ss")
 
     // Interval Variants
     val INTERVAL_COMPLETE0 = IsoIntervalFormat("PnnYnnMnnDTnnHnnMnnS")
