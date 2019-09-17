@@ -89,28 +89,21 @@ data class DateTimeRange(val from: DateTime, val to: DateTime, val inclusive: Bo
         return DateTimeRange(from, to, if (this.to > that.to) this.inclusive else that.inclusive)
     }
 
-    fun without(that: DateTimeRange): List<DateTimeRange> {
+    fun without(that: DateTimeRange): List<DateTimeRange> = when {
         // Full remove
-        if ((that.from <= this.from) && (that.to >= this.to)) {
-            return listOf()
-        }
-        // To the right, nothing to remove
-        if (that.from >= this.to) {
-            return listOf(this)
-        }
-        // To the left, nothing to remove
-        if (that.to <= this.from) {
-            return listOf(this)
-        }
+        (that.from <= this.from) && (that.to >= this.to) -> listOf()
+        // To the right or left, nothing to remove
+        that.from >= this.to || that.to <= this.from -> listOf(this)
         // In the middle
-        val p0 = this.from
-        val p1 = that.from
-        val p2 = that.to
-        val p3 = this.to
-        return listOf(
-            DateTimeRange(p0, p1, inclusive = false),
-            DateTimeRange(p2, p3, inclusive = false)
-        )
+        else -> {
+            val p0 = this.from
+            val p1 = that.from
+            val p2 = that.to
+            val p3 = this.to
+            val c1 = if (p0 < p1) DateTimeRange(p0, p1, inclusive = false) else null
+            val c2 = if (p2 < p3) DateTimeRange(p2, p3, inclusive = false) else null
+            listOfNotNull(c1, c2)
+        }
     }
 
     fun toString(format: DateFormat): String = "${from.toString(format)}..${to.toString(format)}"

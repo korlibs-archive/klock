@@ -1,40 +1,90 @@
 package com.soywiz.klock
 
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.random.Random
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DateTimeRangeSetTest {
+    val date = DateTime.EPOCH
+    fun range(from: Int, to: Int) = (date + from.milliseconds)..(date + to.milliseconds)
+
     @Test
     fun test() {
-        val date = DateTime.EPOCH
-        fun range(from: Int, to: Int) = (date + from.milliseconds)..(date + to.milliseconds)
         val range1 = range(0, 10)
         val range2 = range(20, 30)
         val range3 = range(30, 40)
 
-        val ranges = DateTimeRangeSet(range1, range2, range3)
-        val rangesCombined = ranges.combined()
-        assertEquals("[0..10, 20..30, 30..40]", ranges.toStringLongs())
-        assertEquals("[0..10, 20..40]", rangesCombined.toStringLongs())
-        assertEquals("[0..10, 30..40]", (rangesCombined - range(10, 30)).toStringLongs())
-        assertEquals("[0..5, 30..40]", (rangesCombined - range(5, 30)).toStringLongs())
-        assertEquals("[5..10, 20..35]", (rangesCombined.intersection(range(5, 35))).toStringLongs())
-        assertEquals("[5..10, 20..35]", (rangesCombined.intersection(range(5, 15), range(16, 35))).toStringLongs())
+        val rangesList = listOf(range1, range2, range3)
+        val ranges = DateTimeRangeSet(rangesList)
+        assertEquals("[0..10, 20..30, 30..40]", DateTimeRangeSet.toStringLongs(rangesList))
+        assertEquals("[0..10, 20..40]", ranges.toStringLongs())
+        assertEquals("[0..10, 30..40]", (ranges - range(10, 30)).toStringLongs())
+        assertEquals("[0..5, 30..40]", (ranges - range(5, 30)).toStringLongs())
+        assertEquals("[5..10, 20..35]", (ranges.intersection(range(5, 35))).toStringLongs())
+        assertEquals("[5..10, 20..35]", (ranges.intersection(range(5, 15), range(16, 35))).toStringLongs())
     }
 
-    //@Test
-    //fun test2() {
-    //    val date = DateTime.EPOCH
-    //    val random = Random(0L)
-    //    fun range(from: Int, to: Int) = (date + from.milliseconds) .. (date + to.milliseconds)
-    //    fun randomRange(): DateTimeRange {
-    //        val a = random.nextInt(1000000)
-    //        val b = random.nextInt(1000000)
-    //        return range(min(a, b), max(a, b))
-    //    }
-    //    val ranges = (0 until 10000).map { randomRange() }
-    //    val ranges2 = DateTimeRangeSet(ranges)
-    //    assertEquals(ranges2.fastCombine(), ranges2.slowCombine())
-    //    //assertEquals(ranges2.fastCombine(), ranges2.fastCombine())
-    //}
+    private fun randomRanges(count: Int, min: Int = 0, max: Int = 1000000, seed: Long = 0L): List<DateTimeRange> {
+        val random = Random(seed)
+        fun randomRange(): DateTimeRange {
+            val a = random.nextInt(min, max)
+            val b = random.nextInt(min, max)
+            return range(min(a, b), max(a, b))
+        }
+        return (0 until count).map { randomRange() }
+    }
+
+    private fun randomRangesSeparated(count: Int = 30, seed: Long = 0L): DateTimeRangeSet {
+        val random = Random(seed)
+        val out = arrayListOf<DateTimeRange>()
+        var pos = random.nextLong(1000)
+        for (n in 0 until count) {
+            val dist = random.nextLong(1000)
+            out += DateTimeRange(date + (pos).milliseconds, date + (pos + dist).milliseconds, false)
+            val separation = random.nextLong(1000)
+            pos += dist + separation
+        }
+        return DateTimeRangeSet(out)
+    }
+
+    @Test
+    fun testCombine() {
+        val ranges = randomRanges(10000, seed = 0L)
+        assertEquals(DateTimeRangeSet.Fast.combine(ranges), DateTimeRangeSet.Slow.combine(ranges))
+    }
+
+    @Test
+    fun testMinus() {
+        val r1 = randomRangesSeparated(40, seed = 10L)
+        val r2 = randomRangesSeparated(10, seed = 1L)
+
+        val fast = DateTimeRangeSet.Fast.minus(r1, r2).toStringLongs()
+        val slow = DateTimeRangeSet.Slow.minus(r1, r2).toStringLongs()
+        println(r1)
+        println(r2)
+        println("fast: $fast")
+        println("slow: $slow")
+        assertEquals(fast, slow)
+    }
+
+    @Test
+    @Ignore // Fast not working yet
+    fun testIntersect() {
+        val r1 = randomRangesSeparated(40, seed = 10L)
+        val r2 = randomRangesSeparated(10, seed = 1L)
+
+        //val r1 = randomRangesSeparated(3, seed = 10L)
+        //val r2 = randomRangesSeparated(3, seed = 1L)
+
+        val fast = DateTimeRangeSet.Fast.intersection(r1, r2).toStringLongs()
+        val slow = DateTimeRangeSet.Slow.intersection(r1, r2).toStringLongs()
+        println(r1)
+        println(r2)
+        println("fast: $fast")
+        println("slow: $slow")
+        assertEquals(fast, slow)
+    }
 }
