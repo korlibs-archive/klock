@@ -86,4 +86,10 @@ class ISO8601Test {
         assertEquals(44, DateTime(2007, Month.November, 3).weekOfYear1)
         assertEquals(6, DateTime(2007, Month.November, 3).dayOfWeek.index1Monday)
     }
+
+    @Test
+    fun test() {
+        assertEquals("20190917T114805", ISO8601.DATETIME_COMPLETE.basic.format(1568720885379))
+        assertEquals("2019-09-17T11:48:05", ISO8601.DATETIME_COMPLETE.extended.format(1568720885379))
+    }
 }
