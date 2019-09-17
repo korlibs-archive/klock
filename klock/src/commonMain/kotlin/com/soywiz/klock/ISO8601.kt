@@ -52,6 +52,11 @@ object ISO8601 {
             }
         }
 
+        private fun reportParse(reason: String): DateTimeTz? {
+            //println("reason: $reason")
+            return null
+        }
+
         private fun tryParse(str: String): DateTimeTz? {
             var isUtc = false
             var sign = +1
@@ -73,34 +78,34 @@ object ISO8601 {
             while (fmtReader.hasMore) {
                 when {
                     fmtReader.tryRead("Z") -> isUtc = true
-                    fmtReader.tryRead("YYYYYY") -> year = reader.tryReadInt(6) ?: return null
-                    fmtReader.tryRead("YYYY") -> year = reader.tryReadInt(4) ?: return null
+                    fmtReader.tryRead("YYYYYY") -> year = reader.tryReadInt(6) ?: return reportParse("YYYYYY")
+                    fmtReader.tryRead("YYYY") -> year = reader.tryReadInt(4) ?: return reportParse("YYYY")
                     //fmtReader.tryRead("YY") -> year = twoDigitBaseYear + (reader.tryReadInt(2) ?: return null) // @TODO: Kotlin compiler BUG?
                     fmtReader.tryRead("YY") -> {
-                        val base = reader.tryReadInt(2) ?: return null
+                        val base = reader.tryReadInt(2) ?: return reportParse("YY")
                         year = twoDigitBaseYear + base
                     }
-                    fmtReader.tryRead("MM") -> month = reader.tryReadInt(2) ?: return null
-                    fmtReader.tryRead("DD") -> dayOfMonth = reader.tryReadInt(4) ?: return null
-                    fmtReader.tryRead("DDD") -> dayOfYear = reader.tryReadInt(3) ?: return null
-                    fmtReader.tryRead("ww") -> weekOfYear = reader.tryReadInt(2) ?: return null
-                    fmtReader.tryRead("D") -> dayOfWeek = reader.tryReadInt(1) ?: return null
+                    fmtReader.tryRead("MM") -> month = reader.tryReadInt(2) ?: return reportParse("MM")
+                    fmtReader.tryRead("DD") -> dayOfMonth = reader.tryReadInt(2) ?: return reportParse("DD")
+                    fmtReader.tryRead("DDD") -> dayOfYear = reader.tryReadInt(3) ?: return reportParse("DDD")
+                    fmtReader.tryRead("ww") -> weekOfYear = reader.tryReadInt(2) ?: return reportParse("ww")
+                    fmtReader.tryRead("D") -> dayOfWeek = reader.tryReadInt(1) ?: return reportParse("D")
 
-                    fmtReader.tryRead("hh,hh") -> hours = reader.tryReadDouble(5) ?: return null
-                    fmtReader.tryRead("hh") -> hours = reader.tryReadDouble(2) ?: return null
-                    fmtReader.tryRead("mm,mm") -> minutes = reader.tryReadDouble(5) ?: return null
-                    fmtReader.tryRead("mm") -> minutes = reader.tryReadDouble(2) ?: return null
-                    fmtReader.tryRead("ss,ss") -> seconds = reader.tryReadDouble(5) ?: return null
-                    fmtReader.tryRead("ss") -> seconds = reader.tryReadDouble(2) ?: return null
+                    fmtReader.tryRead("hh,hh") -> hours = reader.tryReadDouble(5) ?: return reportParse("hh,hh")
+                    fmtReader.tryRead("hh") -> hours = reader.tryReadDouble(2) ?: return reportParse("hh")
+                    fmtReader.tryRead("mm,mm") -> minutes = reader.tryReadDouble(5) ?: return reportParse("mm,mm")
+                    fmtReader.tryRead("mm") -> minutes = reader.tryReadDouble(2) ?: return reportParse("mm")
+                    fmtReader.tryRead("ss,ss") -> seconds = reader.tryReadDouble(5) ?: return reportParse("ss,ss")
+                    fmtReader.tryRead("ss") -> seconds = reader.tryReadDouble(2) ?: return reportParse("ss")
 
                     fmtReader.tryRead("±") -> {
-                        when (reader.readChar()) {
-                            '+' -> sign = +1
-                            '-' -> sign = -1
-                            else -> return null
+                        sign = when (reader.readChar()) {
+                            '+' -> +1
+                            '-' -> -1
+                            else -> return reportParse("±")
                         }
                     }
-                    else -> if (fmtReader.readChar() != reader.readChar()) return null
+                    else -> if (fmtReader.readChar() != reader.readChar()) return reportParse("separator")
                 }
             }
             if (reader.hasMore) return null
@@ -202,8 +207,9 @@ object ISO8601 {
         val extended = BaseIsoDateTimeFormat(extendedFormat ?: basicFormat ?: TODO())
 
         override fun format(dd: DateTimeTz): String = extended.format(dd)
-        override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? =
-            basic.tryParse(str, false) ?: extended.tryParse(str, false)
+        override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? = null
+            ?: basic.tryParse(str, false)
+            ?: extended.tryParse(str, false)
             ?: (if (doThrow) throw DateException("Invalid format $str") else null)
     }
 

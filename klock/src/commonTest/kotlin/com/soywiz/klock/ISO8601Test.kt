@@ -88,8 +88,11 @@ class ISO8601Test {
     }
 
     @Test
-    fun test() {
-        assertEquals("20190917T114805", ISO8601.DATETIME_COMPLETE.basic.format(1568720885379))
-        assertEquals("2019-09-17T11:48:05", ISO8601.DATETIME_COMPLETE.extended.format(1568720885379))
+    fun testDateTimeComplete() {
+        assertEquals("20190917T114805", ISO8601.DATETIME_COMPLETE.basic.format(1568720885000))
+        assertEquals("2019-09-17T11:48:05", ISO8601.DATETIME_COMPLETE.extended.format(1568720885000))
+
+        assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_COMPLETE.parse("20190917T114805").utc.toString())
+        assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_COMPLETE.parse("2019-09-17T11:48:05").utc.toString())
     }
 }
