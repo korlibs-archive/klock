@@ -32,6 +32,8 @@ interface DateFormat {
 fun DateFormat.parse(str: String): DateTimeTz =
     tryParse(str, doThrow = true) ?: throw DateException("Not a valid format: '$str' for '$this'")
 
+fun DateFormat.parseUtc(str: String): DateTime = parse(str).utc
+
 fun DateFormat.format(date: Double): String = format(DateTime.fromUnix(date))
 fun DateFormat.format(date: Long): String = format(DateTime.fromUnix(date))
 

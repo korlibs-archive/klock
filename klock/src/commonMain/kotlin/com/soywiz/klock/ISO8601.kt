@@ -108,7 +108,7 @@ object ISO8601 {
                     else -> if (fmtReader.readChar() != reader.readChar()) return reportParse("separator")
                 }
             }
-            if (reader.hasMore) return null
+            if (reader.hasMore) return reportParse("uncomplete")
 
             val dateTime = when {
                 dayOfYear >= 0 -> DateTime(year, 1, 1) + (dayOfYear - 1).days

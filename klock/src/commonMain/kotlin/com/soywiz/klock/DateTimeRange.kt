@@ -59,6 +59,63 @@ data class DateTimeRange(val from: DateTime, val to: DateTime, val inclusive: Bo
             else -> unix < to
         }
     }
+
+    // @TODO: Handle inclusive <= or <
+    private inline fun <T> _intersectionWith(that: DateTimeRange, handler: (from: DateTime, to: DateTime, matches: Boolean, inclusive: Boolean) -> T): T {
+        val from = max(this.from, that.from)
+        val to = min(this.to, that.to)
+        return handler(from, to, from <= to, when {
+            this.to > that.to -> this.inclusive
+            this.to == that.to -> this.inclusive || that.inclusive
+            else -> that.inclusive
+        })
+    }
+
+    fun intersectionWith(that: DateTimeRange): DateTimeRange? {
+        return _intersectionWith(that) { from, to, matches, inclusive ->
+            when {
+                matches -> DateTimeRange(from, to, inclusive)
+                else -> null
+            }
+        }
+    }
+
+    fun intersectsWith(that: DateTimeRange): Boolean = _intersectionWith(that) { _, _, matches, _ -> matches }
+
+    fun mergeOnIntersectionOrNull(that: DateTimeRange): DateTimeRange? {
+        if (!intersectsWith(that)) return null
+        val from = min(this.from, that.from)
+        val to = max(this.to, that.to)
+        return DateTimeRange(from, to, if (this.to > that.to) this.inclusive else that.inclusive)
+    }
+
+    fun without(that: DateTimeRange): List<DateTimeRange> {
+        // Full remove
+        if ((that.from <= this.from) && (that.to >= this.to)) {
+            return listOf()
+        }
+        // To the right, nothing to remove
+        if (that.from >= this.to) {
+            return listOf(this)
+        }
+        // To the left, nothing to remove
+        if (that.to <= this.from) {
+            return listOf(this)
+        }
+        // In the middle
+        val p0 = this.from
+        val p1 = that.from
+        val p2 = that.to
+        val p3 = this.to
+        return listOf(
+            DateTimeRange(p0, p1, inclusive = false),
+            DateTimeRange(p2, p3, inclusive = false)
+        )
+    }
+
+    fun toString(format: DateFormat): String = "${from.toString(format)}..${to.toString(format)}"
+    fun toStringLongs(): String = "${from.unixMillisLong}..${to.unixMillisLong}"
+    override fun toString(): String = toString(DateFormat.FORMAT1)
 }
 
 /**
