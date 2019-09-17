@@ -71,20 +71,33 @@ class DateTimeRangeSetTest {
     }
 
     @Test
-    @Ignore // Fast not working yet
     fun testIntersect() {
-        val r1 = randomRangesSeparated(40, seed = 10L)
-        val r2 = randomRangesSeparated(10, seed = 1L)
+        //val r1 = randomRangesSeparated(40, seed = 10L)
+        //val r2 = randomRangesSeparated(10, seed = 1L)
 
-        //val r1 = randomRangesSeparated(3, seed = 10L)
-        //val r2 = randomRangesSeparated(3, seed = 1L)
+        for (seed in listOf(1L, 3L, 10L, 100L, 1000L)) {
 
-        val fast = DateTimeRangeSet.Fast.intersection(r1, r2).toStringLongs()
-        val slow = DateTimeRangeSet.Slow.intersection(r1, r2).toStringLongs()
-        println(r1)
-        println(r2)
-        println("fast: $fast")
-        println("slow: $slow")
-        assertEquals(fast, slow)
+            //val r1 = randomRangesSeparated(1000, seed = seed)
+            //val r2 = randomRangesSeparated(1010, seed = seed + 1)
+            val r1 = randomRangesSeparated(100, seed = seed)
+            val r2 = randomRangesSeparated(115, seed = seed + 1)
+
+            //val r1 = randomRangesSeparated(3, seed = 10L)
+            //val r2 = randomRangesSeparated(3, seed = 1L)
+
+            val fast = DateTimeRangeSet.Fast.intersection(r1, r2).toStringLongs()
+            val slow = DateTimeRangeSet.Slow.intersection(r1, r2).toStringLongs()
+            //val slow = DateTimeRangeSet.Fast.intersection(r1, r2).toStringLongs()
+            println(r1)
+            println(r2)
+            println("fast: $fast")
+            println("slow: $slow")
+            assertEquals(fast, slow)
+
+            val fast2 = DateTimeRangeSet.Fast.intersection(r2, r1).toStringLongs()
+            val slow2 = DateTimeRangeSet.Slow.intersection(r2, r1).toStringLongs()
+
+            assertEquals(fast2, slow2)
+        }
     }
 }

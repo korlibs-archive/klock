@@ -4,6 +4,8 @@ package com.soywiz.klock
  * Represents an open or close range between two dates.
  */
 data class DateTimeRange(val from: DateTime, val to: DateTime, val inclusive: Boolean) {
+    val min get() = from
+    val max get() = to
     /**
      * Duration [TimeSpan] without having into account actual months/years.
      */

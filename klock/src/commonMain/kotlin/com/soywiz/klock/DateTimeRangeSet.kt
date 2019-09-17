@@ -7,17 +7,20 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
         inclusive = false
     ) }
 
-    constructor(ranges: List<DateTimeRange>) : this(false, combine(ranges))
+    constructor(ranges: List<DateTimeRange>) : this(false, Fast.combine(ranges))
     constructor(range: DateTimeRange) : this(listOf(range))
     constructor(vararg ranges: DateTimeRange) : this(ranges.toList())
 
     operator fun plus(range: DateTimeRange): DateTimeRangeSet = this + DateTimeRangeSet(range)
+    operator fun plus(right: DateTimeRangeSet): DateTimeRangeSet = DateTimeRangeSet(this.ranges + right.ranges)
+
     operator fun minus(range: DateTimeRange): DateTimeRangeSet = this - DateTimeRangeSet(range)
+    operator fun minus(right: DateTimeRangeSet): DateTimeRangeSet = Fast.minus(this, right)
+
     fun intersection(range: DateTimeRange): DateTimeRangeSet = this.intersection(DateTimeRangeSet(range))
     fun intersection(vararg range: DateTimeRange): DateTimeRangeSet = this.intersection(DateTimeRangeSet(*range))
-    operator fun plus(right: DateTimeRangeSet): DateTimeRangeSet = DateTimeRangeSet(this.ranges + right.ranges)
-    operator fun minus(right: DateTimeRangeSet): DateTimeRangeSet = minus(this, right)
-    fun intersection(right: DateTimeRangeSet): DateTimeRangeSet = intersection(this, right)
+    fun intersection(right: DateTimeRangeSet): DateTimeRangeSet = Fast.intersection(this, right)
+    //fun intersection(right: DateTimeRangeSet): DateTimeRangeSet = Slow.intersection(this, right)
 
     /*
     fun combined(): DateTimeRangeSet {
@@ -27,21 +30,6 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
     */
 
     companion object {
-        fun combine(ranges: List<DateTimeRange>): List<DateTimeRange> {
-            //return Slow.combine(ranges)
-            return Fast.combine(ranges)
-        }
-
-        fun minus(left: DateTimeRangeSet, right: DateTimeRangeSet): DateTimeRangeSet {
-            //return Slow.minus(left, right)
-            return Fast.minus(left, right)
-        }
-
-        fun intersection(left: DateTimeRangeSet, right: DateTimeRangeSet): DateTimeRangeSet {
-            return Slow.intersection(left, right)
-            //return Fast.intersection(left, right)
-        }
-
         fun toStringLongs(ranges: List<DateTimeRange>): String = "${ranges.map { it.toStringLongs() }}"
     }
 
@@ -124,40 +112,39 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
         }
 
         fun intersection(left: DateTimeRangeSet, right: DateTimeRangeSet): DateTimeRangeSet {
-            if (left.ranges.isEmpty() || right.ranges.isEmpty()) return left
+            if (left.ranges.isEmpty() || right.ranges.isEmpty()) return DateTimeRangeSet(listOf())
 
-            val ll = left.ranges
+            val ll = left.ranges.filter { it.intersectsWith(right.bounds) }
             val rr = right.ranges.filter { it.intersectsWith(left.bounds) }
-            var lpos = 0
-            var rpos = 0
-            var l = ll.getOrNull(lpos++)
-            var r = rr.getOrNull(rpos++)
             val out = arrayListOf<DateTimeRange>()
             debug { "-----------------" }
             debug { "Intersection:" }
             debug { "  - ll=${toStringLongs(ll)}" }
             debug { "  - rr=${toStringLongs(rr)}" }
-            while (l != null && r != null) {
-                val result = l.intersectionWith(r)
-                debug { "Intersection ${l!!.toStringLongs()} with ${r!!.toStringLongs()} -- ${result?.toStringLongs()}" }
-
-                if (r.from <= l.to) {
-                    r = rr.getOrNull(rpos++)
-                    if (result != null) {
-                        l = result
-                        debug { "  - Move right and keep result ${l?.toStringLongs()}" }
-                    } else {
-                        debug { "  - Move right and and keep old l" }
+            var rpos = 0
+            for (l in ll) {
+                // @TODO: We can't do this?
+                //
+                //      |
+                //   |  |
+                //      |
+                // |    |
+                // |    |
+                // |
+                //while (rpos > 0) {
+                //    val r = rr.getOrNull(rpos) ?: break
+                //    if ((r.from < l.from) && (r.to < l.from)) break // End since we are already
+                //    rpos--
+                //}
+                rpos = 0
+                while (rpos < rr.size) {
+                    val r = rr.getOrNull(rpos) ?: break
+                    if (r.min > l.max) break // End since the rest are going to be farther
+                    val res = l.intersectionWith(r)
+                    if (res != null) {
+                        out.add(res)
                     }
-                } else {
-                    if (result != null) {
-                        debug { "  - Move left and store result ${result.toStringLongs()}" }
-                        out.add(result)
-                    } else {
-                        debug { "  - Move left without storing result" }
-                        out.add(l)
-                    }
-                    l = ll.getOrNull(lpos++)
+                    rpos++
                 }
             }
 
@@ -166,7 +153,7 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
         }
 
         private inline fun debug(gen: () -> String) {
-            println(gen())
+            //println(gen())
         }
     }
 
@@ -218,8 +205,15 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
             val rightList = right.ranges
             val out = arrayListOf<DateTimeRange>()
             for (l in leftList) {
-                val chunks = rightList.mapNotNull { r -> l.intersectionWith(r) }
-                out.addAll(DateTimeRangeSet(chunks).ranges)
+                for (r in rightList) {
+                    if (r.min > l.max) break
+                    val result = l.intersectionWith(r)
+                    if (result != null) {
+                        out.add(result)
+                    }
+                }
+                //val chunks = rightList.mapNotNull { r -> l.intersectionWith(r) }
+                //out.addAll(DateTimeRangeSet(chunks).ranges)
             }
             return DateTimeRangeSet(out)
         }
