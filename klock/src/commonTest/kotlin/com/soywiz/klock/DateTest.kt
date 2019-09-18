@@ -15,5 +15,17 @@ class DateTest {
 		assertEquals("2019-10-01", (Date(2019, Month.September, 30) + 1.days).toString())
 		assertEquals("2019-10-30", (Date(2019, Month.September, 30) + 1.months).toString())
 
+		(Time(9, 0) .. Time(19, 30)).let { range ->
+			assertEquals(true, range.contains(Time(11, 0)))
+			assertEquals(false, range.contains(Time(8, 59, 59, 999)))
+			assertEquals(false, range.contains(Time(19, 31)))
+		}
+
+		(Date(2019, 9, 18) .. Date(2019, 10, 2)).let { range ->
+			assertEquals(true, range.contains(Date(2019, 9, 18)))
+			assertEquals(true, range.contains(Date(2019, 10, 1)))
+			assertEquals(false, range.contains(Date(2019, 9, 17)))
+			assertEquals(false, range.contains(Date(2019, 10, 3)))
+		}
 	}
 }
