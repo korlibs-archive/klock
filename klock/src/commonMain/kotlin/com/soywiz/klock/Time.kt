@@ -22,3 +22,5 @@ inline class Time(val encoded: TimeSpan) : Comparable<Time> {
 	override fun compareTo(other: Time): Int = encoded.compareTo(other.encoded)
 }
 
+// @TODO: Do overflowing here instead of relying on DateTime. In fact, refact DateTime to handle the overflowing using this class
+operator fun Time.plus(span: TimeSpan) = (DateTime.EPOCH + this.encoded + span).time
