@@ -41,4 +41,10 @@ class DateTimeRangeTest {
 		assertEquals(false, range(80, 101) in range(0, 100))
 		assertEquals(false, range(-50, 0) in range(0, 100))
 	}
+
+	@Test
+	fun testTest() {
+		val range = DateTimeRange(Date(2019, Month.September, 18), Time(8), Time(13))
+		assertEquals("2019-09-18T08:00:00..2019-09-18T13:00:00", range.toString(ISO8601.DATETIME_COMPLETE.extended))
+	}
 }

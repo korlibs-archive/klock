@@ -9,6 +9,10 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
 		//check(from <= to)
 	}
 
+	companion object {
+		operator fun invoke(base: Date, from: Time, to: Time): DateTimeRange = DateTimeRange(base + from, base + to)
+	}
+
 	val size: TimeSpan get() = to - from
 
     @Suppress("UNUSED_PARAMETER")
