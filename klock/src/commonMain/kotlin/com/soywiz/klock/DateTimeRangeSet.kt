@@ -64,40 +64,40 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
             var l = ll.getOrNull(lpos++)
             var r = rr.getOrNull(rpos++)
             val out = arrayListOf<DateTimeRange>()
-            debug { "-----------------" }
-            debug { "Minus:" }
-            debug { "  - ll=${toStringLongs(ll)}" }
-            debug { "  - rr=${toStringLongs(rr)}" }
+            //debug { "-----------------" }
+            //debug { "Minus:" }
+            //debug { "  - ll=${toStringLongs(ll)}" }
+            //debug { "  - rr=${toStringLongs(rr)}" }
             while (l != null && r != null) {
                 val result = l.without(r)
-                debug { "Minus ${l!!.toStringLongs()} with ${r!!.toStringLongs()} -- ${toStringLongs(result)}" }
+                //debug { "Minus ${l!!.toStringLongs()} with ${r!!.toStringLongs()} -- ${toStringLongs(result)}" }
                 when (result.size) {
                     0 -> {
-                        debug { "  - Full remove" }
+                        //debug { "  - Full remove" }
                         l = ll.getOrNull(lpos++)
                     }
                     1 -> {
-                        debug { "  - Result 1" }
+                        //debug { "  - Result 1" }
                         when {
                             r.from >= l.to -> {
-                                debug { "    - Move left. Emit ${result[0].toStringLongs()}" }
+                                //debug { "    - Move left. Emit ${result[0].toStringLongs()}" }
                                 out.add(result[0])
                                 l = ll.getOrNull(lpos++)
                             }
                             l == result[0] -> {
-                                debug { "    - Move right. Change l from ${l!!.toStringLongs()} to ${result[0].toStringLongs()}" }
+                                //debug { "    - Move right. Change l from ${l!!.toStringLongs()} to ${result[0].toStringLongs()}" }
                                 r = rr.getOrNull(rpos++)
                             }
                             else -> {
-                                debug { "    - Use this l=${result[0].toStringLongs()} from ${l!!.toStringLongs()}" }
+                                //debug { "    - Use this l=${result[0].toStringLongs()} from ${l!!.toStringLongs()}" }
                                 l = result[0]
                             }
                         }
                     }
                     else -> {
-                        debug { "  - One chunk removed: ${result.map { it.toStringLongs() }}" }
-                        debug { "    - Emit: ${result[0].toStringLongs()}" }
-                        debug { "    - Keep: ${result[1].toStringLongs()}" }
+                        //debug { "  - One chunk removed: ${result.map { it.toStringLongs() }}" }
+                        //debug { "    - Emit: ${result[0].toStringLongs()}" }
+                        //debug { "    - Keep: ${result[1].toStringLongs()}" }
                         out.add(result[0])
                         l = result[1]
                     }
@@ -108,7 +108,7 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
             }
             while (lpos < ll.size) out.add(ll[lpos++])
 
-            debug { toStringLongs(out) }
+            //debug { toStringLongs(out) }
             return DateTimeRangeSet(out)
         }
 
@@ -118,10 +118,10 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
             val ll = left.ranges.filter { it.intersectsWith(right.bounds) }
             val rr = right.ranges.filter { it.intersectsWith(left.bounds) }
             val out = arrayListOf<DateTimeRange>()
-            debug { "-----------------" }
-            debug { "Intersection:" }
-            debug { "  - ll=${toStringLongs(ll)}" }
-            debug { "  - rr=${toStringLongs(rr)}" }
+            //debug { "-----------------" }
+            //debug { "Intersection:" }
+            //debug { "  - ll=${toStringLongs(ll)}" }
+            //debug { "  - rr=${toStringLongs(rr)}" }
             var rpos = 0
             for (l in ll) {
                 // @TODO: We can't do this?
@@ -149,13 +149,11 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
                 }
             }
 
-            debug { toStringLongs(out) }
+            //debug { toStringLongs(out) }
             return DateTimeRangeSet(out)
         }
 
-        private inline fun debug(gen: () -> String) {
-            //println(gen())
-        }
+        //private inline fun debug(gen: () -> String) { println(gen()) }
     }
 
     object Slow {
