@@ -36,7 +36,15 @@ inline class DateTime(
             DateTime.dateToMillis(year.year, month.index1, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
         )
 
-        /**
+		operator fun invoke(
+			date: Date,
+			time: Time = Time(0.milliseconds)
+		): DateTime = DateTime(
+			date.year, date.month1, date.day,
+			time.hour, time.minute, time.second, time.millisecond
+		)
+
+		/**
          * Constructs a new [DateTime] from date and time information.
          *
          * This might throw a [DateException] on invalid dates.
@@ -296,6 +304,9 @@ inline class DateTime(
 	val dateDayStart get() = DateTime(year, month, dayOfMonth, 0, 0, 0, 0)
 	/** Returns a [DateTime] of [this] day with the hour at 23:59:59.999 */
 	val dateDayEnd get() = DateTime(year, month, dayOfMonth, 23, 59, 59, 999)
+
+	val date get() = Date(yearInt, month1, dayOfMonth)
+	val time get() = Time(hours, minutes, seconds, milliseconds)
 
     operator fun plus(delta: MonthSpan): DateTime = this.add(delta.totalMonths, 0.0)
     operator fun plus(delta: DateTimeSpan): DateTime = this.add(delta.totalMonths, delta.totalMilliseconds)
