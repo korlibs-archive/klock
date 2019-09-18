@@ -1,6 +1,8 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.BSearchResult
 import com.soywiz.klock.internal.fastForEach
+import com.soywiz.klock.internal.genericBinarySearch
 
 // Properties:
 //   - ranges are sorted
@@ -153,14 +155,12 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
             return DateTimeRangeSet(out)
         }
 
-        fun contains(time: DateTime, rangeSet: DateTimeRangeSet): Boolean {
-            if (time !in rangeSet.bounds) return false // Early guard clause
-            // @TODO: Fast binary search, since the ranges doesn't intersect each other
-            rangeSet.ranges.fastForEach { range ->
-                if (time in range) return true
-            }
-            return false
-        }
+		fun contains(time: DateTime, rangeSet: DateTimeRangeSet): Boolean {
+			if (time !in rangeSet.bounds) return false // Early guard clause
+			val ranges = rangeSet.ranges
+			val result = BSearchResult(genericBinarySearch(0, ranges.size) { index -> ranges[index].compareTo(time) })
+			return result.found
+		}
         //private inline fun debug(gen: () -> String) { println(gen()) }
     }
 
@@ -225,14 +225,14 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
             return DateTimeRangeSet(out)
         }
 
-        fun contains(time: DateTime, rangeSet: DateTimeRangeSet): Boolean {
-            if (time !in rangeSet.bounds) return false // Early guard clause
-            // @TODO: Fast binary search, since the ranges doesn't intersect each other
-            rangeSet.ranges.fastForEach { range ->
-                if (time in range) return true
-            }
-            return false
-        }
+		fun contains(time: DateTime, rangeSet: DateTimeRangeSet): Boolean {
+			if (time !in rangeSet.bounds) return false // Early guard clause
+			// @TODO: Fast binary search, since the ranges doesn't intersect each other
+			rangeSet.ranges.fastForEach { range ->
+				if (time in range) return true
+			}
+			return false
+		}
     }
 
     fun toStringLongs(): String = "${ranges.map { it.toStringLongs() }}"

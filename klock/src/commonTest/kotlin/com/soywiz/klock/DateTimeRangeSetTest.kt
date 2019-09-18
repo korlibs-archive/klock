@@ -104,12 +104,30 @@ class DateTimeRangeSetTest {
 
     @Test
     fun testContains() {
-        val ranges = DateTimeRangeSet(range(0, 100), range(150, 200))
-        assertEquals(true, date(50) in ranges)
-        assertEquals(false, date(100) in ranges)
-        assertEquals(false, date(120) in ranges)
-        assertEquals(true, date(150) in ranges)
-        assertEquals(true, date(170) in ranges)
-        assertEquals(false, date(200) in ranges)
+        DateTimeRangeSet(range(0, 100), range(150, 200)).let { ranges ->
+			assertEquals(false, date(-50) in ranges)
+			assertEquals(true, date(0) in ranges)
+			assertEquals(true, date(50) in ranges)
+			assertEquals(false, date(100) in ranges)
+			assertEquals(false, date(120) in ranges)
+			assertEquals(true, date(150) in ranges)
+			assertEquals(true, date(170) in ranges)
+			assertEquals(false, date(200) in ranges)
+		}
+
+		DateTimeRangeSet(range(0, 100), range(150, 200), range(250, 300)).let { ranges ->
+			assertEquals(false, date(-50) in ranges)
+			assertEquals(true, date(0) in ranges)
+			assertEquals(true, date(50) in ranges)
+			assertEquals(false, date(100) in ranges)
+			assertEquals(false, date(120) in ranges)
+			assertEquals(true, date(150) in ranges)
+			assertEquals(true, date(170) in ranges)
+			assertEquals(false, date(200) in ranges)
+			assertEquals(true, date(250) in ranges)
+			assertEquals(true, date(270) in ranges)
+			assertEquals(false, date(300) in ranges)
+			assertEquals(false, date(320) in ranges)
+		}
     }
 }
