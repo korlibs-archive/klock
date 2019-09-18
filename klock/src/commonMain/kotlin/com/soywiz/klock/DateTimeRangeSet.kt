@@ -124,12 +124,13 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
             //debug { "  - rr=${toStringLongs(rr)}" }
             var rpos = 0
             for (l in ll) {
-                // We can do this because the time ranges doesn't intersect each other
-                while (rpos > 0) {
-                    val r = rr.getOrNull(rpos) ?: break
-                    if ((r.from < l.from) && (r.to < l.from)) break // End since we are already
-                    rpos--
-                }
+                rpos = 0
+                // We should be able to do this because the time ranges doesn't intersect each other
+                //while (rpos > 0) {
+                //    val r = rr.getOrNull(rpos) ?: break
+                //    if ((r.from < l.from) && (r.to < l.from)) break // End since we are already
+                //    rpos--
+                //}
                 while (rpos < rr.size) {
                     val r = rr.getOrNull(rpos) ?: break
                     if (r.min > l.max) break // End since the rest are going to be farther
