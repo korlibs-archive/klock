@@ -147,4 +147,10 @@ class DateTimeRangeSetTest {
 		assertEquals(false, range(90, 110) in range)
 		assertEquals(false, range(500, 510) in range)
 	}
+
+	@Test
+	fun testSize() {
+		assertEquals(100.milliseconds, range(100, 200).size)
+		assertEquals(200.milliseconds, DateTimeRangeSet(range(100, 200), range(150, 300)).size)
+	}
 }

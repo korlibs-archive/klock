@@ -14,7 +14,13 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
         ranges.lastOrNull()?.to ?: DateTime.EPOCH
     ) }
 
-    constructor(ranges: List<DateTimeRange>) : this(false, Fast.combine(ranges))
+	val size: TimeSpan by lazy {
+		var out = 0.seconds
+		ranges.fastForEach { out += it.size }
+		out
+	}
+
+	constructor(ranges: List<DateTimeRange>) : this(false, Fast.combine(ranges))
     constructor(range: DateTimeRange) : this(listOf(range))
     constructor(vararg ranges: DateTimeRange) : this(ranges.toList())
 

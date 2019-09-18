@@ -9,6 +9,8 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
 		//check(from <= to)
 	}
 
+	val size: TimeSpan get() = to - from
+
     @Suppress("UNUSED_PARAMETER")
     @Deprecated("[inclusive] is ignored")
     constructor(from: DateTime, to: DateTime, inclusive: Boolean) : this(from, to)
