@@ -26,8 +26,9 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
 
     //operator fun contains(time: DateTime): Boolean = Slow.contains(time, this)
     operator fun contains(time: DateTime): Boolean = Fast.contains(time, this)
+	operator fun contains(time: DateTimeRange): Boolean = Fast.contains(time, this)
 
-    fun intersection(range: DateTimeRange): DateTimeRangeSet = this.intersection(DateTimeRangeSet(range))
+	fun intersection(range: DateTimeRange): DateTimeRangeSet = this.intersection(DateTimeRangeSet(range))
     fun intersection(vararg range: DateTimeRange): DateTimeRangeSet = this.intersection(DateTimeRangeSet(*range))
     fun intersection(right: DateTimeRangeSet): DateTimeRangeSet = Fast.intersection(this, right)
     //fun intersection(right: DateTimeRangeSet): DateTimeRangeSet = Slow.intersection(this, right)
@@ -161,6 +162,20 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
 			val result = BSearchResult(genericBinarySearch(0, ranges.size) { index -> ranges[index].compareTo(time) })
 			return result.found
 		}
+
+		fun contains(time: DateTimeRange, rangeSet: DateTimeRangeSet): Boolean {
+			if (time !in rangeSet.bounds) return false // Early guard clause
+			val ranges = rangeSet.ranges
+			val result = BSearchResult(genericBinarySearch(0, ranges.size) { index ->
+				val range = ranges[index]
+				when {
+					time in range -> 0
+					time.min < range.min -> +1
+					else -> -1
+				}
+			})
+			return result.found
+		}
         //private inline fun debug(gen: () -> String) { println(gen()) }
     }
 
@@ -226,6 +241,15 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
         }
 
 		fun contains(time: DateTime, rangeSet: DateTimeRangeSet): Boolean {
+			if (time !in rangeSet.bounds) return false // Early guard clause
+			// @TODO: Fast binary search, since the ranges doesn't intersect each other
+			rangeSet.ranges.fastForEach { range ->
+				if (time in range) return true
+			}
+			return false
+		}
+
+		fun contains(time: DateTimeRange, rangeSet: DateTimeRangeSet): Boolean {
 			if (time !in rangeSet.bounds) return false // Early guard clause
 			// @TODO: Fast binary search, since the ranges doesn't intersect each other
 			rangeSet.ranges.fastForEach { range ->
