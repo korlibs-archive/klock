@@ -9,7 +9,8 @@ import kotlin.test.assertEquals
 
 class DateTimeRangeSetTest {
     val date = DateTime.EPOCH
-    fun range(from: Int, to: Int) = (date + from.milliseconds)..(date + to.milliseconds)
+    fun date(time: Int) = (date + time.milliseconds)
+    fun range(from: Int, to: Int) = date(from) until date(to)
 
     @Test
     fun test() {
@@ -99,5 +100,16 @@ class DateTimeRangeSetTest {
 
             assertEquals(fast2, slow2)
         }
+    }
+
+    @Test
+    fun testContains() {
+        val ranges = DateTimeRangeSet(range(0, 100), range(150, 200))
+        assertEquals(true, date(50) in ranges)
+        assertEquals(false, date(100) in ranges)
+        assertEquals(false, date(120) in ranges)
+        assertEquals(true, date(150) in ranges)
+        assertEquals(true, date(170) in ranges)
+        assertEquals(false, date(200) in ranges)
     }
 }

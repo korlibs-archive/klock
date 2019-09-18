@@ -17,6 +17,8 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
     operator fun minus(range: DateTimeRange): DateTimeRangeSet = this - DateTimeRangeSet(range)
     operator fun minus(right: DateTimeRangeSet): DateTimeRangeSet = Fast.minus(this, right)
 
+    operator fun contains(time: DateTime): Boolean = Slow.contains(time, this)
+
     fun intersection(range: DateTimeRange): DateTimeRangeSet = this.intersection(DateTimeRangeSet(range))
     fun intersection(vararg range: DateTimeRange): DateTimeRangeSet = this.intersection(DateTimeRangeSet(*range))
     fun intersection(right: DateTimeRangeSet): DateTimeRangeSet = Fast.intersection(this, right)
@@ -216,6 +218,15 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
                 //out.addAll(DateTimeRangeSet(chunks).ranges)
             }
             return DateTimeRangeSet(out)
+        }
+
+        fun contains(time: DateTime, rangeSet: DateTimeRangeSet): Boolean {
+            if (time !in rangeSet.bounds) return false // Early guard clause
+            // @TODO: Fast binary search, since the ranges doesn't intersect each other
+            for (range in rangeSet.ranges) {
+                if (time in range) return true
+            }
+            return false
         }
     }
 
