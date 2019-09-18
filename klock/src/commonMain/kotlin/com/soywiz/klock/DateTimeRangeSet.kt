@@ -52,7 +52,7 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
             var pivot = sorted.first()
             for (n in 1 until sorted.size) {
                 val current = sorted[n]
-                val result = pivot.mergeOnIntersectionOrNull(current)
+                val result = pivot.mergeOnContactOrNull(current)
                 pivot = if (result != null) {
                     result
                 } else {
@@ -193,7 +193,7 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
                         if (i == j) continue
                         val ri = ranges[i]
                         val rj = ranges[j]
-                        val concat = ri.mergeOnIntersectionOrNull(rj)
+                        val concat = ri.mergeOnContactOrNull(rj)
                         if (concat != null) {
                             //println("Combining $ri and $rj : $concat")
                             ranges.remove(rj)

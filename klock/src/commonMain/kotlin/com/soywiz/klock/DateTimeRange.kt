@@ -4,6 +4,11 @@ package com.soywiz.klock
  * Represents an open or close range between two dates.
  */
 data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<DateTime> {
+	val valid get() = from <= to
+	init {
+		//check(from <= to)
+	}
+
     @Suppress("UNUSED_PARAMETER")
     @Deprecated("[inclusive] is ignored")
     constructor(from: DateTime, to: DateTime, inclusive: Boolean) : this(from, to)
@@ -61,19 +66,17 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
         val unix = date.unixMillisDouble
         val from = from.unixMillisDouble
         val to = to.unixMillisDouble
-        if (unix < from) return false
-        return unix < to
+		return if (unix < from) false else unix < to
     }
 
-    // @TODO: Handle inclusive <= or <
-    private inline fun <T> _intersectionWith(that: DateTimeRange, handler: (from: DateTime, to: DateTime, matches: Boolean) -> T): T {
+    private inline fun <T> _intersectionWith(that: DateTimeRange, rightOpen: Boolean, handler: (from: DateTime, to: DateTime, matches: Boolean) -> T): T {
         val from = max(this.from, that.from)
         val to = min(this.to, that.to)
-        return handler(from, to, from <= to)
+        return handler(from, to, if (rightOpen) from < to else from <= to)
     }
 
-    fun intersectionWith(that: DateTimeRange): DateTimeRange? {
-        return _intersectionWith(that) { from, to, matches ->
+    fun intersectionWith(that: DateTimeRange, rightOpen: Boolean = true): DateTimeRange? {
+        return _intersectionWith(that, rightOpen) { from, to, matches ->
             when {
                 matches -> DateTimeRange(from, to)
                 else -> null
@@ -81,34 +84,35 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
         }
     }
 
-    fun intersectsWith(that: DateTimeRange): Boolean = _intersectionWith(that) { _, _, matches -> matches }
+	fun intersectsWith(that: DateTimeRange, rightOpen: Boolean = true): Boolean = _intersectionWith(that, rightOpen) { _, _, matches -> matches }
+	fun intersectsOrInContactWith(that: DateTimeRange): Boolean = intersectsWith(that, rightOpen = false)
 
-    fun mergeOnIntersectionOrNull(that: DateTimeRange): DateTimeRange? {
-        if (!intersectsWith(that)) return null
-        val from = min(this.from, that.from)
-        val to = max(this.to, that.to)
-        return DateTimeRange(from, to)
+    fun mergeOnContactOrNull(that: DateTimeRange): DateTimeRange? {
+        if (!intersectsOrInContactWith(that)) return null
+        val min = min(this.min, that.min)
+        val max = max(this.max, that.max)
+        return DateTimeRange(min, max)
     }
 
     fun without(that: DateTimeRange): List<DateTimeRange> = when {
         // Full remove
-        (that.from <= this.from) && (that.to >= this.to) -> listOf()
+        (that.min <= this.min) && (that.max >= this.max) -> listOf()
         // To the right or left, nothing to remove
-        that.from >= this.to || that.to <= this.from -> listOf(this)
+		(that.min >= this.max) || (that.max <= this.min) -> listOf(this)
         // In the middle
         else -> {
-            val p0 = this.from
-            val p1 = that.from
-            val p2 = that.to
-            val p3 = this.to
+            val p0 = this.min
+            val p1 = that.min
+            val p2 = that.max
+            val p3 = this.max
             val c1 = if (p0 < p1) DateTimeRange(p0, p1) else null
             val c2 = if (p2 < p3) DateTimeRange(p2, p3) else null
             listOfNotNull(c1, c2)
         }
     }
 
-    fun toString(format: DateFormat): String = "${from.toString(format)}..${to.toString(format)}"
-    fun toStringLongs(): String = "${from.unixMillisLong}..${to.unixMillisLong}"
+    fun toString(format: DateFormat): String = "${min.toString(format)}..${max.toString(format)}"
+    fun toStringLongs(): String = "${min.unixMillisLong}..${max.unixMillisLong}"
     override fun toString(): String = toString(DateFormat.FORMAT1)
 
     override fun compareTo(other: DateTime): Int {
@@ -117,6 +121,8 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
         return 0
     }
 }
+
+fun List<DateTimeRange>.toStringLongs() = this.map { it.toStringLongs() }.toString()
 
 /**
  * Alias for [this] until [other]
