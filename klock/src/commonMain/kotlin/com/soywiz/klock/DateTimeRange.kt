@@ -69,6 +69,10 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
 		return if (unix < from) false else unix < to
     }
 
+	operator fun contains(other: DateTimeRange): Boolean {
+		return other.min >= this.min && other.max <= this.max
+	}
+
     private inline fun <T> _intersectionWith(that: DateTimeRange, rightOpen: Boolean, handler: (from: DateTime, to: DateTime, matches: Boolean) -> T): T {
         val from = max(this.from, that.from)
         val to = min(this.to, that.to)
