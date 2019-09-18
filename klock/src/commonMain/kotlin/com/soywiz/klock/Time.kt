@@ -4,9 +4,8 @@ import kotlin.math.abs
 
 inline class Time(val encoded: TimeSpan) : Comparable<Time> {
 	companion object {
-		operator fun invoke(hour: Int, minute: Int, second: Int, millisecond: Int): Time {
-			return Time(hour.hours + minute.minutes + second.seconds + millisecond.milliseconds)
-		}
+		operator fun invoke(hour: Int, minute: Int = 0, second: Int = 0, millisecond: Int = 0): Time =
+			Time(hour.hours + minute.minutes + second.seconds + millisecond.milliseconds)
 
 		private const val DIV_MILLISECONDS = 1
 		private const val DIV_SECONDS = DIV_MILLISECONDS * 1000
