@@ -3,8 +3,7 @@ package com.soywiz.klock
 data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: List<DateTimeRange>) {
     val bounds by lazy { DateTimeRange(
         ranges.firstOrNull()?.from ?: DateTime.EPOCH,
-        ranges.lastOrNull()?.to ?: DateTime.EPOCH,
-        inclusive = false
+        ranges.lastOrNull()?.to ?: DateTime.EPOCH
     ) }
 
     constructor(ranges: List<DateTimeRange>) : this(false, Fast.combine(ranges))

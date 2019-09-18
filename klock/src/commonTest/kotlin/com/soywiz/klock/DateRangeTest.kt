@@ -19,15 +19,18 @@ class DateRangeTest {
         val outside1 = DateTime(2000, Month.January, 9)
         val outside2 = DateTime(2000, Month.February, 21)
 
-        assertTrue(other in (src .. dst))
-        assertTrue(src in (src .. dst))
-        assertTrue(dst in (src .. dst))
+        //assertTrue(other in (src .. dst))
+
+        //assertTrue(src in (src .. dst))
+        //assertTrue(dst in (src .. dst))
+
+        assertTrue(other in (src until dst))
 
         assertTrue(src in (src until dst))
         assertTrue(dst !in (src until dst))
 
-        assertTrue(outside1 !in (src .. dst))
-        assertTrue(outside2 !in (src .. dst))
+        //assertTrue(outside1 !in (src .. dst))
+        //assertTrue(outside2 !in (src .. dst))
         assertTrue(outside1 !in (src until dst))
         assertTrue(outside2 !in (src until dst))
     }

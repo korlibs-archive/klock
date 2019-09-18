@@ -44,7 +44,7 @@ class DateTimeRangeSetTest {
         var pos = random.nextLong(1000)
         for (n in 0 until count) {
             val dist = random.nextLong(1000)
-            out += DateTimeRange(date + (pos).milliseconds, date + (pos + dist).milliseconds, false)
+            out += DateTimeRange(date + (pos).milliseconds, date + (pos + dist).milliseconds)
             val separation = random.nextLong(1000)
             pos += dist + separation
         }

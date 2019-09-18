@@ -3,7 +3,13 @@ package com.soywiz.klock
 /**
  * Represents an open or close range between two dates.
  */
-data class DateTimeRange(val from: DateTime, val to: DateTime, val inclusive: Boolean) {
+data class DateTimeRange(val from: DateTime, val to: DateTime) {
+    @Suppress("UNUSED_PARAMETER")
+    @Deprecated("[inclusive] is ignored")
+    constructor(from: DateTime, to: DateTime, inclusive: Boolean) : this(from, to)
+
+    @Deprecated("[inclusive is not used anymore. All the ranges are right-opened.")
+    val inclusive get() = false
     val min get() = from
     val max get() = to
     /**
@@ -56,39 +62,32 @@ data class DateTimeRange(val from: DateTime, val to: DateTime, val inclusive: Bo
         val from = from.unixMillisDouble
         val to = to.unixMillisDouble
         if (unix < from) return false
-        return when {
-            inclusive -> unix <= to
-            else -> unix < to
-        }
+        return unix < to
     }
 
     // @TODO: Handle inclusive <= or <
-    private inline fun <T> _intersectionWith(that: DateTimeRange, handler: (from: DateTime, to: DateTime, matches: Boolean, inclusive: Boolean) -> T): T {
+    private inline fun <T> _intersectionWith(that: DateTimeRange, handler: (from: DateTime, to: DateTime, matches: Boolean) -> T): T {
         val from = max(this.from, that.from)
         val to = min(this.to, that.to)
-        return handler(from, to, from <= to, when {
-            this.to > that.to -> this.inclusive
-            this.to == that.to -> this.inclusive || that.inclusive
-            else -> that.inclusive
-        })
+        return handler(from, to, from <= to)
     }
 
     fun intersectionWith(that: DateTimeRange): DateTimeRange? {
-        return _intersectionWith(that) { from, to, matches, inclusive ->
+        return _intersectionWith(that) { from, to, matches ->
             when {
-                matches -> DateTimeRange(from, to, inclusive)
+                matches -> DateTimeRange(from, to)
                 else -> null
             }
         }
     }
 
-    fun intersectsWith(that: DateTimeRange): Boolean = _intersectionWith(that) { _, _, matches, _ -> matches }
+    fun intersectsWith(that: DateTimeRange): Boolean = _intersectionWith(that) { _, _, matches -> matches }
 
     fun mergeOnIntersectionOrNull(that: DateTimeRange): DateTimeRange? {
         if (!intersectsWith(that)) return null
         val from = min(this.from, that.from)
         val to = max(this.to, that.to)
-        return DateTimeRange(from, to, if (this.to > that.to) this.inclusive else that.inclusive)
+        return DateTimeRange(from, to)
     }
 
     fun without(that: DateTimeRange): List<DateTimeRange> = when {
@@ -102,8 +101,8 @@ data class DateTimeRange(val from: DateTime, val to: DateTime, val inclusive: Bo
             val p1 = that.from
             val p2 = that.to
             val p3 = this.to
-            val c1 = if (p0 < p1) DateTimeRange(p0, p1, inclusive = false) else null
-            val c2 = if (p2 < p3) DateTimeRange(p2, p3, inclusive = false) else null
+            val c1 = if (p0 < p1) DateTimeRange(p0, p1) else null
+            val c2 = if (p2 < p3) DateTimeRange(p2, p3) else null
             listOfNotNull(c1, c2)
         }
     }
@@ -114,11 +113,12 @@ data class DateTimeRange(val from: DateTime, val to: DateTime, val inclusive: Bo
 }
 
 /**
- * Generates a closed range between two [DateTime]
+ * Alias for [this] until [other]
  */
-operator fun DateTime.rangeTo(other: DateTime) = DateTimeRange(this, other, inclusive = true)
+@Deprecated("Use until instead", ReplaceWith("this until other"))
+operator fun DateTime.rangeTo(other: DateTime) = this until other
 
 /**
- * Generates a open range from the right between two [DateTime].
+ * Generates a range between two [DateTime] non-inclusive (right opened)
  */
-infix fun DateTime.until(other: DateTime) = DateTimeRange(this, other, inclusive = false)
+infix fun DateTime.until(other: DateTime) = DateTimeRange(this, other)
