@@ -292,6 +292,11 @@ inline class DateTime(
     /** Returns this date with a local offset. Components might change because of the [offset]. */
     fun toOffset(offset: TimezoneOffset) = DateTimeTz.utc(this, offset)
 
+	/** Returns a [DateTime] of [this] day with the hour at 00:00:00 */
+	val dateDayStart get() = DateTime(year, month, dayOfMonth, 0, 0, 0, 0)
+	/** Returns a [DateTime] of [this] day with the hour at 23:59:59.999 */
+	val dateDayEnd get() = DateTime(year, month, dayOfMonth, 23, 59, 59, 999)
+
     operator fun plus(delta: MonthSpan): DateTime = this.add(delta.totalMonths, 0.0)
     operator fun plus(delta: DateTimeSpan): DateTime = this.add(delta.totalMonths, delta.totalMilliseconds)
     operator fun plus(delta: TimeSpan): DateTime = add(0, delta.milliseconds)

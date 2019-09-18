@@ -327,4 +327,15 @@ class DateTimeTest {
         assertEquals(a, a.clamp(a, c))
         assertEquals(c, c.clamp(a, c))
     }
+
+	@Test
+	fun testStartEndDay() {
+		val date = DateTime(1568803601377)
+		val start = date.dateDayStart
+		val end = date.dateDayEnd
+		assertEquals("2019-09-18T00:00:00", ISO8601.DATETIME_COMPLETE.extended.format(start))
+		assertEquals("2019-09-18T23:59:59", ISO8601.DATETIME_COMPLETE.extended.format(end))
+		assertEquals(1568764800000L, start.unixMillisLong)
+		assertEquals(1568851199999L, end.unixMillisLong)
+	}
 }
