@@ -2,7 +2,7 @@ package com.soywiz.klock
 
 import kotlin.math.abs
 
-inline class Date(val encoded: Int) {
+inline class Date(val encoded: Int) : Comparable<Date> {
 	companion object {
 		operator fun invoke(year: Int, month: Int, day: Int) = Date((year shl 16) or (month shl 8) or (day shl 0))
 		operator fun invoke(year: Int, month: Month, day: Int) = Date(year, month.index1, day)
@@ -18,6 +18,7 @@ inline class Date(val encoded: Int) {
 	val dateTimeDayStart get() = DateTime(year, month, day)
 
 	override fun toString(): String = "${if (year < 0) "-" else ""}${abs(year).toString()}-${abs(month1).toString().padStart(2, '0')}-${abs(day).toString().padStart(2, '0')}"
+	override fun compareTo(other: Date): Int = this.encoded.compareTo(other.encoded)
 }
 
 operator fun Date.plus(time: TimeSpan) = (this.dateTimeDayStart + time).date
