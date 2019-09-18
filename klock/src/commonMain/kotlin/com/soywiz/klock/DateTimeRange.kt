@@ -3,7 +3,7 @@ package com.soywiz.klock
 /**
  * Represents an open or close range between two dates.
  */
-data class DateTimeRange(val from: DateTime, val to: DateTime) {
+data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<DateTime> {
     @Suppress("UNUSED_PARAMETER")
     @Deprecated("[inclusive] is ignored")
     constructor(from: DateTime, to: DateTime, inclusive: Boolean) : this(from, to)
@@ -110,6 +110,12 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) {
     fun toString(format: DateFormat): String = "${from.toString(format)}..${to.toString(format)}"
     fun toStringLongs(): String = "${from.unixMillisLong}..${to.unixMillisLong}"
     override fun toString(): String = toString(DateFormat.FORMAT1)
+
+    override fun compareTo(other: DateTime): Int {
+        if (this.max <= other) return -1
+        if (this.min > other) return +1
+        return 0
+    }
 }
 
 /**

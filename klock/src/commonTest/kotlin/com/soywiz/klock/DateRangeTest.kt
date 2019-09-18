@@ -50,4 +50,19 @@ class DateRangeTest {
         assertEquals("-1Y -29D", (christmas until date3).span.toString(includeWeeks = false))
         assertEquals("-2017Y -29D", (christmas until date4).span.toString(includeWeeks = false))
     }
+
+    @Test
+    fun testCompareDate() {
+        val range = range(0, 100)
+        assertEquals(-1, range.compareTo(date(110)))
+        assertEquals(-1, range.compareTo(date(100)))
+        assertEquals(0, range.compareTo(date(99)))
+        assertEquals(0, range.compareTo(date(50)))
+        assertEquals(0, range.compareTo(date(0)))
+        assertEquals(+1, range.compareTo(date(-1)))
+    }
+
+    val date = DateTime.EPOCH
+    fun date(time: Int) = (date + time.milliseconds)
+    fun range(from: Int, to: Int) = date(from) until date(to)
 }
