@@ -37,5 +37,7 @@ class DateTest {
 			assertEquals(false, range.contains(Date(2019, 9, 17)))
 			assertEquals(false, range.contains(Date(2019, 10, 3)))
 		}
+
+		assertEquals("Wed, 18 Sep 2019 00:00:00 UTC", (Date(2019, Month.September, 17) + Time(24)).toString())
 	}
 }

@@ -29,4 +29,4 @@ inline class Date(val encoded: Int) : Comparable<Date> {
 operator fun Date.plus(time: TimeSpan) = (this.dateTimeDayStart + time).date
 operator fun Date.plus(time: MonthSpan) = (this.dateTimeDayStart + time).date
 operator fun Date.plus(time: DateTimeSpan) = (this.dateTimeDayStart + time).date
-operator fun Date.plus(time: Time) = DateTime(year, month1, day, time.hour, time.minute, time.second, time.millisecond)
+operator fun Date.plus(time: Time) = DateTime.createAdjusted(year, month1, day, time.hour, time.minute, time.second, time.millisecond)
