@@ -12,5 +12,8 @@ class DateTest {
 		assertEquals("13:09:37.150", time.toString())
 		assertEquals("Wed, 18 Sep 2019 00:00:00 UTC", (date.dateTimeDayStart).toString())
 		assertEquals("Wed, 18 Sep 2019 13:09:37 UTC", (date + time).toString())
+		assertEquals("2019-10-01", (Date(2019, Month.September, 30) + 1.days).toString())
+		assertEquals("2019-10-30", (Date(2019, Month.September, 30) + 1.months).toString())
+
 	}
 }

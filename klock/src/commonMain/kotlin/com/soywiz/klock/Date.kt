@@ -20,4 +20,7 @@ inline class Date(val encoded: Int) {
 	override fun toString(): String = "${if (year < 0) "-" else ""}${abs(year).toString()}-${abs(month1).toString().padStart(2, '0')}-${abs(day).toString().padStart(2, '0')}"
 }
 
+operator fun Date.plus(time: TimeSpan) = (this.dateTimeDayStart + time).date
+operator fun Date.plus(time: MonthSpan) = (this.dateTimeDayStart + time).date
+operator fun Date.plus(time: DateTimeSpan) = (this.dateTimeDayStart + time).date
 operator fun Date.plus(time: Time) = DateTime(year, month1, day, time.hour, time.minute, time.second, time.millisecond)
