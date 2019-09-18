@@ -2,6 +2,10 @@ package com.soywiz.klock
 
 import com.soywiz.klock.internal.fastForEach
 
+// Properties:
+//   - ranges are sorted
+//   - ranges do not overlap/intersect between each other (they are merged and normalized)
+// These properties allows to do some tricks and optimizations like binary search and a lot of O(n) operations.
 data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: List<DateTimeRange>) {
     val bounds by lazy { DateTimeRange(
         ranges.firstOrNull()?.from ?: DateTime.EPOCH,
