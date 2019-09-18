@@ -268,3 +268,5 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
     fun toStringLongs(): String = "${ranges.map { it.toStringLongs() }}"
     override fun toString(): String = "$ranges"
 }
+
+fun Iterable<DateTimeRange>.toRangeSet() = DateTimeRangeSet(this.toList())
