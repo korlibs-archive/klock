@@ -7,7 +7,17 @@ class DateTest {
 	@Test
 	fun test() {
 		val date = Date(2019, Month.September, 18)
+		val date2 = Date(2019, Month.September, 19)
 		val time = Time(13, 9, 37, 150)
+
+		assertEquals(DayOfWeek.Wednesday, date.dayOfWeek)
+		assertEquals(DayOfWeek.Thursday, date2.dayOfWeek)
+		assertEquals(4, date2.dayOfWeekInt)
+		assertEquals(1, Date(2019, Month.January, 1).dayOfYear)
+		assertEquals(262, date2.dayOfYear)
+		assertEquals(2019, date2.year)
+		assertEquals(Year(2019), date2.yearYear)
+
 		assertEquals("2019-09-18", date.toString())
 		assertEquals("13:09:37.150", time.toString())
 		assertEquals("Wed, 18 Sep 2019 00:00:00 UTC", (date.dateTimeDayStart).toString())

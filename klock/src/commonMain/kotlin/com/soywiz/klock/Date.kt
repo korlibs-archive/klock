@@ -14,8 +14,13 @@ inline class Date(val encoded: Int) : Comparable<Date> {
 	val month1: Int get() = (encoded ushr 8) and 0xFF
 	val month: Month get() = Month[month1]
 	val day: Int get() = (encoded ushr 0) and 0xFF
+	val yearYear: Year get() = Year(year)
 
 	val dateTimeDayStart get() = DateTime(year, month, day)
+
+	val dayOfYear get() = dateTimeDayStart.dayOfYear
+	val dayOfWeek get() = dateTimeDayStart.dayOfWeek
+	val dayOfWeekInt get() = dateTimeDayStart.dayOfWeekInt
 
 	override fun toString(): String = "${if (year < 0) "-" else ""}${abs(year).toString()}-${abs(month1).toString().padStart(2, '0')}-${abs(day).toString().padStart(2, '0')}"
 	override fun compareTo(other: Date): Int = this.encoded.compareTo(other.encoded)
