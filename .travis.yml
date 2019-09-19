@@ -29,10 +29,6 @@ jobs:
     language: shell # java is not supported but jdk is installed
     script:
       - powershell -Command "cmd /c travis_win.bat"
-      - |
-        if [ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ]; then
-          powershell -Command "cmd /c travis_win_bintray.bat"
-        fi
   - os: osx
     stage: test_and_upload
     env:
@@ -47,11 +43,7 @@ jobs:
     before_script:
       - echo before_script
     script:
-      - ./gradlew -s -i check
-      - |
-        if [ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ]; then
-          ./gradlew -s -i localPublishToBintrayIfRequired
-        fi
+      - ./gradlew check localPublishToBintrayIfRequiredOnTravisMasterNoPR
   - os: linux
     stage: publish
     language: android
@@ -70,7 +62,4 @@ jobs:
     before_script:
       - echo before_script
     script:
-      - |
-        if [ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ]; then
-            ./gradlew -s -i actuallyPublishBintray
-        fi
+      - ./gradlew actuallyPublishBintrayIfOnTravisMasterNoPR
