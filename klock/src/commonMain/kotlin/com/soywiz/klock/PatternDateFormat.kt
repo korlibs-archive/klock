@@ -20,83 +20,79 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
     fun withOptional() = this.copy(options = options.copy(optionalSupport = true))
     fun withNonOptional() = this.copy(options = options.copy(optionalSupport = false))
 
-    private val openOffsets by lazy { LinkedHashMap<Int, Int>() }
-    private val closeOffsets by lazy { LinkedHashMap<Int, Int>() }
+    private val openOffsets = LinkedHashMap<Int, Int>()
+    private val closeOffsets = LinkedHashMap<Int, Int>()
 
-	internal val chunks by lazy {
-		arrayListOf<String>().also { chunks ->
-			val s = MicroStrReader(format)
-			while (s.hasMore) {
-				if (s.peekChar() == '\'') {
-					val escapedChunk = s.readChunk {
-						s.tryRead('\'')
-						while (s.hasMore && s.readChar() != '\'') Unit
-					}
-					chunks.add(escapedChunk)
-					continue
-				}
-                if (options.optionalSupport) {
-                    val offset = chunks.size
-                    if (s.tryRead('[')) {
-                        openOffsets.increment(offset)
-                        continue
-                    }
-                    if (s.tryRead(']')) {
-                        closeOffsets.increment(offset - 1)
-                        continue
-                    }
+	internal val chunks = arrayListOf<String>().also { chunks ->
+        val s = MicroStrReader(format)
+        while (s.hasMore) {
+            if (s.peekChar() == '\'') {
+                val escapedChunk = s.readChunk {
+                    s.tryRead('\'')
+                    while (s.hasMore && s.readChar() != '\'') Unit
                 }
-				val chunk = s.readChunk {
-					val c = s.readChar()
-					while (s.hasMore && s.tryRead(c)) Unit
-				}
-				chunks.add(chunk)
-			}
-		}.toList()
-	}
+                chunks.add(escapedChunk)
+                continue
+            }
+            if (options.optionalSupport) {
+                val offset = chunks.size
+                if (s.tryRead('[')) {
+                    openOffsets.increment(offset)
+                    continue
+                }
+                if (s.tryRead(']')) {
+                    closeOffsets.increment(offset - 1)
+                    continue
+                }
+            }
+            val chunk = s.readChunk {
+                val c = s.readChar()
+                while (s.hasMore && s.tryRead(c)) Unit
+            }
+            chunks.add(chunk)
+        }
+    }.toList()
 
-	internal val regexChunks by lazy {
-		chunks.map {
-			when (it) {
-				"E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> """(\w+)"""
-				"z", "zzz" -> """([\w\s\-\+\:]+)"""
-				"d" -> """(\d{1,2})"""
-				"dd" -> """(\d{2})"""
-				"M" -> """(\d{1,5})"""
-				"MM" -> """(\d{2})"""
-				"MMM", "MMMM", "MMMMM" -> """(\w+)"""
-				"y" -> """(\d{1,5})"""
-				"yy" -> """(\d{2})"""
-				"yyy" -> """(\d{3})"""
-				"yyyy" -> """(\d{4})"""
-				"YYYY" -> """(\d{4})"""
-				"H" -> """(\d{1,2})"""
-				"HH" -> """(\d{2})"""
-				"h" -> """(\d{1,2})"""
-				"hh" -> """(\d{2})"""
-				"m" -> """(\d{1,2})"""
-				"mm" -> """(\d{2})"""
-				"s" -> """(\d{1,2})"""
-				"ss" -> """(\d{2})"""
-				"S" -> """(\d{1,6})"""
-				"SS" ->  """(\d{2})"""
-				"SSS" -> """(\d{3})"""
-				"SSSS" -> """(\d{4})"""
-				"SSSSS" -> """(\d{5})"""
-				"SSSSSS" -> """(\d{6})"""
-				"X", "XX", "XXX", "x", "xx", "xxx" -> """([\w:\+\-]+)"""
-				"a" -> """(\w+)"""
-				" " -> """(\s+)"""
-				else -> when {
-					it.startsWith('\'') -> "(" + Regex.escapeReplacement(it.substr(1, it.length - 2)) + ")"
-					else -> "(" + Regex.escapeReplacement(it) + ")"
-				}
-			}
-		}
-	}
+	internal val regexChunks = chunks.map {
+        when (it) {
+            "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> """(\w+)"""
+            "z", "zzz" -> """([\w\s\-\+\:]+)"""
+            "d" -> """(\d{1,2})"""
+            "dd" -> """(\d{2})"""
+            "M" -> """(\d{1,5})"""
+            "MM" -> """(\d{2})"""
+            "MMM", "MMMM", "MMMMM" -> """(\w+)"""
+            "y" -> """(\d{1,5})"""
+            "yy" -> """(\d{2})"""
+            "yyy" -> """(\d{3})"""
+            "yyyy" -> """(\d{4})"""
+            "YYYY" -> """(\d{4})"""
+            "H" -> """(\d{1,2})"""
+            "HH" -> """(\d{2})"""
+            "h" -> """(\d{1,2})"""
+            "hh" -> """(\d{2})"""
+            "m" -> """(\d{1,2})"""
+            "mm" -> """(\d{2})"""
+            "s" -> """(\d{1,2})"""
+            "ss" -> """(\d{2})"""
+            "S" -> """(\d{1,6})"""
+            "SS" ->  """(\d{2})"""
+            "SSS" -> """(\d{3})"""
+            "SSSS" -> """(\d{4})"""
+            "SSSSS" -> """(\d{5})"""
+            "SSSSSS" -> """(\d{6})"""
+            "X", "XX", "XXX", "x", "xx", "xxx" -> """([\w:\+\-]+)"""
+            "a" -> """(\w+)"""
+            " " -> """(\s+)"""
+            else -> when {
+                it.startsWith('\'') -> "(" + Regex.escapeReplacement(it.substr(1, it.length - 2)) + ")"
+                else -> "(" + Regex.escapeReplacement(it) + ")"
+            }
+        }
+    }
 
 	//val escapedFormat = Regex.escape(format)
-	internal val rx2: Regex by lazy { Regex("^" + regexChunks.mapIndexed { index, it ->
+	internal val rx2: Regex = Regex("^" + regexChunks.mapIndexed { index, it ->
         if (options.optionalSupport) {
             val opens = openOffsets.getOrElse(index) { 0 }
             val closes = closeOffsets.getOrElse(index) { 0 }
@@ -108,7 +104,7 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
         } else {
             it
         }
-    }.joinToString("") + "$") }
+    }.joinToString("") + "$")
 
 
 	// EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
@@ -180,7 +176,7 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
     }
 
 	private fun parseError(message: String, str: String): DateTimeTz? {
-		println("Parser error: $message, $str, $rx2")
+		//println("Parser error: $message, $str, $rx2")
 		return null
 	}
 

@@ -1,15 +1,16 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.klockAtomicLazy
+
 /** Allows to [format] and [parse], [DateTime] and [DateTimeTz] instances */
 interface DateFormat {
     fun format(dd: DateTimeTz): String
     fun tryParse(str: String, doThrow: Boolean = false): DateTimeTz?
 
     companion object {
-        val DEFAULT_FORMAT by lazy { DateFormat("EEE, dd MMM yyyy HH:mm:ss z") }
-        val FORMAT1 by lazy { DateFormat("yyyy-MM-dd'T'HH:mm:ssXXX") }
-
-        val FORMAT_DATE by lazy { DateFormat("yyyy-MM-dd") }
+        val DEFAULT_FORMAT = DateFormat("EEE, dd MMM yyyy HH:mm:ss z")
+        val FORMAT1 = DateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        val FORMAT_DATE = DateFormat("yyyy-MM-dd")
 
         val FORMATS = listOf(DEFAULT_FORMAT, FORMAT1)
 

@@ -125,5 +125,5 @@ data class DateTimeSpan(
         }
     }
 
-    private val computed by lazy { ComputedTime(timeSpan) }
+    private val computed by klockLazyOrGet { ComputedTime(timeSpan) }
 }

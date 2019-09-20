@@ -1,5 +1,7 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.*
+import com.soywiz.klock.internal.klockLazyOrGet
 import com.soywiz.klock.internal.substr
 import kotlin.native.concurrent.ThreadLocal
 
@@ -11,9 +13,31 @@ abstract class KlockLocale {
 	abstract val daysOfWeek: List<String>
 	abstract val months: List<String>
 	abstract val firstDayOfWeek: DayOfWeek
-	open val monthsShort by lazy { months.map { it.substr(0, 3) } }
+    // @TODO: This allocates for each get, but Kotlin/Native by lazy or atomic refs are causing issues with this. So let's do this temporarily until a solution is found
+    open val monthsShort: List<String> by klockLazyOrGet { months.map { it.substr(0, 3) } }
+    open val daysOfWeekShort: List<String> by klockLazyOrGet { daysOfWeek.map { it.substr(0, 3) } }
 
-	open val daysOfWeekShort: List<String> by lazy { daysOfWeek.map { it.substr(0, 3) } }
+    //open val monthsShort: List<String> by klockAtomicLazy { months.map { it.substr(0, 3) } }
+    //open val daysOfWeekShort: List<String> by klockAtomicLazy { daysOfWeek.map { it.substr(0, 3) } }
+    /*
+    private val _lock = KlockLock()
+    private val _monthsShort = KlockAtomicRef<List<String>?>(null)
+    private val _daysOfWeekShort = KlockAtomicRef<List<String>?>(null)
+	//open val monthsShort by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { months.map { it.substr(0, 3) } }
+    open val monthsShort: List<String> get() = _lock {
+        if (_monthsShort.value == null) {
+            _monthsShort.value = months.map { it.substr(0, 3) }
+        }
+        _monthsShort.value!!
+    }
+	open val daysOfWeekShort: List<String> get() = _lock {
+        if (_daysOfWeekShort.value == null) {
+            _daysOfWeekShort.value = daysOfWeek.map { it.substr(0, 3) }
+        }
+        _daysOfWeekShort.value!!
+    }
+    */
+
 	@Deprecated("Use months3", ReplaceWith("monthsShort"))
 	val months3 get() = monthsShort
 	open val h12Marker = listOf("AM", "OM")
