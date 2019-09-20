@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.7.3](https://github.com/korlibs/klock/compare/1.7.2...1.7.3)
+
+* Fixed InvalidMutabilityException issues [#64](https://github.com/korlibs/klock/issues/64)
+
 ## [1.7.2](https://github.com/korlibs/klock/compare/1.7.1...1.7.2)
 
 * Support optional format parts [#27](https://github.com/korlibs/klock/issues/27)
