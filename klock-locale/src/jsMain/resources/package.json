@@ -1,0 +1,27 @@
+{
+	"name": "@korlibs/klock-locale",
+	"version": "%%%VERSION!!!",
+	"main": "klock-root-klock.js",
+	"description": "Standard Library for Kotlin Applications",
+	"license": "Apache-2.0",
+	"dependencies": {
+		"@korlibs/klock": "%%%VERSION!!!",
+		"kotlin": "%%%KOTLIN_VERSION!!!"
+	},
+	"bundleDependencies": [],
+	"author": {
+		"name": "korlibs"
+	},
+	"deprecated": false,
+	"homepage": "https://korlibs.soywiz.com/klock",
+	"keywords": [
+		"Date",
+		"Time",
+		"Library",
+		"Kotlin"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://git@github.com/korlibs/klock.git"
+	}
+}
