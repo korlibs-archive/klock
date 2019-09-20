@@ -24,6 +24,7 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
 			v.startsWith("'") -> "(" + Regex.escapeReplacement(v.trim('\'')) + ")"
 			v.startsWith("X", ignoreCase = true) -> """([Z]|[+-]\d\d|[+-]\d\d\d\d|[+-]\d\d:\d\d)?"""
 			v.startsWith("Z", ignoreCase = true) -> """([\w\s\-\+\:]+)"""
+			v.startsWith("S") -> """(\d+)"""
 			else -> """([\w\+\-]*[^Z+-\.])"""
 		}
     } + "$")
@@ -69,7 +70,7 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
                         val fractionalPart = (milli.toDouble() * 10.0.pow(-1 * (base10length - name.length))).toInt()
                         fractionalPart
                     } else {
-                        var fractionalPart = "${milli.padded(3)}000"
+                        val fractionalPart = "${milli.padded(3)}000"
                         fractionalPart.substr(0, name.length)
                     }
                 }

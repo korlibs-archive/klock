@@ -344,4 +344,9 @@ class DateTimeTest {
 		"Tue, 19 Sep 2017 00:58:45 GMT-0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
 		"Tue, 19 Sep 2017 00:58:45 GMT+0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
 	}
+
+	@Test
+	fun testBug37() {
+		DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").parse("2019-04-15T17:28:46.862+0900")
+	}
 }
