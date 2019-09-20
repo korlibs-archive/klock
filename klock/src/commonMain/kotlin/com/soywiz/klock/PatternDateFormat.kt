@@ -4,13 +4,24 @@ import com.soywiz.klock.internal.*
 import kotlin.jvm.JvmOverloads
 import kotlin.math.*
 
-class PatternDateFormat @JvmOverloads constructor(val format: String, val locale: KlockLocale?, val tzNames: TimezoneNames = TimezoneNames.DEFAULT) : DateFormat {
+data class PatternDateFormat @JvmOverloads constructor(val format: String, val locale: KlockLocale? = null, val tzNames: TimezoneNames = TimezoneNames.DEFAULT, val options: Options = Options.DEFAULT) : DateFormat {
     val realLocale get() = locale ?: KlockLocale.default
 
-    constructor(format: String) : this(format, null)
+    data class Options(val optionalSupport: Boolean = false) {
+        companion object {
+            val DEFAULT = Options(optionalSupport = false)
+            val WITH_OPTIONAL = Options(optionalSupport = true)
+        }
+    }
 
-    fun withLocale(locale: KlockLocale?) = PatternDateFormat(format, locale)
-	fun withTimezoneNames(tzNames: TimezoneNames) = PatternDateFormat(format, locale, this.tzNames + tzNames)
+    fun withLocale(locale: KlockLocale?) = this.copy(locale = locale)
+	fun withTimezoneNames(tzNames: TimezoneNames) = this.copy(tzNames = this.tzNames + tzNames)
+    fun withOptions(options: Options) = this.copy(options = options)
+    fun withOptional() = this.copy(options = options.copy(optionalSupport = true))
+    fun withNonOptional() = this.copy(options = options.copy(optionalSupport = false))
+
+    private val openOffsets = LinkedHashMap<Int, Int>()
+    private val closeOffsets = LinkedHashMap<Int, Int>()
 
 	internal val chunks by lazy {
 		arrayListOf<String>().also { chunks ->
@@ -24,6 +35,17 @@ class PatternDateFormat @JvmOverloads constructor(val format: String, val locale
 					chunks.add(escapedChunk)
 					continue
 				}
+                if (options.optionalSupport) {
+                    val offset = chunks.size
+                    if (s.tryRead('[')) {
+                        openOffsets.increment(offset)
+                        continue
+                    }
+                    if (s.tryRead(']')) {
+                        closeOffsets.increment(offset - 1)
+                        continue
+                    }
+                }
 				val chunk = s.readChunk {
 					val c = s.readChar()
 					while (s.hasMore && s.tryRead(c)) Unit
@@ -74,7 +96,19 @@ class PatternDateFormat @JvmOverloads constructor(val format: String, val locale
 	}
 
 	//val escapedFormat = Regex.escape(format)
-	internal val rx2: Regex by lazy { Regex("^" + regexChunks.joinToString("") + "$") }
+	internal val rx2: Regex by lazy { Regex("^" + regexChunks.mapIndexed { index, it ->
+        if (options.optionalSupport) {
+            val opens = openOffsets.getOrElse(index) { 0 }
+            val closes = closeOffsets.getOrElse(index) { 0 }
+            buildString {
+                repeat(opens) { append("(?:") }
+                append(it)
+                repeat(closes) { append(")?") }
+            }
+        } else {
+            it
+        }
+    }.joinToString("") + "$") }
 
 
 	// EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
@@ -163,6 +197,8 @@ class PatternDateFormat @JvmOverloads constructor(val format: String, val locale
         var is12HourFormat = false
         val result = rx2.find(str) ?: return parseError("Not match", str)
         for ((name, value) in chunks.zip(result.groupValues.drop(1))) {
+            if (value.isEmpty()) continue
+
             when (name) {
                 "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> Unit // day of week (Sun | Sunday)
                 "z", "zzz" -> { // timezone (GMT)

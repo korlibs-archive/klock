@@ -47,4 +47,12 @@ class DateTimeRangeTest {
 		val range = DateTimeRange(Date(2019, Month.September, 18), Time(8), Time(13))
 		assertEquals("2019-09-18T08:00:00..2019-09-18T13:00:00", range.toString(ISO8601.DATETIME_COMPLETE.extended))
 	}
+
+    @Test
+    fun testOptionalPatterns() {
+        val format = PatternDateFormat("YYYY[-MM[-dd]]").withOptional()
+        assertEquals("2019-01-01", format.parse("2019").toString(format))
+        assertEquals("2019-09-01", format.parse("2019-09").toString(format))
+        assertEquals("2019-09-03", format.parse("2019-09-03").toString(format))
+    }
 }
