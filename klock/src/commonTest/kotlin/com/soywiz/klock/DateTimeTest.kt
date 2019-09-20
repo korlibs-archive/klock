@@ -338,4 +338,10 @@ class DateTimeTest {
 		assertEquals(1568764800000L, start.unixMillisLong)
 		assertEquals(1568851199999L, end.unixMillisLong)
 	}
+
+	@Test
+	fun testTimeZones() {
+		"Tue, 19 Sep 2017 00:58:45 GMT-0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
+		"Tue, 19 Sep 2017 00:58:45 GMT+0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
+	}
 }

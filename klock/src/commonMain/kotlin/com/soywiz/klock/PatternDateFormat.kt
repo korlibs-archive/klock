@@ -20,13 +20,12 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
     private val rx2: Regex = Regex("^" + escapedFormat.replace(rx) { result ->
         val v = result.groupValues[0]
         parts += v
-        if (v.startsWith("'")) {
-            "(" + Regex.escapeReplacement(v.trim('\'')) + ")"
-        } else if (v.startsWith("X", ignoreCase = true)) {
-            """([Z]|[+-]\d\d|[+-]\d\d\d\d|[+-]\d\d:\d\d)?"""
-        } else {
-            """([\w\+\-]*[^Z+-\.])"""
-        }
+		when {
+			v.startsWith("'") -> "(" + Regex.escapeReplacement(v.trim('\'')) + ")"
+			v.startsWith("X", ignoreCase = true) -> """([Z]|[+-]\d\d|[+-]\d\d\d\d|[+-]\d\d:\d\d)?"""
+			v.startsWith("Z", ignoreCase = true) -> """([\w\s\-\+\:]+)"""
+			else -> """([\w\+\-]*[^Z+-\.])"""
+		}
     } + "$")
 
     private val parts2 = escapedFormat.splitKeep(rx)
@@ -106,14 +105,33 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
         var day = 1
         var month = 1
         var fullYear = 1970
-        var offset: Int? = null
+        var offset: TimeSpan? = null
         var isPm = false
         var is12HourFormat = false
         val result = rx2.find(str) ?: return null
         for ((name, value) in parts.zip(result.groupValues.drop(1))) {
             when (name) {
                 "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> Unit // day of week (Sun | Sunday)
-                "z", "zzz" -> Unit // timezone (GMT)
+                "z", "zzz" -> when (value) { // timezone (GMT)
+					// @TODO: Should we include the most popular timezones increasing the artifact size? Maybe include a plugin mechanism and a registration in klock-locale?
+					// @TODO: https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations
+					"PDT" -> (-7).hours
+					"PST" -> (-8).hours
+					"GMT", "UTC" -> (0).hours
+					else -> {
+						var sign = +1
+						val reader = MicroStrReader(value)
+						reader.tryRead("GMT")
+						reader.tryRead("UTC")
+						if (reader.tryRead("+")) sign = +1
+						if (reader.tryRead("-")) sign = -1
+						val part = reader.readRemaining().replace(":", "")
+						val hours = part.substr(0, 2).padStart(2, '0').toIntOrNull() ?: 0
+						val minutes = part.substr(2, 2).padStart(2, '0').toIntOrNull() ?: 0
+						val roffset = hours.hours + minutes.minutes
+						offset = if (sign > 0) +roffset else -roffset
+					}
+				}
                 "d", "dd" -> day = value.toInt()
                 "M", "MM" -> month = value.toInt()
                 "MMM" -> month = realLocale.monthsShort.indexOf(value.toLowerCase()) + 1
@@ -133,14 +151,14 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
                     }
                 }
                 "X", "XX", "XXX", "x", "xx", "xxx" -> when {
-                    name.startsWith("X") && value.first() == 'Z' -> offset = 0
+                    name.startsWith("X") && value.first() == 'Z' -> offset = 0.hours
                     name.startsWith("x") && value.first() == 'Z' -> {
                         if (doThrow) throw RuntimeException("Zulu Time Zone is only accepted with X-XXX formats.") else return null
                     }
                     value.first() != 'Z' -> {
                         val hours = value.drop(1).substringBefore(':').toInt()
                         val minutes = value.substringAfter(':', "0").toInt()
-                        offset = (hours * 60) + minutes
+                        offset = hours.hours + minutes.minutes
                         if (value.first() == '-') {
                             offset = -offset
                         }
@@ -163,7 +181,7 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
             hour += 12
         }
         val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second, millisecond)
-        return dateTime.toOffsetUnadjusted((offset ?: 0).minutes)
+        return dateTime.toOffsetUnadjusted(offset ?: 0.hours)
     }
 
     override fun toString(): String = format

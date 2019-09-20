@@ -15,6 +15,7 @@ internal class MicroStrReader(val str: String, var offset: Int = 0) {
         return true
     }
     fun read(count: Int): String = this.str.substring(offset, (offset + count).coerceAtMost(length)).also { this.offset += it.length }
+	fun readRemaining(): String = read(available)
     fun readInt(count: Int): Int = read(count).toInt()
     fun tryReadInt(count: Int): Int? = read(count).toIntOrNull()
     fun tryReadDouble(count: Int): Double? = read(count).replace(',', '.').toDoubleOrNull()
