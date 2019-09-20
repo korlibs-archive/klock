@@ -3,8 +3,8 @@ package com.soywiz.klock
 import kotlin.test.*
 
 class DateTimeTest {
-    val HttpDate = DateFormat("EEE, dd MMM yyyy HH:mm:ss z")
-    val HttpDate2 = DateFormat("EEE, dd MMM yyyy H:mm:ss z")
+    val HttpDate by lazy { DateFormat("EEE, dd MMM yyyy HH:mm:ss z") }
+    val HttpDate2 by lazy { DateFormat("EEE, dd MMM yyyy H:mm:ss z") }
 
     @Test
     fun testFromString() {
@@ -159,6 +159,11 @@ class DateTimeTest {
             actual = DateFormat("EEE, dd MMM yyyy HH:mm:s z").parseLong("Sat, 08 Sep 2018 04:08:9 UTC")
         )
     }
+
+	@Test
+	fun testNewParserBug1() {
+		DateFormat("EEE, dd MMMM yyyy HH:mm:ss z").parseLong("Sat, 08 September 2018 04:08:09 UTC")
+	}
 
     @Test
     fun testParsingDateTimesInCustomStringFormatsWithAmPm() {
@@ -347,6 +352,14 @@ class DateTimeTest {
 
 	@Test
 	fun testBug37() {
-		DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").parse("2019-04-15T17:28:46.862+0900")
+		val format = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+		format.parse("2019-04-15T17:28:46.862+0900")
+	}
+
+	@Test
+	fun testBug33() {
+		assertEquals("20190412", DateTime(2019, 4, 12).local.format("yyyyMMdd"))
+		assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy年MM月dd日"))
+		assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy'年'MM'月'dd'日'"))
 	}
 }

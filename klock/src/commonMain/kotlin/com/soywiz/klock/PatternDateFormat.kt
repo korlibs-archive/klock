@@ -8,39 +8,82 @@ class PatternDateFormat @JvmOverloads constructor(val format: String, val locale
     val realLocale get() = locale ?: KlockLocale.default
 
     constructor(format: String) : this(format, null)
-    companion object {
-        private val rx by lazy { Regex("""('[\w]+'|[\w]+\B[^Xx]|[Xx]{1,3}|[\w]+)""") }
-    }
 
     fun withLocale(locale: KlockLocale?) = PatternDateFormat(format, locale)
 	fun withTimezoneNames(tzNames: TimezoneNames) = PatternDateFormat(format, locale, this.tzNames + tzNames)
 
-    private val parts = arrayListOf<String>()
-    //val escapedFormat = Regex.escape(format)
-    private val escapedFormat = Regex.escapeReplacement(format)
+	internal val chunks by lazy {
+		arrayListOf<String>().also { chunks ->
+			val s = MicroStrReader(format)
+			while (s.hasMore) {
+				if (s.peekChar() == '\'') {
+					val escapedChunk = s.readChunk {
+						s.tryRead('\'')
+						while (s.hasMore && s.readChar() != '\'') Unit
+					}
+					chunks.add(escapedChunk)
+					continue
+				}
+				val chunk = s.readChunk {
+					val c = s.readChar()
+					while (s.hasMore && s.tryRead(c)) Unit
+				}
+				chunks.add(chunk)
+			}
+		}.toList()
+	}
 
-    private val rx2: Regex = Regex("^" + escapedFormat.replace(rx) { result ->
-        val v = result.groupValues[0]
-        parts += v
-		when {
-			v.startsWith("'") -> "(" + Regex.escapeReplacement(v.trim('\'')) + ")"
-			v.startsWith("X", ignoreCase = true) -> """([Z]|[+-]\d\d|[+-]\d\d\d\d|[+-]\d\d:\d\d)?"""
-			v.startsWith("Z", ignoreCase = true) -> """([\w\s\-\+\:]+)"""
-			v.startsWith("S") -> """(\d+)"""
-			else -> """([\w\+\-]*[^Z+-\.])"""
+	internal val regexChunks by lazy {
+		chunks.map {
+			when (it) {
+				"E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> """(\w+)"""
+				"z", "zzz" -> """([\w\s\-\+\:]+)"""
+				"d" -> """(\d{1,2})"""
+				"dd" -> """(\d{2})"""
+				"M" -> """(\d{1,5})"""
+				"MM" -> """(\d{2})"""
+				"MMM", "MMMM", "MMMMM" -> """(\w+)"""
+				"y" -> """(\d{1,5})"""
+				"yy" -> """(\d{2})"""
+				"yyy" -> """(\d{3})"""
+				"yyyy" -> """(\d{4})"""
+				"YYYY" -> """(\d{4})"""
+				"H" -> """(\d{1,2})"""
+				"HH" -> """(\d{2})"""
+				"h" -> """(\d{1,2})"""
+				"hh" -> """(\d{2})"""
+				"m" -> """(\d{1,2})"""
+				"mm" -> """(\d{2})"""
+				"s" -> """(\d{1,2})"""
+				"ss" -> """(\d{2})"""
+				"S" -> """(\d{1,6})"""
+				"SS" ->  """(\d{2})"""
+				"SSS" -> """(\d{3})"""
+				"SSSS" -> """(\d{4})"""
+				"SSSSS" -> """(\d{5})"""
+				"SSSSSS" -> """(\d{6})"""
+				"X", "XX", "XXX", "x", "xx", "xxx" -> """([\w:\+\-]+)"""
+				"a" -> """(\w+)"""
+				" " -> """(\s+)"""
+				else -> when {
+					it.startsWith('\'') -> "(" + Regex.escapeReplacement(it.substr(1, it.length - 2)) + ")"
+					else -> "(" + Regex.escapeReplacement(it) + ")"
+				}
+			}
 		}
-    } + "$")
+	}
 
-    private val parts2 = escapedFormat.splitKeep(rx)
+	//val escapedFormat = Regex.escape(format)
+	internal val rx2: Regex by lazy { Regex("^" + regexChunks.joinToString("") + "$") }
 
-    // EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
+
+	// EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
     // YYYY-MM-dd HH:mm:ss
 
     override fun format(dd: DateTimeTz): String {
         val utc = dd.local
         var out = ""
-        for (name2 in parts2) {
-            val name = name2.trim('\'')
+        for (name in chunks) {
             out += when (name) {
                 "E", "EE", "EEE" -> realLocale.daysOfWeekShort[utc.dayOfWeek.index0].capitalize()
                 "EEEE", "EEEEE", "EEEEEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].capitalize()
@@ -93,12 +136,19 @@ class PatternDateFormat @JvmOverloads constructor(val format: String, val locale
                     }
                 }
                 "a" -> if (utc.hours < 12) "am" else "pm"
-                else -> name
+                else -> when {
+					name.startsWith('\'') -> name.substring(1, name.length - 1)
+					else -> name
+				}
             }
         }
         return out
     }
 
+	private fun parseError(message: String, str: String): DateTimeTz? {
+		println("Parser error: $message, $str, $rx2")
+		return null
+	}
 
     override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? {
         var millisecond = 0
@@ -111,8 +161,8 @@ class PatternDateFormat @JvmOverloads constructor(val format: String, val locale
         var offset: TimeSpan? = null
         var isPm = false
         var is12HourFormat = false
-        val result = rx2.find(str) ?: return null
-        for ((name, value) in parts.zip(result.groupValues.drop(1))) {
+        val result = rx2.find(str) ?: return parseError("Not match", str)
+        for ((name, value) in chunks.zip(result.groupValues.drop(1))) {
             when (name) {
                 "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> Unit // day of week (Sun | Sunday)
                 "z", "zzz" -> { // timezone (GMT)

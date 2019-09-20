@@ -24,11 +24,11 @@ open class KoreanKlockLocale : KlockLocale() {
 	override val daysOfWeekShort: List<String> = listOf("일", "월", "화", "수", "목", "금", "토")
 	override val monthsShort: List<String> get() = months
 
-	override val formatDateTimeMedium = format("'y'. 'M'. 'd'. a h:mm:ss")
-	override val formatDateTimeShort = format("'yy'. 'M'. 'd'. a h:mm")
+	override val formatDateTimeMedium = format("y. M. d. a h:mm:ss")
+	override val formatDateTimeShort = format("yy. M. d. a h:mm")
 
-	override val formatDateFull = format("'y'년 'M'월 'd'일 EEEE")
-	override val formatDateLong = format("'y'년 'M'월 'd'일")
+	override val formatDateFull = format("y년 M월 d일 EEEE")
+	override val formatDateLong = format("y년 M월 d일")
 	override val formatDateMedium = format("y. M. d.")
 	override val formatDateShort = format("yy. M. d.")
 

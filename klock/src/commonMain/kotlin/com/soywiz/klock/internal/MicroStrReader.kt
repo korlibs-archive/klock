@@ -6,12 +6,25 @@ internal class MicroStrReader(val str: String, var offset: Int = 0) {
     val length get() = str.length
     val available get() = str.length - offset
     val hasMore get() = offset < str.length
+	val eof get() = !hasMore
+	inline fun readChunk(callback: () -> Unit): String {
+		val start = this.offset
+		callback()
+		val end = this.offset
+		return this.str.substring(start, end)
+	}
+	fun peekCharOrZero(): Char = if (hasMore) str[offset] else '\u0000'
     fun peekChar(): Char = str[offset]
     fun readChar(): Char = str[offset++]
-    fun tryRead(str: String): Boolean {
-        if (str.length > available) return false
-        for (n in 0 until str.length) if (this.str[offset + n] != str[n]) return false
-        offset += str.length
+	fun tryRead(expected: Char): Boolean {
+		if (eof || peekChar() != expected) return false
+		readChar()
+		return true
+	}
+    fun tryRead(expected: String): Boolean {
+        if (expected.length > available) return false
+        for (n in expected.indices) if (this.str[offset + n] != expected[n]) return false
+        offset += expected.length
         return true
     }
     fun read(count: Int): String = this.str.substring(offset, (offset + count).coerceAtMost(length)).also { this.offset += it.length }

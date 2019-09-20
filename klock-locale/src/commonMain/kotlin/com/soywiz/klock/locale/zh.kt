@@ -26,12 +26,12 @@ open class ChineseKlockLocale : KlockLocale() {
 		"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"
 	)
 
-	override val formatDateTimeMedium = format("'y'年'M'月'd'日 ah:mm:ss")
+	override val formatDateTimeMedium = format("y年M月d日 ah:mm:ss")
 	override val formatDateTimeShort = format("y/M/d ah:mm")
 
-	override val formatDateFull = format("'y'年'M'月'd'日'EEEE'")
-	override val formatDateLong = format("'y'年'M'月'd'日")
-	override val formatDateMedium = format("'y'年'M'月'd'日")
+	override val formatDateFull = format("y年M月d日EEEE")
+	override val formatDateLong = format("y年M月d日")
+	override val formatDateMedium = format("y年M月d日")
 	override val formatDateShort = format("y/M/d")
 
 	override val formatTimeMedium = format("h:mm:ss")

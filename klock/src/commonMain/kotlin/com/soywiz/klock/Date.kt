@@ -22,6 +22,9 @@ inline class Date(val encoded: Int) : Comparable<Date> {
 	val dayOfWeek get() = dateTimeDayStart.dayOfWeek
 	val dayOfWeekInt get() = dateTimeDayStart.dayOfWeekInt
 
+	fun format(format: String) = dateTimeDayStart.format(format)
+	fun format(format: DateFormat) = dateTimeDayStart.format(format)
+
 	override fun toString(): String = "${if (year < 0) "-" else ""}${abs(year).toString()}-${abs(month1).toString().padStart(2, '0')}-${abs(day).toString().padStart(2, '0')}"
 	override fun compareTo(other: Date): Int = this.encoded.compareTo(other.encoded)
 }
