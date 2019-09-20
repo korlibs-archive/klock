@@ -20,8 +20,8 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
     fun withOptional() = this.copy(options = options.copy(optionalSupport = true))
     fun withNonOptional() = this.copy(options = options.copy(optionalSupport = false))
 
-    private val openOffsets = LinkedHashMap<Int, Int>()
-    private val closeOffsets = LinkedHashMap<Int, Int>()
+    private val openOffsets by lazy { LinkedHashMap<Int, Int>() }
+    private val closeOffsets by lazy { LinkedHashMap<Int, Int>() }
 
 	internal val chunks by lazy {
 		arrayListOf<String>().also { chunks ->
