@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.7.2](https://github.com/korlibs/klock/compare/1.7.1...1.7.2)
+
+* Support optional format parts [#27](https://github.com/korlibs/klock/issues/27)
+
 ## [1.7.1](https://github.com/korlibs/klock/compare/1.7.0...1.7.1)
 
 * Supports TimeZone parsing. Fixes [#14](https://github.com/korlibs/klock/pull/14)
