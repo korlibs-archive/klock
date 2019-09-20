@@ -1,9 +1,10 @@
 package com.soywiz.klock
 
 import com.soywiz.klock.internal.*
+import kotlin.jvm.JvmOverloads
 import kotlin.math.*
 
-class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateFormat {
+class PatternDateFormat @JvmOverloads constructor(val format: String, val locale: KlockLocale?, val tzNames: TimezoneNames = TimezoneNames.DEFAULT) : DateFormat {
     val realLocale get() = locale ?: KlockLocale.default
 
     constructor(format: String) : this(format, null)
@@ -12,6 +13,7 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
     }
 
     fun withLocale(locale: KlockLocale?) = PatternDateFormat(format, locale)
+	fun withTimezoneNames(tzNames: TimezoneNames) = PatternDateFormat(format, locale, this.tzNames + tzNames)
 
     private val parts = arrayListOf<String>()
     //val escapedFormat = Regex.escape(format)
@@ -113,13 +115,11 @@ class PatternDateFormat(val format: String, val locale: KlockLocale?) : DateForm
         for ((name, value) in parts.zip(result.groupValues.drop(1))) {
             when (name) {
                 "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> Unit // day of week (Sun | Sunday)
-                "z", "zzz" -> when (value) { // timezone (GMT)
-					// @TODO: Should we include the most popular timezones increasing the artifact size? Maybe include a plugin mechanism and a registration in klock-locale?
-					// @TODO: https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations
-					"PDT" -> (-7).hours
-					"PST" -> (-8).hours
-					"GMT", "UTC" -> (0).hours
-					else -> {
+                "z", "zzz" -> { // timezone (GMT)
+					val tzOffset = tzNames.namesToOffsets[value.toUpperCase()]
+					if (tzOffset != null) {
+						offset = tzOffset
+					} else {
 						var sign = +1
 						val reader = MicroStrReader(value)
 						reader.tryRead("GMT")

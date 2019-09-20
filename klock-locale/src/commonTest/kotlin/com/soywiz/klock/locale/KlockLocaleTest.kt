@@ -204,4 +204,14 @@ class KlockLocaleTest {
 		}
 		assertEquals("Wed, 13 Mar 2019 21:36:45 UTC", date.toString())
 	}
+
+	val HttpDate = DateFormat("EEE, dd MMM yyyy HH:mm:ss z")
+
+	@Test
+	fun testExtendedTimezoneNames() {
+		assertEquals(
+			"Tue, 19 Sep 2017 00:58:45 GMT+0300",
+			HttpDate.withTimezoneNames(ExtendedTimezoneNames).parse("Tue, 19 Sep 2017 00:58:45 MSK").toString()
+		)
+	}
 }
