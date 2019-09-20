@@ -27,4 +27,12 @@ class DateTimeSpanTest {
         assertEquals("1M 10W 10H", (1.months + 10.hours + 10.weeks).toString())
         assertEquals("1M 11W 1D 10H", (1.months + 10.hours + 10.weeks + 8.days).toString())
     }
+
+	@Test
+	fun testBug63() {
+		val startDate = DateTime.fromString("Mon, 01 Jan 2019 00:00:00 UTC").utc
+		val endDate = DateTime.fromString("Sat, 01 Sep 2019 00:00:00 UTC").utc
+		val span = (startDate until endDate).span
+		assertEquals("8M", span.toString())
+	}
 }

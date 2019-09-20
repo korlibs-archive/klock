@@ -53,7 +53,7 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
         // Compute months (at most an iteration of 12)
         while (true) {
             val t = pivot + 1.months
-            if (t < rto) {
+            if (t <= rto) {
                 months++
                 pivot = t
             } else {
@@ -61,7 +61,7 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
             }
         }
 
-        val out = DateTimeSpan(years.years + months.months, rto - pivot)
+		val out = DateTimeSpan(years.years + months.months, rto - pivot)
         if (reverse) -out else out
     }
 
