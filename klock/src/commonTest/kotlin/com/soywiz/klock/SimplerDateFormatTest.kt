@@ -22,6 +22,12 @@ class SimplerDateFormatTest {
         assertEquals(dateStr, format.format(format.parseDouble(dateStr)))
     }
 
+    @Test
+    fun testBug67() {
+        assertEquals(31, DateTime(2000, 12, 31).dayOfMonth)
+        //assertEquals(31, DateFormat("yyyy-MM-dd'T'HH:mm:ss").parse("2000-12-31T00:00:00").dayOfMonth)
+    }
+
     class StrictOffset {
         val format = DateFormat("yyyy-MM-dd'T'HH:mm:ssxxx")
 
