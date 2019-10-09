@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.4](https://github.com/korlibs/klock/compare/1.7.3...1.7.4)
+
+* Android MIN SDK is now 16. Fixes [#66](https://github.com/korlibs/klock/issues/66)
+* Fixed bug in `Year.fromDays`. Fixes [#67](https://github.com/korlibs/klock/issues/67)
+* Updated `package.json` included in JS jar files were referencing an invalid Kotlin version. Fixes [#68](https://github.com/korlibs/klock/issues/68)
+
 ## [1.7.3](https://github.com/korlibs/klock/compare/1.7.2...1.7.3)
 
 * Fixed InvalidMutabilityException issues [#64](https://github.com/korlibs/klock/issues/64)
