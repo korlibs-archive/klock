@@ -37,13 +37,13 @@ inline class Year(val year: Int) : Comparable<Year> {
             // Each 400 years the modular cycle is completed
 
             val v400 = days / DAYS_PER_400_YEARS
-            val r400 = days % DAYS_PER_400_YEARS
+            val r400 = days - (v400 * DAYS_PER_400_YEARS)
 
             val v100 = min(r400 / DAYS_PER_100_YEARS, 3)
-            val r100 = r400 % DAYS_PER_100_YEARS
+            val r100 = r400 - (v100 * DAYS_PER_100_YEARS)
 
             val v4 = r100 / DAYS_PER_4_YEARS
-            val r4 = r100 % DAYS_PER_4_YEARS
+            val r4 = r100 - (v4 * DAYS_PER_4_YEARS)
 
             val v1 = min(r4 / DAYS_COMMON, 3)
 
