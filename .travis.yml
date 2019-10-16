@@ -22,7 +22,7 @@ jobs:
     before_script:
       - echo before_script
     script:
-    - ./gradlew -s -i assemble check lint testDebugUnitTest
+    - ./gradlew -s -i assemble check lint testDebugUnitTest localPublishToBintrayIfRequiredOnTravisMasterNoPR
   - os: windows
     stage: test_and_upload
     env: KBUILD=windows
