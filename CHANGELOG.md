@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.7.5](https://github.com/korlibs/klock/compare/1.7.4...1.7.5)
+
+* Fix android artifact publication. Fixes [#72](https://github.com/korlibs/klock/issues/72)
+
 ## [1.7.4](https://github.com/korlibs/klock/compare/1.7.3...1.7.4)
 
 * Android MIN SDK is now 16. Fixes [#66](https://github.com/korlibs/klock/issues/66)
