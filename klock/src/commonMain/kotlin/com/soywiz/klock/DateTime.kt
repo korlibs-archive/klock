@@ -299,12 +299,15 @@ inline class DateTime(
     fun toOffset(offset: TimeSpan) = toOffset(offset.offset)
     /** Returns this date with a local offset. Components might change because of the [offset]. */
     fun toOffset(offset: TimezoneOffset) = DateTimeTz.utc(this, offset)
+    /** Returns this date with a 0 offset. Components are equal. */
+    val utc: DateTimeTz get() = DateTimeTz.utc(this, TimezoneOffset(0.minutes))
 
 	/** Returns a [DateTime] of [this] day with the hour at 00:00:00 */
 	val dateDayStart get() = DateTime(year, month, dayOfMonth, 0, 0, 0, 0)
 	/** Returns a [DateTime] of [this] day with the hour at 23:59:59.999 */
 	val dateDayEnd get() = DateTime(year, month, dayOfMonth, 23, 59, 59, 999)
 
+    /** Returns the quarter 1, 2, 3 or 4 */
     val quarter get() = (month0 / 3) + 1
 
     // startOf
