@@ -358,7 +358,7 @@ class DateTimeTest {
 
 	@Test
 	fun testBug33() {
-		assertEquals("20190412", DateTime(2019, 4, 12).local.format("yyyyMMdd"))
+		assertEquals("20190412", DateTime(2019, 4, 12).localUnadjusted.format("yyyyMMdd"))
 		assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy年MM月dd日"))
 		assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy'年'MM'月'dd'日'"))
 	}
