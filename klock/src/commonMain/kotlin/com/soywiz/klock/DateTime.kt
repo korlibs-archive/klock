@@ -305,7 +305,47 @@ inline class DateTime(
 	/** Returns a [DateTime] of [this] day with the hour at 23:59:59.999 */
 	val dateDayEnd get() = DateTime(year, month, dayOfMonth, 23, 59, 59, 999)
 
-	val date get() = Date(yearInt, month1, dayOfMonth)
+    val quarter get() = (month0 / 3) + 1
+
+    // startOf
+
+    val startOfYear get() = DateTime(year, Month.January, 1)
+    val startOfMonth get() = DateTime(year, month, 1)
+    val startOfQuarter get() = DateTime(year, Month[(quarter - 1) * 3 + 1], 1)
+    fun startOfDayOfWeek(day: DayOfWeek): DateTime {
+        for (n in 0 until 7) {
+            val date = (this - n.days)
+            if (date.dayOfWeek == day) return date.startOfDay
+        }
+        error("Shouldn't happen")
+    }
+    val startOfWeek: DateTime get() = startOfDayOfWeek(DayOfWeek.Sunday)
+    val startOfIsoWeek: DateTime get() = startOfDayOfWeek(DayOfWeek.Monday)
+    val startOfDay get() = DateTime(year, month, dayOfMonth)
+    val startOfHour get() = DateTime(year, month, dayOfMonth, hours)
+    val startOfMinute get() = DateTime(year, month, dayOfMonth, hours, minutes)
+    val startOfSecond get() = DateTime(year, month, dayOfMonth, hours, minutes, seconds)
+
+    // endOf
+
+    val endOfYear get() = DateTime(year, Month.December, 31, 23, 59, 59, 999)
+    val endOfMonth get() = DateTime(year, month, month.days(year), 23, 59, 59, 999)
+    val endOfQuarter get() = DateTime(year, Month[(quarter - 1) * 3 + 3], month.days(year), 23, 59, 59, 999)
+    fun endOfDayOfWeek(day: DayOfWeek): DateTime {
+        for (n in 0 until 7) {
+            val date = (this + n.days)
+            if (date.dayOfWeek == day) return date.endOfDay
+        }
+        error("Shouldn't happen")
+    }
+    val endOfWeek: DateTime get() = endOfDayOfWeek(DayOfWeek.Monday)
+    val endOfIsoWeek: DateTime get() = endOfDayOfWeek(DayOfWeek.Sunday)
+    val endOfDay get() = DateTime(year, month, dayOfMonth, 23, 59, 59, 999)
+    val endOfHour get() = DateTime(year, month, dayOfMonth, hours, 59, 59, 999)
+    val endOfMinute get() = DateTime(year, month, dayOfMonth, hours, minutes, 59, 999)
+    val endOfSecond get() = DateTime(year, month, dayOfMonth, hours, minutes, seconds, 999)
+
+    val date get() = Date(yearInt, month1, dayOfMonth)
 	val time get() = Time(hours, minutes, seconds, milliseconds)
 
     operator fun plus(delta: MonthSpan): DateTime = this.add(delta.totalMonths, 0.0)
