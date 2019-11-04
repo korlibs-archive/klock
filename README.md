@@ -2,6 +2,17 @@
 
 Klock is a Date & Time library for Multiplatform Kotlin 1.3.
 
+<!-- SUPPORT -->
+
+<h2 align="center">Support this project</h2>
+
+<p align="center">
+If you like the project, or want your company logo here, please consider <a href="https://github.com/sponsors/soywiz">becoming a sponsor ★</a>,<br />
+in addition to ensure the continuity of the project, you will get exclusive content.
+</p>
+
+<!-- /SUPPORT -->
+
 It is designed to be as allocation-free as possible using Kotlin inline classes,
 to be consistent and portable across targets since all the code is written in Common Kotlin,
 and to provide an API that is powerful, fun and easy to use.
@@ -74,4 +85,3 @@ dependencies {
 | 1.6.0  | 1.3.50 | 1.0              |
 | 1.5.0  | 1.3.40 | 1.0              |
 | 1.4.0  | 1.3.21 | 1.0              |
-
