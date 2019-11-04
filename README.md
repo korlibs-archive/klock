@@ -1,6 +1,22 @@
-# ![Klock](/assets/klock_256.png)
+<p align="center">
+    <img alt="Klock" src="/assets/klock_256.png" />
+</p>
 
-Klock is a Date & Time library for Multiplatform Kotlin 1.3.
+<p align="center">
+    Klock is a Date & Time library for Multiplatform Kotlin 1.3.
+</p>
+
+<p align="center">
+    It is designed to be as allocation-free as possible using Kotlin inline classes,
+    to be consistent and portable across targets since all the code is written in Common Kotlin,
+    and to provide an API that is powerful, fun and easy to use.
+</p>
+
+<p align="center">
+    <a href="https://travis-ci.org/korlibs/klock"><img alt="Build Status" src="https://travis-ci.org/korlibs/klock.svg?branch=master" /></a>
+    <a href="http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22klock%22"><img alt="Maven Version" src="https://img.shields.io/github/tag/korlibs/klock.svg?style=flat&label=maven" /></a>
+    <a href="https://img.shields.io/gitter/room/korlibs/korlibs.svg"><img alt="Gitter" src="https://img.shields.io/gitter/room/korlibs/korlibs.svg" /></a>
+</p>
 
 <!-- SUPPORT -->
 
@@ -12,14 +28,6 @@ in addition to ensure the continuity of the project, you will get exclusive cont
 </p>
 
 <!-- /SUPPORT -->
-
-It is designed to be as allocation-free as possible using Kotlin inline classes,
-to be consistent and portable across targets since all the code is written in Common Kotlin,
-and to provide an API that is powerful, fun and easy to use.
-
-[![Build Status](https://travis-ci.org/korlibs/klock.svg?branch=master)](https://travis-ci.org/korlibs/klock)
-[![Maven Version](https://img.shields.io/github/tag/korlibs/klock.svg?style=flat&label=maven)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22klock%22)
-[![Gitter](https://img.shields.io/gitter/room/korlibs/korlibs.svg)](https://gitter.im/korlibs/Lobby)
 
 ### Full Documentation: <https://korlibs.soywiz.com/klock/>
 
