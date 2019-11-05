@@ -114,14 +114,13 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
         val utc = dd.local
         var out = ""
         for (name in chunks) {
+            val nlen = name.length
             out += when (name) {
                 "E", "EE", "EEE" -> realLocale.daysOfWeekShort[utc.dayOfWeek.index0].capitalize()
                 "EEEE", "EEEEE", "EEEEEE" -> realLocale.daysOfWeek[utc.dayOfWeek.index0].capitalize()
                 "z", "zzz" -> dd.offset.timeZone
-                "d" -> utc.dayOfMonth.toString()
-                "dd" -> utc.dayOfMonth.padded(2)
-                "M" -> utc.month1.padded(1)
-                "MM" -> utc.month1.padded(2)
+                "d", "dd" -> utc.dayOfMonth.padded(nlen)
+                "M", "MM" -> utc.month1.padded(nlen)
                 "MMM" -> realLocale.months[utc.month0].substr(0, 3).capitalize()
                 "MMMM" -> realLocale.months[utc.month0].capitalize()
                 "MMMMM" -> realLocale.months[utc.month0].substr(0, 1).capitalize()
@@ -130,14 +129,16 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
                 "yyy" -> (utc.yearInt % 1000).padded(3)
                 "yyyy" -> utc.yearInt.padded(4)
                 "YYYY" -> utc.yearInt.padded(4)
-                "H" -> utc.hours.padded(1)
-                "HH" -> utc.hours.padded(2)
-                "h" -> (((12 + utc.hours) % 12)).padded(1)
-                "hh" -> (((12 + utc.hours) % 12)).padded(2)
-                "m" -> utc.minutes.padded(1)
-                "mm" -> utc.minutes.padded(2)
-                "s" -> utc.seconds.padded(1)
-                "ss" -> utc.seconds.padded(2)
+
+                "H", "HH" -> mconvertRangeZero(utc.hours, 24).padded(nlen)
+                "k", "kk" -> mconvertRangeNonZero(utc.hours, 24).padded(nlen)
+
+                "h", "hh" -> mconvertRangeNonZero(utc.hours, 12).padded(nlen)
+                "K", "KK" -> mconvertRangeZero(utc.hours, 12).padded(nlen)
+
+                "m", "mm" -> utc.minutes.padded(nlen)
+                "s", "ss" -> utc.seconds.padded(nlen)
+
                 "S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS" -> {
                     val milli = utc.milliseconds
                     val base10length = log10(utc.milliseconds.toDouble()).toInt() + 1
@@ -221,7 +222,11 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
                 "y", "yyyy", "YYYY" -> fullYear = value.toInt()
                 "yy" -> if (doThrow) throw RuntimeException("Not guessing years from two digits.") else return null
                 "yyy" -> fullYear = value.toInt() + if (value.toInt() < 800) 2000 else 1000 // guessing year...
-                "H", "HH" -> hour = value.toInt()
+                "H", "HH", "k", "kk" -> hour = value.toInt() umod 24
+                "h", "hh", "K", "KK" -> {
+                    hour = value.toInt() umod 24
+                    is12HourFormat = true
+                }
                 "m", "mm" -> minute = value.toInt()
                 "s", "ss" -> second = value.toInt()
                 "S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS" -> {
@@ -249,10 +254,6 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
                 }
                 "MMMM" -> month = realLocale.months.indexOf(value.toLowerCase()) + 1
                 "MMMMM" -> if (doThrow) throw RuntimeException("Not possible to get the month from one letter.") else return null
-                "h", "hh" -> {
-                    hour = value.toInt()
-                    is12HourFormat = true
-                }
                 "a" -> isPm = value == "pm"
                 else -> {
                     // ...
@@ -268,4 +269,13 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
     }
 
     override fun toString(): String = format
+}
+
+private fun mconvertRangeZero(value: Int, size: Int): Int {
+    return (value umod size)
+}
+
+private fun mconvertRangeNonZero(value: Int, size: Int): Int {
+    val res = (value umod size)
+    return if (res == 0) size else res
 }
