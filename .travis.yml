@@ -1,8 +1,7 @@
 stages:
   - test_and_upload
   - test_and_upload_linux
-  - name: publish
-    if: branch = master
+  - publish
 jobs:
   include:
     - os: windows

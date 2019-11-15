@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.0](https://github.com/korlibs/klock/compare/1.7.5...release-1.8.0)
+
+Thanks to my sponsors that brought to you this version! <https://github.com/sponsors/soywiz>
+
+* Kotlin 1.3.60
+* tvOS and watchOS targets
+* Added `DateTime.endOf*` and `DateTime.startOf*` + `DateTime.quarter`
+* Parsing or formatting midday time seems to give strange results. Fixes [#73](https://github.com/korlibs/klock/issues/73)
+
 ## [1.7.5](https://github.com/korlibs/klock/compare/1.7.4...1.7.5)
 
 * Fix android artifact publication. Fixes [#72](https://github.com/korlibs/klock/issues/72)
