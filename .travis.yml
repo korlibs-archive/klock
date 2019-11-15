@@ -44,7 +44,7 @@ jobs:
       before_script:
         - echo before_script
       script:
-        - ./gradlew -s -i assemble check lint testDebugUnitTest localPublishToBintrayIfRequiredOnTravisReleaseTagNoPR
+        - ./gradlew assemble check lint testDebugUnitTest localPublishToBintrayIfRequiredOnTravisReleaseTagNoPR -x jsBrowserTest
     - os: linux
       stage: publish
       language: android
