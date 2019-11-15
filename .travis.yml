@@ -11,6 +11,7 @@ jobs:
       script:
         - powershell -Command "cmd /c travis_win.bat"
     - os: osx
+      osx_image: xcode11.2
       stage: test_and_upload
       env:
         KBUILD=macos
@@ -24,7 +25,7 @@ jobs:
       before_script:
         - echo before_script
       script:
-        - ./gradlew check localPublishToBintrayIfRequiredOnTravisMasterNoPR
+        - ./gradlew check localPublishToBintrayIfRequiredOnTravisReleaseTagNoPR
     - os: linux
       stage: test_and_upload_linux
       language: android
@@ -43,7 +44,7 @@ jobs:
       before_script:
         - echo before_script
       script:
-        - ./gradlew -s -i assemble check lint testDebugUnitTest localPublishToBintrayIfRequiredOnTravisMasterNoPR
+        - ./gradlew -s -i assemble check lint testDebugUnitTest localPublishToBintrayIfRequiredOnTravisReleaseTagNoPR
     - os: linux
       stage: publish
       language: android
@@ -62,4 +63,4 @@ jobs:
       before_script:
         - echo before_script
       script:
-        - ./gradlew actuallyPublishBintrayIfOnTravisMasterNoPR
+        - ./gradlew actuallyPublishBintrayIfOnTravisReleaseTagNoPR
