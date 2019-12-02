@@ -5,8 +5,10 @@
 	"description": "Standard Library for Kotlin Applications",
 	"license": "Apache-2.0",
 	"dependencies": {
-		"kotlin": "%%%KOTLIN_VERSION!!!"
 	},
+  "peerDependencies": {
+    "kotlin": "%%%KOTLIN_VERSION!!!"
+  },
 	"bundleDependencies": [],
 	"author": {
 		"name": "korlibs"
