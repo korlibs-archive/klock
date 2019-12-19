@@ -81,6 +81,8 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
             "SSSS" -> """(\d{4})"""
             "SSSSS" -> """(\d{5})"""
             "SSSSSS" -> """(\d{6})"""
+            "SSSSSSS" -> """(\d{7})"""
+            "SSSSSSSS" -> """(\d{8})"""
             "X", "XX", "XXX", "x", "xx", "xxx" -> """([\w:\+\-]+)"""
             "a" -> """(\w+)"""
             " " -> """(\s+)"""
@@ -139,14 +141,14 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
                 "m", "mm" -> utc.minutes.padded(nlen)
                 "s", "ss" -> utc.seconds.padded(nlen)
 
-                "S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS" -> {
+                "S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS", "SSSSSSS", "SSSSSSSS" -> {
                     val milli = utc.milliseconds
                     val base10length = log10(utc.milliseconds.toDouble()).toInt() + 1
                     if (base10length > name.length) {
                         val fractionalPart = (milli.toDouble() * 10.0.pow(-1 * (base10length - name.length))).toInt()
                         fractionalPart
                     } else {
-                        val fractionalPart = "${milli.padded(3)}000"
+                        val fractionalPart = "${milli.padded(3)}00000".substr(0, name.length)
                         fractionalPart.substr(0, name.length)
                     }
                 }
@@ -177,7 +179,7 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
     }
 
 	private fun parseError(message: String, str: String): DateTimeTz? {
-		//println("Parser error: $message, $str, $rx2")
+		println("Parser error: $message, $str, $rx2")
 		return null
 	}
 
