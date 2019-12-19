@@ -13,4 +13,11 @@ class IssuesTest {
         assertEquals("12:10 pm", tparse("2019-10-17 12:10 +12")) // Gives 00:10 pm, I believe it should be 12:10 pm
         assertEquals("01:10 pm", tparse("2019-10-17 13:10 +12")) // Gives 01:10 pm
     }
+
+    @Test
+    fun testIssue81() {
+        val format = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS")
+        val dateStr = "2019-04-26T19:00:00.0000000"
+        assertEquals(dateStr, format.format(format.parse(dateStr)))
+    }
 }
