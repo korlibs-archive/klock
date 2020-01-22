@@ -38,7 +38,7 @@ object ISO8601 {
                     fmtReader.tryRead("hh") -> append(d.hours.padded(2))
                     fmtReader.tryRead("mm,mm") -> append((time.minutes % 60.0).padded(2, 2).replace('.', ','))
                     fmtReader.tryRead("mm") -> append(d.minutes.padded(2))
-                    fmtReader.tryRead("ss,ss") -> append(time.seconds.padded(2, 2).replace('.', ','))
+                    fmtReader.tryRead("ss,ss") -> append((time.seconds % 60).padded(2, 2).replace('.', ','))
                     fmtReader.tryRead("ss") -> append(d.seconds.padded(2))
                     fmtReader.tryRead("±") -> append(if (d.yearInt < 0) "-" else "+")
                     else -> append(fmtReader.readChar())
