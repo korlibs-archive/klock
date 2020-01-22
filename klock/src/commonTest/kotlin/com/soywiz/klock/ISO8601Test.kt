@@ -95,4 +95,16 @@ class ISO8601Test {
         assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_COMPLETE.parse("20190917T114805").utc.toString())
         assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_COMPLETE.parse("2019-09-17T11:48:05").utc.toString())
     }
+
+    @Test
+    fun testIssue84() {
+        val badUtc = DateTime(
+            date = Date(2020, 1, 4),
+            time = Time(2, 42, 55, millisecond = 500)
+        )
+        assertEquals(
+            "2020-01-04T02:42:55,50",
+            badUtc.format(ISO8601.IsoDateTimeFormat("YYYYMMDDThhmmss,ss", "YYYY-MM-DDThh:mm:ss,ss"))
+        )
+    }
 }
