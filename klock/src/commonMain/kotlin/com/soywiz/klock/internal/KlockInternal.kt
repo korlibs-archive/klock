@@ -7,3 +7,5 @@ internal expect object KlockInternal {
     val microClock: Double
     fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan
 }
+
+expect interface Serializable

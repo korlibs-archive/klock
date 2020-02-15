@@ -1,13 +1,18 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.Serializable
+
 /** [DateTime] with an associated [TimezoneOffset] */
 class DateTimeTz private constructor(
     /** The [adjusted] part */
     private val adjusted: DateTime,
     /** The [offset] part */
     val offset: TimezoneOffset
-) : Comparable<DateTimeTz> {
+) : Comparable<DateTimeTz>, Serializable {
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** Creates a new [DateTimeTz] with the [utc] date and an [offset]. The [utc] components will be the same as this independently on the [offset]. */
         fun local(local: DateTime, offset: TimezoneOffset) = DateTimeTz(local, offset)
 

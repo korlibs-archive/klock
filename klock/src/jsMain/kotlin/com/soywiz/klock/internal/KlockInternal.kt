@@ -27,3 +27,5 @@ internal actual object KlockInternal {
         return js("-(new Date(rtime)).getTimezoneOffset()").unsafeCast<Int>().minutes
     }
 }
+
+actual interface Serializable

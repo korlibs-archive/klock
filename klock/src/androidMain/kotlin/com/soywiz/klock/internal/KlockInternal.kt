@@ -8,3 +8,5 @@ internal actual object KlockInternal {
     actual val microClock: Double get() = (System.nanoTime() / 1000L).toDouble()
     actual fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan = TimeZone.getDefault().getOffset(time.unixMillisLong).milliseconds
 }
+
+actual typealias Serializable = java.io.Serializable
