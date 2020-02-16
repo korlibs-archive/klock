@@ -27,3 +27,5 @@ interface KlockInternalJvm {
     val microClock: Double get() = (System.nanoTime() / 1000L).toDouble()
     fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan = TimeZone.getDefault().getOffset(time.unixMillisLong).milliseconds
 }
+
+actual typealias Serializable = java.io.Serializable
