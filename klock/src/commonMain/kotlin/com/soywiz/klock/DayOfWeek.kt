@@ -38,6 +38,12 @@ enum class DayOfWeek(
     val localShortName get() = localShortName(KlockLocale.default)
     fun localShortName(locale: KlockLocale) = locale.daysOfWeekShort[index0]
 
+    val prev get() = DayOfWeek[index0 - 1]
+    val next get() = DayOfWeek[index0 + 1]
+
+    fun prev(offset: Int = 1) = DayOfWeek[index0 - offset]
+    fun next(offset: Int = 1) = DayOfWeek[index0 + offset]
+
     companion object {
         /**
          * Number of days in a wekk.
