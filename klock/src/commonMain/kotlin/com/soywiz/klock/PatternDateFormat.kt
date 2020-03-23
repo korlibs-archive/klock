@@ -178,11 +178,6 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
         return out
     }
 
-	private fun parseError(message: String, str: String): DateTimeTz? {
-		println("Parser error: $message, $str, $rx2")
-		return null
-	}
-
     override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? {
         var millisecond = 0
         var second = 0
@@ -194,7 +189,7 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
         var offset: TimeSpan? = null
         var isPm = false
         var is12HourFormat = false
-        val result = rx2.find(str) ?: return parseError("Not match", str)
+        val result = rx2.find(str) ?: return null //println("Parser error: Not match, $str, $rx2");
         for ((name, value) in chunks.zip(result.groupValues.drop(1))) {
             if (value.isEmpty()) continue
 
