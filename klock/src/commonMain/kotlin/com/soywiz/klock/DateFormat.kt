@@ -1,8 +1,6 @@
 package com.soywiz.klock
 
-import com.soywiz.klock.internal.klockAtomicLazy
-
-/** Allows to [format] and [parse], [DateTime] and [DateTimeTz] instances */
+/** Allows to [format] and [parse] instances of [DateTime] and [DateTimeTz] */
 interface DateFormat {
     fun format(dd: DateTimeTz): String
     fun tryParse(str: String, doThrow: Boolean = false): DateTimeTz?
