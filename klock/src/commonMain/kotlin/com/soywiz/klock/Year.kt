@@ -15,7 +15,7 @@ inline class Year(val year: Int) : Comparable<Year> {
         /**
          * Creates a Year instance checking that the year is between 1 and 9999 inclusive.
          *
-         * It throws a [DateException] is the year is not in the 1..9999 range.
+         * It throws a [DateException] if the year is not in the 1..9999 range.
          */
         fun checked(year: Int) = year.apply { if (year !in 1..9999) throw DateException("Year $year not in 1..9999") }
 
@@ -25,7 +25,7 @@ inline class Year(val year: Int) : Comparable<Year> {
         fun isLeapChecked(year: Int): Boolean = isLeap(checked(year))
 
         /**
-         * Determines if a year is leap. The model works for years between 1..9999, outside this range, the result might be invalid.
+         * Determines if a year is leap. The model works for years between 1..9999. Outside this range, the result might be invalid.
          */
         fun isLeap(year: Int): Boolean = (year % 4 == 0) && (year % 100 != 0 || year % 400 == 0)
 
@@ -52,7 +52,7 @@ inline class Year(val year: Int) : Comparable<Year> {
 
         /**
          * Get the number of days of a year depending on being leap or not.
-         * Normal, non leap years contains 365 days, while leap ones 366.
+         * Normal, non leap years contain 365 days, while leap ones 366.
          */
         fun days(isLeap: Boolean) = if (isLeap) DAYS_LEAP else DAYS_COMMON
 
@@ -91,7 +91,7 @@ inline class Year(val year: Int) : Comparable<Year> {
     val isLeapChecked get() = Year.isLeapChecked(year)
 
     /**
-     * Determines if this year is leap. The model works for years between 1..9999, outside this range, the result might be invalid.
+     * Determines if this year is leap. The model works for years between 1..9999. Outside this range, the result might be invalid.
      */
     val isLeap get() = Year.isLeap(year)
 

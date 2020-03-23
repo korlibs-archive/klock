@@ -16,7 +16,7 @@ inline class DateTime(
     val unixMillis: Double
 ) : Comparable<DateTime> {
     companion object {
-        /** It is the that have elapsed since 00:00:00 UTC, Thursday, 1 January 1970, minus leap seconds. */
+        /** It is a [DateTime] instance representing 00:00:00 UTC, Thursday, 1 January 1970. */
         val EPOCH = DateTime(0.0)
 
         /**
@@ -36,6 +36,11 @@ inline class DateTime(
             DateTime.dateToMillis(year.year, month.index1, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
         )
 
+        /**
+         * Constructs a new [DateTime] from date and time information.
+         *
+         * This might throw a [DateException] on invalid dates.
+         */
 		operator fun invoke(
 			date: Date,
 			time: Time = Time(0.milliseconds)
@@ -77,7 +82,6 @@ inline class DateTime(
         ): DateTime = DateTime(
             DateTime.dateToMillis(year, month, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
         )
-
 
         /**
          * Constructs a new [DateTime] from date and time information.
@@ -136,7 +140,7 @@ inline class DateTime(
                 dm += dd.cycleSteps(1, dup); dd = dd.cycle(1, dup) // Adjust days, adding months
                 dy += dm.cycleSteps(1, 12); dm = dm.cycle(1, 12) // Adjust months, adding years
 
-                // We already have found a day that is valid for the adjusted month!
+                // We have already found a day that is valid for the adjusted month!
                 if (dd.cycle(1, Month(dm).days(dy)) == dd) {
                     break
                 }
@@ -148,7 +152,7 @@ inline class DateTime(
         /**
          * Constructs a new [DateTime] from date and time information.
          *
-         * On invalid dates, will have an undefined behaviour.
+         * On invalid dates, this function will have an undefined behaviour.
          */
         fun createUnchecked(
             year: Int,
@@ -191,7 +195,7 @@ inline class DateTime(
 
         internal const val EPOCH_INTERNAL_MILLIS = 62135596800000.0 // Millis since 00-00-0000 00:00 UTC to UNIX EPOCH
 
-        internal enum class DatePart { Year, DayOfYear, Month, Day}
+        internal enum class DatePart { Year, DayOfYear, Month, Day }
 
         internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Double =
             (Year(year).daysSinceOne + Month(month).daysToStart(year) + day - 1) * MILLIS_PER_DAY.toDouble() - EPOCH_INTERNAL_MILLIS
@@ -286,7 +290,7 @@ inline class DateTime(
     /** The [milliseconds] part */
     val milliseconds: Int get() = ((yearOneMillis) % 1000).toInt()
 
-    /** Returns a new local date that will match these components but with a different offset. */
+    /** Returns a new local date that will match these components. */
     val localUnadjusted: DateTimeTz get() = DateTimeTz.local(this, localOffset)
     /** Returns a new local date that will match these components but with a different [offset]. */
     fun toOffsetUnadjusted(offset: TimeSpan) = toOffsetUnadjusted(offset.offset)

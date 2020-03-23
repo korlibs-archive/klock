@@ -47,5 +47,12 @@ inline class YearMonth(internal val internalPackedInfo: Int) {
     override fun toString(): String = "$month $yearInt"
 }
 
+/**
+ * Creates a [YearMonth] representing [this] year and this [month].
+ */
 fun Year.withMonth(month: Month) = YearMonth(this, month)
+
+/**
+ * Creates a [YearMonth] representing this [year] and [this] month.
+ */
 fun Month.withYear(year: Year) = YearMonth(year, this)
