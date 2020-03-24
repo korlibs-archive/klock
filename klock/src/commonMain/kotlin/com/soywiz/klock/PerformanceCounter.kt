@@ -3,7 +3,7 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 
 /**
- * Class for measuring relative times with as much precission as possible.
+ * Class for measuring relative times with as much precision as possible.
  */
 object PerformanceCounter {
     /**

@@ -1,21 +1,23 @@
 package com.soywiz.klock
 
-import com.soywiz.klock.internal.*
 import com.soywiz.klock.internal.BSearchResult
 import com.soywiz.klock.internal.fastForEach
 import com.soywiz.klock.internal.genericBinarySearch
 import com.soywiz.klock.internal.klockLazyOrGet
 
 // Properties:
-//   - ranges are sorted
-//   - ranges do not overlap/intersect between each other (they are merged and normalized)
+//  - ranges are sorted
+//  - ranges do not overlap/intersect between each other (they are merged and normalized)
 // These properties allows to do some tricks and optimizations like binary search and a lot of O(n) operations.
 data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: List<DateTimeRange>) {
+
+    /** [DateTimeRange] from the beginning of the first element to the end of the last one. */
     val bounds = DateTimeRange(
         ranges.firstOrNull()?.from ?: DateTime.EPOCH,
         ranges.lastOrNull()?.to ?: DateTime.EPOCH
     )
 
+    /** Total time of all [ranges]. */
 	val size: TimeSpan by klockLazyOrGet {
 		var out = 0.seconds
 		ranges.fastForEach { out += it.size }
@@ -32,21 +34,12 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
     operator fun minus(range: DateTimeRange): DateTimeRangeSet = this - DateTimeRangeSet(range)
     operator fun minus(right: DateTimeRangeSet): DateTimeRangeSet = Fast.minus(this, right)
 
-    //operator fun contains(time: DateTime): Boolean = Slow.contains(time, this)
     operator fun contains(time: DateTime): Boolean = Fast.contains(time, this)
 	operator fun contains(time: DateTimeRange): Boolean = Fast.contains(time, this)
 
 	fun intersection(range: DateTimeRange): DateTimeRangeSet = this.intersection(DateTimeRangeSet(range))
     fun intersection(vararg range: DateTimeRange): DateTimeRangeSet = this.intersection(DateTimeRangeSet(*range))
     fun intersection(right: DateTimeRangeSet): DateTimeRangeSet = Fast.intersection(this, right)
-    //fun intersection(right: DateTimeRangeSet): DateTimeRangeSet = Slow.intersection(this, right)
-
-    /*
-    fun combined(): DateTimeRangeSet {
-        //return slowCombine()
-        return fastCombine(ranges)
-    }
-    */
 
     companion object {
         fun toStringLongs(ranges: List<DateTimeRange>): String = "${ranges.map { it.toStringLongs() }}"

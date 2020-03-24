@@ -25,9 +25,8 @@ inline val Number.weeks get() = TimeSpan.fromWeeks(this.toDouble())
  *
  * It is an inline class wrapping [Double] instead of [Long] to work on JavaScript without allocations.
  */
-@Suppress("DataClassPrivateConstructor")
 inline class TimeSpan(
-    /** Returns the total number of [seconds] for this [TimeSpan] (1 / 1_000 [seconds]) */
+    /** Returns the total number of [milliseconds] for this [TimeSpan] (1 / 1_000 [seconds]) */
     val milliseconds: Double
 ) : Comparable<TimeSpan> {
     /** Returns the total number of [nanoseconds] for this [TimeSpan] (1 / 1_000_000_000 [seconds]) */

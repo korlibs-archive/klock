@@ -3,13 +3,11 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.klockLazyOrGet
 
 /**
- * Represents an open or close range between two dates.
+ * Represents a right-opened range between two dates.
  */
 data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<DateTime> {
-	val valid get() = from <= to
-	init {
-		//check(from <= to)
-	}
+
+    val valid get() = from <= to
 
 	companion object {
 		operator fun invoke(base: Date, from: Time, to: Time): DateTimeRange = DateTimeRange(base + from, base + to)
@@ -87,6 +85,9 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
         return handler(from, to, if (rightOpen) from < to else from <= to)
     }
 
+    /**
+     * Returns new [DateTimeRange] or null - the result of intersection of this and [that] DateTimeRanges.
+     */
     fun intersectionWith(that: DateTimeRange, rightOpen: Boolean = true): DateTimeRange? {
         return _intersectionWith(that, rightOpen) { from, to, matches ->
             when {
@@ -96,9 +97,19 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
         }
     }
 
+    /**
+     * Returns true if this and [that] DateTimeRanges have intersection otherwise false.
+     */
 	fun intersectsWith(that: DateTimeRange, rightOpen: Boolean = true): Boolean = _intersectionWith(that, rightOpen) { _, _, matches -> matches }
-	fun intersectsOrInContactWith(that: DateTimeRange): Boolean = intersectsWith(that, rightOpen = false)
 
+    /**
+     * Returns true if this and [that] DateTimeRanges have intersection or at least a common end otherwise false.
+     */
+    fun intersectsOrInContactWith(that: DateTimeRange): Boolean = intersectsWith(that, rightOpen = false)
+
+    /**
+     * Returns new [DateTimeRange] or null - the result of merging this and [that] DateTimeRanges if they have intersection.
+     */
     fun mergeOnContactOrNull(that: DateTimeRange): DateTimeRange? {
         if (!intersectsOrInContactWith(that)) return null
         val min = min(this.min, that.min)
@@ -106,6 +117,9 @@ data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<Date
         return DateTimeRange(min, max)
     }
 
+    /**
+     * Returns a [List] of 0, 1 or 2 [DateTimeRange]s - the result of removing [that] DateTimeRange from this one
+     */
     fun without(that: DateTimeRange): List<DateTimeRange> = when {
         // Full remove
         (that.min <= this.min) && (that.max >= this.max) -> listOf()
@@ -143,6 +157,6 @@ fun List<DateTimeRange>.toStringLongs() = this.map { it.toStringLongs() }.toStri
 operator fun DateTime.rangeTo(other: DateTime) = this until other
 
 /**
- * Generates a range between two [DateTime] non-inclusive (right opened)
+ * Generates a right-opened range between two [DateTime]s
  */
 infix fun DateTime.until(other: DateTime) = DateTimeRange(this, other)

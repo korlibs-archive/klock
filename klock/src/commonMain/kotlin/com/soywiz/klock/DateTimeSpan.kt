@@ -94,7 +94,7 @@ data class DateTimeSpan(
     }
 
     /**
-     * Represents this [DateTimeSpan] as a string like `50Y 10M 3W 6D 5H 30m 15s`.
+     * Represents this [DateTimeSpan] as a string like `50Y 10M 3W 6DH 30m 15s`.
      * Parts that are zero, won't be included. You can omit weeks and represent them
      * as days by adjusting the [includeWeeks] parameter.
      */

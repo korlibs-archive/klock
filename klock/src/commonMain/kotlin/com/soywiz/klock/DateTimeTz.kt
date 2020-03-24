@@ -74,9 +74,9 @@ class DateTimeTz private constructor(
     /** Constructs this local date with a new [offset] without changing its components */
     fun toOffsetUnadjusted(offset: TimezoneOffset) = DateTimeTz.local(this.local, offset)
 
-    /** Constructs this local date with by adding an additional [offset] without changing its components */
+    /** Constructs this local date by adding an additional [offset] without changing its components */
     fun addOffsetUnadjusted(offset: TimeSpan) = addOffsetUnadjusted(offset.offset)
-    /** Constructs this local date with by adding an additional [offset] without changing its components */
+    /** Constructs this local date by adding an additional [offset] without changing its components */
     fun addOffsetUnadjusted(offset: TimezoneOffset) = DateTimeTz.local(this.local, (this.offset.time + offset.time).offset)
 
     /** Constructs the UTC part of this date with a new [offset] */
