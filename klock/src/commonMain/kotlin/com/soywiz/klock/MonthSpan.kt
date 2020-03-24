@@ -33,6 +33,7 @@ inline class MonthSpan(
 
     override fun compareTo(other: MonthSpan): Int = this.totalMonths.compareTo(other.totalMonths)
 
+    /** Converts this time to String formatting it like "20Y", "20Y 1M", "1M" or "0M". */
     override fun toString(): String {
         val list = arrayListOf<String>()
         if (years != 0) list.add("${years}Y")

@@ -1,6 +1,6 @@
 package com.soywiz.klock
 
-/** Class to provide time that can be overriden to mock or change its behaviour. */
+/** Class to provide time that can be overridden to mock or change its behaviour. */
 interface TimeProvider {
     /** Returns a [DateTime] for this provider. */
     fun now(): DateTime

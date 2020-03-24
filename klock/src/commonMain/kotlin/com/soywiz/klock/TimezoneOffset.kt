@@ -44,7 +44,11 @@ inline class TimezoneOffset(
         /** Constructs a new [TimezoneOffset] from a [TimeSpan]. */
         operator fun invoke(time: TimeSpan) = TimezoneOffset(time.milliseconds)
 
-        /** Returns timezone offset as a [TimeSpan], for a specified [time]. For example, GMT+01 would return 60.minutes. This uses the Operating System to compute daylight offsets when required. */
+        /**
+         * Returns timezone offset as a [TimeSpan], for a specified [time].
+         * For example, GMT+01 would return 60.minutes.
+         * This uses the Operating System to compute daylight offsets when required.
+         */
         fun local(time: DateTime): TimezoneOffset = KlockInternal.localTimezoneOffsetMinutes(time).offset
     }
 }
