@@ -4,7 +4,13 @@ import com.soywiz.klock.internal.*
 import kotlin.jvm.JvmOverloads
 import kotlin.math.*
 
-data class PatternDateFormat @JvmOverloads constructor(val format: String, val locale: KlockLocale? = null, val tzNames: TimezoneNames = TimezoneNames.DEFAULT, val options: Options = Options.DEFAULT) : DateFormat {
+data class PatternDateFormat @JvmOverloads constructor(
+    val format: String,
+    val locale: KlockLocale? = null,
+    val tzNames: TimezoneNames = TimezoneNames.DEFAULT,
+    val options: Options = Options.DEFAULT
+) : DateFormat {
+
     val realLocale get() = locale ?: KlockLocale.default
 
     data class Options(val optionalSupport: Boolean = false) {
@@ -67,16 +73,16 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
             "yyy" -> """(\d{3})"""
             "yyyy" -> """(\d{4})"""
             "YYYY" -> """(\d{4})"""
-            "H" -> """(\d{1,2})"""
-            "HH" -> """(\d{2})"""
-            "h" -> """(\d{1,2})"""
-            "hh" -> """(\d{2})"""
+            "H", "k" -> """(\d{1,2})"""
+            "HH", "kk" -> """(\d{2})"""
+            "h", "K" -> """(\d{1,2})"""
+            "hh", "KK" -> """(\d{2})"""
             "m" -> """(\d{1,2})"""
             "mm" -> """(\d{2})"""
             "s" -> """(\d{1,2})"""
             "ss" -> """(\d{2})"""
             "S" -> """(\d{1,6})"""
-            "SS" ->  """(\d{2})"""
+            "SS" -> """(\d{2})"""
             "SSS" -> """(\d{3})"""
             "SSSS" -> """(\d{4})"""
             "SSSSS" -> """(\d{5})"""
@@ -145,11 +151,9 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
                     val milli = utc.milliseconds
                     val base10length = log10(utc.milliseconds.toDouble()).toInt() + 1
                     if (base10length > name.length) {
-                        val fractionalPart = (milli.toDouble() * 10.0.pow(-1 * (base10length - name.length))).toInt()
-                        fractionalPart
+                        (milli.toDouble() * 10.0.pow(-1 * (base10length - name.length))).toInt()
                     } else {
-                        val fractionalPart = "${milli.padded(3)}00000".substr(0, name.length)
-                        fractionalPart.substr(0, name.length)
+                        "${milli.padded(3)}00000".substr(0, name.length)
                     }
                 }
                 "X", "XX", "XXX", "x", "xx", "xxx" -> {
@@ -241,8 +245,19 @@ data class PatternDateFormat @JvmOverloads constructor(val format: String, val l
                         if (doThrow) throw RuntimeException("Zulu Time Zone is only accepted with X-XXX formats.") else return null
                     }
                     value.first() != 'Z' -> {
-                        val hours = value.drop(1).substringBefore(':').toInt()
-                        val minutes = value.substringAfter(':', "0").toInt()
+                        val valueUnsigned = value.drop(1)
+                        val hours = when (name) {
+                            "X", "x" -> valueUnsigned.toInt()
+                            "XX", "xx" -> valueUnsigned.take(2).toInt()
+                            "XXX", "xxx" -> valueUnsigned.substringBefore(':').toInt()
+                            else -> throw RuntimeException("Unreachable code! Incorrect implementation!")
+                        }
+                        val minutes = when (name) {
+                            "X", "x" -> 0
+                            "XX", "xx" -> valueUnsigned.drop(2).toInt()
+                            "XXX", "xxx" -> valueUnsigned.substringAfter(':', "0").toInt()
+                            else -> throw RuntimeException("Unreachable code! Incorrect implementation!")
+                        }
                         offset = hours.hours + minutes.minutes
                         if (value.first() == '-') {
                             offset = -offset
