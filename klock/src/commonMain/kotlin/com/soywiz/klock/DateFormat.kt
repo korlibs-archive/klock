@@ -1,6 +1,6 @@
 package com.soywiz.klock
 
-/** Allows to [format] and [parse] instances of [DateTime] and [DateTimeTz] */
+/** Allows to [format] and [parse] instances of [Date], [DateTime] and [DateTimeTz] */
 interface DateFormat {
     fun format(dd: DateTimeTz): String
     fun tryParse(str: String, doThrow: Boolean = false): DateTimeTz?
@@ -30,6 +30,7 @@ interface DateFormat {
 
 fun DateFormat.parse(str: String): DateTimeTz =
     tryParse(str, doThrow = true) ?: throw DateException("Not a valid format: '$str' for '$this'")
+fun DateFormat.parseDate(str: String): Date = parse(str).local.date
 
 fun DateFormat.parseUtc(str: String): DateTime = parse(str).utc
 

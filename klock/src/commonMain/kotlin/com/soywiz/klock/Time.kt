@@ -24,6 +24,16 @@ inline class Time(val encoded: TimeSpan) : Comparable<Time> {
 	val minute: Int get() = abs((encoded.millisecondsInt / DIV_MINUTES) % 60)
     /** The [hour] part. */
 	val hour: Int get() = (encoded.millisecondsInt / DIV_HOURS)
+    /** The [hour] part adjusted to 24-hour format. */
+	val hourAdjusted: Int get() = (encoded.millisecondsInt / DIV_HOURS % 24)
+
+    /** Returns new [Time] instance adjusted to 24-hour format. */
+    fun adjust(): Time = Time(hourAdjusted, minute, second, millisecond)
+
+    /** Converts this date to String using [format] for representing it. */
+    fun format(format: String) = TimeFormat(format).format(this)
+    /** Converts this date to String using [format] for representing it. */
+    fun format(format: TimeFormat) = format.format(this)
 
     /** Converts this time to String formatting it like "00:00:00.000", "23:59:59.999" or "-23:59:59.999" if the [hour] is negative */
 	override fun toString(): String = "${if (hour < 0) "-" else ""}${abs(hour).toString().padStart(2, '0')}:${abs(minute).toString().padStart(2, '0')}:${abs(second).toString().padStart(2, '0')}.${abs(millisecond).toString().padStart(3, '0')}"
@@ -31,5 +41,4 @@ inline class Time(val encoded: TimeSpan) : Comparable<Time> {
 	override fun compareTo(other: Time): Int = encoded.compareTo(other.encoded)
 }
 
-// @TODO: Do overflowing here instead of relying on DateTime. In fact, refact DateTime to handle the overflowing using this class
-operator fun Time.plus(span: TimeSpan) = (DateTime.EPOCH + this.encoded + span).time
+operator fun Time.plus(span: TimeSpan) = Time(this.encoded + span)
