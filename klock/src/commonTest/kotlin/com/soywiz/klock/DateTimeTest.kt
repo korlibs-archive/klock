@@ -362,4 +362,44 @@ class DateTimeTest {
 		assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy年MM月dd日"))
 		assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy'年'MM'月'dd'日'"))
 	}
+
+    @Test
+    fun testBug93() {
+        // 2020-03-20 11:13:31.317 +05:00
+        val dateTime = DateTime(
+            year = 2020, month = 3, day = 20,
+            hour = 11, minute = 13, second = 31, milliseconds = 317
+        )
+        val original = DateTimeTz.local(dateTime, TimezoneOffset(5.hours))
+
+        val formatter1 = DateFormat("yyyy-MM-dd HH:mm:ss.SSS X")
+        val string1 = formatter1.format(original)
+        assertEquals("2020-03-20 11:13:31.317 +05", string1)
+        assertEquals(original, formatter1.parse(string1))
+
+        val formatter2 = DateFormat("yyyy-MM-dd HH:mm:ss.SSS XX")
+        val string2 = formatter2.format(original)
+        assertEquals("2020-03-20 11:13:31.317 +0500", string2)
+        assertEquals(original, formatter2.parse(string2))
+
+        val formatter3 = DateFormat("yyyy-MM-dd HH:mm:ss.SSS XXX")
+        val string3 = formatter3.format(original)
+        assertEquals("2020-03-20 11:13:31.317 +05:00", string3)
+        assertEquals(original, formatter3.parse(string3))
+
+        val formatter4 = DateFormat("yyyy-MM-dd HH:mm:ss.SSS x")
+        val string4 = formatter4.format(original)
+        assertEquals("2020-03-20 11:13:31.317 +05", string4)
+        assertEquals(original, formatter4.parse(string4))
+
+        val formatter5 = DateFormat("yyyy-MM-dd HH:mm:ss.SSS xx")
+        val string5 = formatter5.format(original)
+        assertEquals("2020-03-20 11:13:31.317 +0500", string5)
+        assertEquals(original, formatter5.parse(string5))
+
+        val formatter6 = DateFormat("yyyy-MM-dd HH:mm:ss.SSS xxx")
+        val string6 = formatter6.format(original)
+        assertEquals("2020-03-20 11:13:31.317 +05:00", string6)
+        assertEquals(original, formatter6.parse(string6))
+    }
 }
