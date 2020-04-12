@@ -65,6 +65,9 @@ inline class TimeSpan(
     operator fun times(scale: Int): TimeSpan = TimeSpan(this.milliseconds * scale)
     operator fun times(scale: Double): TimeSpan = TimeSpan((this.milliseconds * scale))
 
+    operator fun div(scale: Int): TimeSpan = TimeSpan(this.milliseconds / scale)
+    operator fun div(scale: Double): TimeSpan = TimeSpan((this.milliseconds / scale))
+
     operator fun div(other: TimeSpan): Double = this.milliseconds / other.milliseconds
     operator fun rem(other: TimeSpan): TimeSpan = (this.milliseconds % other.milliseconds).milliseconds
 
