@@ -86,15 +86,17 @@ fun benchmark(block: () -> Double): BenchmarkResult {
     )
 }
 
-inline fun <reified T> printBenchmark(name: String, noinline block: () -> T) {
+inline fun <reified T> printBenchmark(name: String, full: Boolean = false, noinline block: () -> T) {
     val result = benchmark(block)
     println("Benchmark '$name' : $result")
-    for (r in result.partialResults) println(" - $r")
+    if (full) {
+        for (r in result.partialResults) println(" - $r")
+    }
 }
 
 // @TODO: Show ratios
-fun printBenchmarks(vararg benchmarks: Pair<String, () -> Double>) {
+fun printBenchmarks(vararg benchmarks: Pair<String, () -> Double>, full: Boolean = false) {
     for ((name, block) in benchmarks) {
-        printBenchmark(name, block)
+        printBenchmark(name, full, block)
     }
 }
