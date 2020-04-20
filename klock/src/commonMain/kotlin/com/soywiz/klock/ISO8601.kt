@@ -34,12 +34,39 @@ object ISO8601 {
                     fmtReader.tryRead("DDD") -> append(d.dayOfWeekInt.padded(3))
                     fmtReader.tryRead("ww") -> append(d.weekOfYear1.padded(2))
                     fmtReader.tryRead("D") -> append(d.dayOfWeek.index1Monday)
-                    fmtReader.tryRead("hh,hh") -> append(time.hours.padded(2, 2).replace('.', ','))
-                    fmtReader.tryRead("hh") -> append(d.hours.padded(2))
-                    fmtReader.tryRead("mm,mm") -> append((time.minutes % 60.0).padded(2, 2).replace('.', ','))
-                    fmtReader.tryRead("mm") -> append(d.minutes.padded(2))
-                    fmtReader.tryRead("ss,ss") -> append((time.seconds % 60).padded(2, 2).replace('.', ','))
-                    fmtReader.tryRead("ss") -> append(d.seconds.padded(2))
+                    fmtReader.tryRead("hh") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        val result = if (nextComma || fmtReader.tryRead('.')) {
+                            var decCount = 0
+                            while (fmtReader.tryRead('h')) decCount++
+                            time.hours.padded(2, decCount)
+                        } else {
+                            d.hours.padded(2)
+                        }
+                        append(if (nextComma) result.replace('.', ',') else result)
+                    }
+                    fmtReader.tryRead("mm") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        val result = if (nextComma || fmtReader.tryRead('.')) {
+                            var decCount = 0
+                            while (fmtReader.tryRead('m')) decCount++
+                            (time.minutes % 60.0).padded(2, decCount)
+                        } else {
+                            d.minutes.padded(2)
+                        }
+                        append(if (nextComma) result.replace('.', ',') else result)
+                    }
+                    fmtReader.tryRead("ss") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        val result = if (nextComma || fmtReader.tryRead('.')) {
+                            var decCount = 0
+                            while (fmtReader.tryRead('s')) decCount++
+                            (time.seconds % 60.0).padded(2, decCount)
+                        } else {
+                            d.seconds.padded(2)
+                        }
+                        append(if (nextComma) result.replace('.', ',') else result)
+                    }
                     fmtReader.tryRead("±") -> append(if (d.yearInt < 0) "-" else "+")
                     else -> append(fmtReader.readChar())
                 }
@@ -91,13 +118,36 @@ object ISO8601 {
                     fmtReader.tryRead("ww") -> weekOfYear = reader.tryReadInt(2) ?: return reportParse("ww")
                     fmtReader.tryRead("D") -> dayOfWeek = reader.tryReadInt(1) ?: return reportParse("D")
 
-                    fmtReader.tryRead("hh,hh") -> hours = reader.tryReadDouble(5) ?: return reportParse("hh,hh")
-                    fmtReader.tryRead("hh") -> hours = reader.tryReadDouble(2) ?: return reportParse("hh")
-                    fmtReader.tryRead("mm,mm") -> minutes = reader.tryReadDouble(5) ?: return reportParse("mm,mm")
-                    fmtReader.tryRead("mm") -> minutes = reader.tryReadDouble(2) ?: return reportParse("mm")
-                    fmtReader.tryRead("ss,ss") -> seconds = reader.tryReadDouble(5) ?: return reportParse("ss,ss")
-                    fmtReader.tryRead("ss") -> seconds = reader.tryReadDouble(2) ?: return reportParse("ss")
-
+                    fmtReader.tryRead("hh") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        hours = if (nextComma || fmtReader.tryRead('.')) {
+                            var count = 3
+                            while (fmtReader.tryRead('h')) count++
+                            reader.tryReadDouble(count) ?: return reportParse("incorrect hours")
+                        } else {
+                            reader.tryReadDouble(2) ?: return reportParse("incorrect hours")
+                        }
+                    }
+                    fmtReader.tryRead("mm") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        minutes = if (nextComma || fmtReader.tryRead('.')) {
+                            var count = 3
+                            while (fmtReader.tryRead('m')) count++
+                            reader.tryReadDouble(count) ?: return reportParse("incorrect minutes")
+                        } else {
+                            reader.tryReadDouble(2) ?: return reportParse("incorrect seconds")
+                        }
+                    }
+                    fmtReader.tryRead("ss") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        seconds = if (nextComma || fmtReader.tryRead('.')) {
+                            var count = 3
+                            while (fmtReader.tryRead('s')) count++
+                            reader.tryReadDouble(count) ?: return reportParse("incorrect seconds")
+                        } else {
+                            reader.tryReadDouble(2) ?: return reportParse("incorrect seconds")
+                        }
+                    }
                     fmtReader.tryRead("±") -> {
                         sign = when (reader.readChar()) {
                             '+' -> +1
