@@ -219,7 +219,7 @@ inline class DateTime(
 
         // millis are 00-00-0000 based.
         internal fun getDatePart(millis: Double, part: DatePart): Int {
-            val totalDays = (millis / MILLIS_PER_DAY).toInt()
+            val totalDays = (millis / MILLIS_PER_DAY).toInt2()
 
             // Year
             val year = Year.fromDays(totalDays)
@@ -228,7 +228,7 @@ inline class DateTime(
             // Day of Year
             val isLeap = year.isLeap
             val startYearDays = year.daysSinceOne
-            val dayOfYear = 1 + (totalDays - startYearDays)
+            val dayOfYear = 1 + ((totalDays - startYearDays) umod year.days)
             if (part == DatePart.DayOfYear) return dayOfYear
 
             // Month
@@ -276,19 +276,19 @@ inline class DateTime(
     /** The [dayOfWeek] part */
     val dayOfWeek: DayOfWeek get() = DayOfWeek[dayOfWeekInt]
     /** The [dayOfWeek] part as [Int] */
-    val dayOfWeekInt: Int get() = ((yearOneMillis / MILLIS_PER_DAY + 1) % 7).toInt()
+    val dayOfWeekInt: Int get() = (yearOneMillis / MILLIS_PER_DAY + 1).toIntMod(7)
 
     /** The [dayOfYear] part */
     val dayOfYear: Int get() = getDatePart(yearOneMillis, DatePart.DayOfYear)
 
     /** The [hours] part */
-    val hours: Int get() = (((yearOneMillis / MILLIS_PER_HOUR) % 24).toInt())
+    val hours: Int get() = (yearOneMillis / MILLIS_PER_HOUR).toIntMod(24)
     /** The [minutes] part */
-    val minutes: Int get() = ((yearOneMillis / MILLIS_PER_MINUTE) % 60).toInt()
+    val minutes: Int get() = (yearOneMillis / MILLIS_PER_MINUTE).toIntMod(60)
     /** The [seconds] part */
-    val seconds: Int get() = ((yearOneMillis / MILLIS_PER_SECOND) % 60).toInt()
+    val seconds: Int get() = (yearOneMillis / MILLIS_PER_SECOND).toIntMod(60)
     /** The [milliseconds] part */
-    val milliseconds: Int get() = ((yearOneMillis) % 1000).toInt()
+    val milliseconds: Int get() = (yearOneMillis).toIntMod(1000)
 
     /** Returns a new local date that will match these components. */
     val localUnadjusted: DateTimeTz get() = DateTimeTz.local(this, localOffset)

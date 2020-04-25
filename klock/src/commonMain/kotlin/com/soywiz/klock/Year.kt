@@ -47,7 +47,10 @@ inline class Year(val year: Int) : Comparable<Year> {
 
             val v1 = min(r4 / DAYS_COMMON, 3)
 
-            return Year(1 + v1 + (v4 * 4) + (v100 * 100) + (v400 * 400))
+            val extra = if (days < 0) 0 else 1
+            //val extra = 1
+
+            return Year(extra + v1 + (v4 * 4) + (v100 * 100) + (v400 * 400))
         }
 
         /**
@@ -59,7 +62,21 @@ inline class Year(val year: Int) : Comparable<Year> {
         /**
          * Return the number of leap years that happened between 1 and the specified [year].
          */
-        fun leapCountSinceOne(year: Int): Int = ((year - 1) / 4) - ((year - 1) / 100) + ((year - 1) / 400)
+        fun leapCountSinceOne(year: Int): Int {
+            if (year < 1) {
+                // @TODO: Hack for negative numbers. Maybe we can do some kind of offset and subtract.
+                var leapCount = 0
+                var y = 1
+                while (y >= year) {
+                    if (Year(y).isLeap) leapCount--
+                    y--
+                }
+                return leapCount
+            }
+            val y1 = (year - 1)
+            val res = (y1 / 4) - (y1 / 100) + (y1 / 400)
+            return res
+        }
 
         /**
          * Number of days since 1 and the beginning of the specified [year].
