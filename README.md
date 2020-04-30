@@ -97,3 +97,11 @@ dependencies {
 | 1.6.0  | 1.3.50 | 1.0              | 1.6         |
 | 1.5.0  | 1.3.40 | 1.0              | 1.6         |
 | 1.4.0  | 1.3.21 | 1.0              | 1.6         |
+
+### Testing & Kotest
+
+Kotest is a flexible and comprehensive testing tool for Kotlin with multiplatform support.
+It supports Klock adding additional matchers. For a full list of Klock Kotest matchers, check this link:
+<https://github.com/kotest/kotest/blob/master/doc/matchers.md>
+
+And you can find a sample here: <https://github.com/kotest/kotest/tree/master/kotest-assertions/kotest-assertions-klock>
