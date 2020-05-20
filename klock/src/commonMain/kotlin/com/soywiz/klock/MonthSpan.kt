@@ -28,8 +28,17 @@ inline class MonthSpan(
     operator fun minus(other: MonthSpan) = this + -other
     operator fun minus(other: DateTimeSpan) = this + -other
 
-    inline operator fun times(times: Number) = MonthSpan((totalMonths * times.toDouble()).toInt())
-    inline operator fun div(times: Number) = MonthSpan((totalMonths / times.toDouble()).toInt())
+    operator fun times(times: Double) = MonthSpan((totalMonths * times).toInt())
+    operator fun div(times: Double) = MonthSpan((totalMonths / times).toInt())
+
+    operator fun times(times: Int) = this * times.toDouble()
+    operator fun div(times: Int) = this / times.toDouble()
+
+    // @TODO: Kotlin/Native is not removing boxes on inline + Number
+    @Deprecated("Boxing on Kotlin/Native", ReplaceWith("this * times.toDouble()"))
+    inline operator fun times(times: Number) = this * times.toDouble()
+    @Deprecated("Boxing on Kotlin/Native", ReplaceWith("this / times.toDouble()"))
+    inline operator fun div(times: Number) = this / times.toDouble()
 
     override fun compareTo(other: MonthSpan): Int = this.totalMonths.compareTo(other.totalMonths)
 

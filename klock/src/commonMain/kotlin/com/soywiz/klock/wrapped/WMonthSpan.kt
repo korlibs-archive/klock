@@ -32,8 +32,16 @@ class WMonthSpan(val value: MonthSpan) : Comparable<WMonthSpan> {
     operator fun minus(other: WMonthSpan) = (this.value - other.value).wrapped
     operator fun minus(other: WDateTimeSpan) = (this.value - other.value).wrapped
 
-    inline operator fun times(times: Number) = (value * times).wrapped
-    inline operator fun div(times: Number) = (value / times).wrapped
+    operator fun times(times: Double) = (value * times).wrapped
+    operator fun div(times: Double) = (value / times).wrapped
+
+    operator fun times(times: Int) = this * times.toDouble()
+    operator fun div(times: Int) = this / times.toDouble()
+
+    @Deprecated("Boxing on Kotlin/Native", ReplaceWith("this * times.toDouble()"))
+    inline operator fun times(times: Number) = this * times.toDouble()
+    @Deprecated("Boxing on Kotlin/Native", ReplaceWith("this / times.toDouble()"))
+    inline operator fun div(times: Number) = this / times.toDouble()
 
     override fun compareTo(other: WMonthSpan): Int = this.value.compareTo(other.value)
 
