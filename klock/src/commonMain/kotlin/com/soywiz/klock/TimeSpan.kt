@@ -3,22 +3,68 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
+// @TODO: Kotlin/Native is not removing boxes on inline + Number
 /** [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds]. */
-inline val Number.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
+@Deprecated("Boxing on Kotlin/Native", ReplaceWith("this.toDouble().nanoseconds"))
+inline val Number.nanoseconds get() = this.toDouble().nanoseconds
 /** [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds]. */
-inline val Number.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
+@Deprecated("Boxing on Kotlin/Native", ReplaceWith("this.toDouble().microseconds"))
+inline val Number.microseconds get() = this.toDouble().microseconds
 /** [TimeSpan] representing this number as [milliseconds] or 1 / 1_000 [seconds]. */
-inline val Number.milliseconds get() = TimeSpan.fromMilliseconds(this.toDouble())
+@Deprecated("Boxing on Kotlin/Native", ReplaceWith("this.toDouble().milliseconds"))
+inline val Number.milliseconds get() = this.toDouble().milliseconds
 /** [TimeSpan] representing this number as [seconds]. */
-inline val Number.seconds get() = TimeSpan.fromSeconds((this.toDouble()))
+@Deprecated("Boxing on Kotlin/Native", ReplaceWith("this.toDouble().seconds"))
+inline val Number.seconds get() = this.toDouble().seconds
 /** [TimeSpan] representing this number as [minutes] or 60 [seconds]. */
-inline val Number.minutes get() = TimeSpan.fromMinutes(this.toDouble())
+@Deprecated("Boxing on Kotlin/Native", ReplaceWith("this.toDouble().minutes"))
+inline val Number.minutes get() = this.toDouble().minutes
 /** [TimeSpan] representing this number as [hours] or 3_600 [seconds]. */
-inline val Number.hours get() = TimeSpan.fromHours(this.toDouble())
+@Deprecated("Boxing on Kotlin/Native", ReplaceWith("this.toDouble().hours"))
+inline val Number.hours get() = this.toDouble().hours
 /** [TimeSpan] representing this number as [days] or 86_400 [seconds]. */
-inline val Number.days get() = TimeSpan.fromDays(this.toDouble())
+@Deprecated("Boxing on Kotlin/Native", ReplaceWith("this.toDouble().days"))
+inline val Number.days get() = this.toDouble().days
 /** [TimeSpan] representing this number as [weeks] or 604_800 [seconds]. */
-inline val Number.weeks get() = TimeSpan.fromWeeks(this.toDouble())
+@Deprecated("Boxing on Kotlin/Native", ReplaceWith("this.toDouble().weeks"))
+inline val Number.weeks get() = this.toDouble().weeks
+
+// Kotlin/Native is not removing boxes from inline + Number
+
+/** [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds]. */
+inline val Int.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
+/** [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds]. */
+inline val Int.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
+/** [TimeSpan] representing this number as [milliseconds] or 1 / 1_000 [seconds]. */
+inline val Int.milliseconds get() = TimeSpan.fromMilliseconds(this.toDouble())
+/** [TimeSpan] representing this number as [seconds]. */
+inline val Int.seconds get() = TimeSpan.fromSeconds((this.toDouble()))
+/** [TimeSpan] representing this number as [minutes] or 60 [seconds]. */
+inline val Int.minutes get() = TimeSpan.fromMinutes(this.toDouble())
+/** [TimeSpan] representing this number as [hours] or 3_600 [seconds]. */
+inline val Int.hours get() = TimeSpan.fromHours(this.toDouble())
+/** [TimeSpan] representing this number as [days] or 86_400 [seconds]. */
+inline val Int.days get() = TimeSpan.fromDays(this.toDouble())
+/** [TimeSpan] representing this number as [weeks] or 604_800 [seconds]. */
+inline val Int.weeks get() = TimeSpan.fromWeeks(this.toDouble())
+
+/** [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds]. */
+inline val Double.nanoseconds get() = TimeSpan.fromNanoseconds(this)
+/** [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds]. */
+inline val Double.microseconds get() = TimeSpan.fromMicroseconds(this)
+/** [TimeSpan] representing this number as [milliseconds] or 1 / 1_000 [seconds]. */
+inline val Double.milliseconds get() = TimeSpan.fromMilliseconds(this)
+/** [TimeSpan] representing this number as [seconds]. */
+inline val Double.seconds get() = TimeSpan.fromSeconds((this))
+/** [TimeSpan] representing this number as [minutes] or 60 [seconds]. */
+inline val Double.minutes get() = TimeSpan.fromMinutes(this)
+/** [TimeSpan] representing this number as [hours] or 3_600 [seconds]. */
+inline val Double.hours get() = TimeSpan.fromHours(this)
+/** [TimeSpan] representing this number as [days] or 86_400 [seconds]. */
+inline val Double.days get() = TimeSpan.fromDays(this)
+/** [TimeSpan] representing this number as [weeks] or 604_800 [seconds]. */
+inline val Double.weeks get() = TimeSpan.fromWeeks(this)
+
 
 /**
  * Represents a span of time, with [milliseconds] precision.

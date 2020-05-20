@@ -80,9 +80,16 @@ internal class Moduler(val value: Double) {
         avalue %= count
         return floor(ret) * sign
     }
+    fun int(count: Double): Int = double(count).toInt()
 
+    fun double(count: Int): Double = double(count.toDouble())
+    fun int(count: Int): Int = int(count.toDouble())
+
+    @Deprecated("Boxing on Kotlin/Native", ReplaceWith("double(count.toDouble())"))
     inline fun double(count: Number): Double = double(count.toDouble())
-    inline fun int(count: Number): Int = double(count.toDouble()).toInt()
+    @Deprecated("Boxing on Kotlin/Native", ReplaceWith("int(count.toDouble())"))
+    inline fun int(count: Number): Int = int(count.toDouble())
+
 }
 
 internal infix fun Double.intDiv(other: Double) = floor(this / other)
