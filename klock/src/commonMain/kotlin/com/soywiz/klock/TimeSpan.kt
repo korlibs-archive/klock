@@ -74,7 +74,7 @@ inline val Double.weeks get() = TimeSpan.fromWeeks(this)
 inline class TimeSpan(
     /** Returns the total number of [milliseconds] for this [TimeSpan] (1 / 1_000 [seconds]) */
     val milliseconds: Double
-) : Comparable<TimeSpan> {
+) : Comparable<TimeSpan>, Serializable {
     /** Returns the total number of [nanoseconds] for this [TimeSpan] (1 / 1_000_000_000 [seconds]) */
     val nanoseconds: Double get() = this.milliseconds / MILLIS_PER_NANOSECOND
     /** Returns the total number of [microseconds] for this [TimeSpan] (1 / 1_000_000 [seconds]) */
@@ -118,6 +118,9 @@ inline class TimeSpan(
     operator fun rem(other: TimeSpan): TimeSpan = (this.milliseconds % other.milliseconds).milliseconds
 
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         private const val MILLIS_PER_MICROSECOND = 1.0 / 1000.0
         private const val MILLIS_PER_NANOSECOND = MILLIS_PER_MICROSECOND / 1000.0
 

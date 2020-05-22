@@ -1,5 +1,6 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.Serializable
 import kotlin.math.*
 
 /**
@@ -10,8 +11,11 @@ import kotlin.math.*
  *
  * The integrated model is capable of determine if a year is leap for years 1 until 9999 inclusive.
  */
-inline class Year(val year: Int) : Comparable<Year> {
+inline class Year(val year: Int) : Comparable<Year>, Serializable {
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /**
          * Creates a Year instance checking that the year is between 1 and 9999 inclusive.
          *

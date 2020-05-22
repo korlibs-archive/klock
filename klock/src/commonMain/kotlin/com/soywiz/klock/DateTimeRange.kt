@@ -1,15 +1,18 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.Serializable
 import com.soywiz.klock.internal.klockLazyOrGet
 
 /**
  * Represents a right-opened range between two dates.
  */
-data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<DateTime> {
-
+data class DateTimeRange(val from: DateTime, val to: DateTime) : Comparable<DateTime>, Serializable {
     val valid get() = from <= to
 
 	companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
 		operator fun invoke(base: Date, from: Time, to: Time): DateTimeRange = DateTimeRange(base + from, base + to)
 	}
 

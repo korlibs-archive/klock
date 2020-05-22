@@ -11,10 +11,17 @@ import kotlin.math.pow
 data class PatternTimeFormat(
     val format: String,
     val options: Options = Options.DEFAULT
-) : TimeFormat {
+) : TimeFormat, Serializable {
+    companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+    }
 
-    data class Options(val optionalSupport: Boolean = false) {
+    data class Options(val optionalSupport: Boolean = false) : Serializable {
         companion object {
+            @Suppress("MayBeConstant", "unused")
+            private const val serialVersionUID = 1L
+
             val DEFAULT = Options(optionalSupport = false)
             val WITH_OPTIONAL = Options(optionalSupport = true)
         }

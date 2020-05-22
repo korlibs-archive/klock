@@ -1,12 +1,16 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.Serializable
 import kotlin.math.abs
 
 /**
  * Represents a union of [millisecond], [second], [minute] and [hour].
  */
-inline class Time(val encoded: TimeSpan) : Comparable<Time> {
+inline class Time(val encoded: TimeSpan) : Comparable<Time>, Serializable {
 	companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** Constructs a new [Time] from the [hour], [minute], [second] and [millisecond] components. */
 		operator fun invoke(hour: Int, minute: Int = 0, second: Int = 0, millisecond: Int = 0): Time =
 			Time(hour.hours + minute.minutes + second.seconds + millisecond.milliseconds)

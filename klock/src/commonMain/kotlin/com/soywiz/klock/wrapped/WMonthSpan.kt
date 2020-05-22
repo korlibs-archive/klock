@@ -2,6 +2,7 @@ package com.soywiz.klock.wrapped
 
 import com.soywiz.klock.*
 import com.soywiz.klock.annotations.*
+import com.soywiz.klock.internal.Serializable
 
 @KlockExperimental
 val MonthSpan.wrapped get() = WMonthSpan(this)
@@ -12,7 +13,12 @@ val MonthSpan.wrapped get() = WMonthSpan(this)
  * Represents a number of years and months temporal distance.
  */
 @KlockExperimental
-class WMonthSpan(val value: MonthSpan) : Comparable<WMonthSpan> {
+class WMonthSpan(val value: MonthSpan) : Comparable<WMonthSpan>, Serializable {
+    companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+    }
+
     val totalMonths: Int get() = value.totalMonths
     /** Total years of this [WMonthSpan] as double (might contain decimals) */
     val totalYears: Double get() = value.totalYears

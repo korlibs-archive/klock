@@ -2,6 +2,7 @@ package com.soywiz.klock.wrapped
 
 import com.soywiz.klock.*
 import com.soywiz.klock.annotations.*
+import com.soywiz.klock.internal.Serializable
 
 @KlockExperimental
 val Time.wrapped get() = WTime(this)
@@ -12,8 +13,11 @@ val Time.wrapped get() = WTime(this)
  * Represents a union of [millisecond], [second], [minute] and [hour].
  */
 @KlockExperimental
-class WTime(val value: Time) : Comparable<WTime> {
+class WTime(val value: Time) : Comparable<WTime>, Serializable {
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** Constructs a new [WTime] from the [hour], [minute], [second] and [millisecond] components. */
         operator fun invoke(hour: Int, minute: Int = 0, second: Int = 0, millisecond: Int = 0): WTime =
             Time(hour, minute, second, millisecond).wrapped

@@ -2,6 +2,7 @@ package com.soywiz.klock.wrapped
 
 import com.soywiz.klock.*
 import com.soywiz.klock.annotations.*
+import com.soywiz.klock.internal.Serializable
 
 @KlockExperimental
 val Date.wrapped get() = WDate(this)
@@ -14,8 +15,11 @@ val Date.wrapped get() = WDate(this)
  * It is packed in an inline class wrapping an Int to prevent allocations.
  */
 @KlockExperimental
-class WDate(val value: Date) : Comparable<WDate> {
+class WDate(val value: Date) : Comparable<WDate>, Serializable {
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** Constructs a new [WDate] from the [year], [month] and [day] components. */
         operator fun invoke(year: Int, month: Int, day: Int) = Date(year, month, day).wrapped
         /** Constructs a new [WDate] from the [year], [month] and [day] components. */

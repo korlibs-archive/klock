@@ -14,8 +14,11 @@ import kotlin.math.*
 inline class DateTime(
     /** Number of milliseconds since UNIX [EPOCH] */
     val unixMillis: Double
-) : Comparable<DateTime> {
+) : Comparable<DateTime>, Serializable {
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** It is a [DateTime] instance representing 00:00:00 UTC, Thursday, 1 January 1970. */
         val EPOCH = DateTime(0.0)
 
