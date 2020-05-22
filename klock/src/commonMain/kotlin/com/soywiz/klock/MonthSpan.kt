@@ -1,5 +1,7 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.Serializable
+
 /**
  * Creates a [MonthSpan] representing these years.
  */
@@ -16,7 +18,12 @@ inline val Int.months get() = MonthSpan(this)
 inline class MonthSpan(
     /** Total months of this [MonthSpan] as integer */
     val totalMonths: Int
-) : Comparable<MonthSpan> {
+) : Comparable<MonthSpan>, Serializable {
+    companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+    }
+
     operator fun unaryMinus() = MonthSpan(-totalMonths)
     operator fun unaryPlus() = MonthSpan(+totalMonths)
 

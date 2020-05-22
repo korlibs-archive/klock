@@ -2,6 +2,7 @@ package com.soywiz.klock.wrapped
 
 import com.soywiz.klock.*
 import com.soywiz.klock.annotations.*
+import com.soywiz.klock.internal.Serializable
 
 @KlockExperimental
 val Year.wrapped get() = WYear(this)
@@ -17,8 +18,11 @@ val Year.wrapped get() = WYear(this)
  * The integrated model is capable of determine if a year is leap for years 1 until 9999 inclusive.
  */
 @KlockExperimental
-class WYear(val value: Year) : Comparable<WYear> {
+class WYear(val value: Year) : Comparable<WYear>, Serializable {
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /**
          * Creates a Year instance checking that the year is between 1 and 9999 inclusive.
          *

@@ -1,5 +1,6 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.wrapped.*
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
@@ -8,14 +9,16 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 
 class SerializableTest {
+    fun <T> serializeDeserializeObject(instance: T): Any? {
+        val bao = ByteArrayOutputStream().also { ObjectOutputStream(it).writeObject(instance) }.toByteArray()
+        return ObjectInputStream(ByteArrayInputStream(bao)).readObject()
+    }
+
     @Test
     fun test() {
-        val os = ByteArrayOutputStream()
-        val oos = ObjectOutputStream(os)
         val time = 1_000_000L
-        oos.writeObject(DateTimeTz.fromUnixLocal(time))
-        val bao = os.toByteArray()
-        val obj = ObjectInputStream(ByteArrayInputStream(bao)).readObject()
-        assertTrue { obj is DateTimeTz }
+        assertTrue { serializeDeserializeObject(DateTimeTz.fromUnixLocal(time)) is DateTimeTz }
+        assertTrue { serializeDeserializeObject(WDateTime(2020, 1, 1)) is WDateTime }
+        assertTrue { serializeDeserializeObject(WDate(2020, 1, 1)) is WDate }
     }
 }

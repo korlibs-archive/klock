@@ -2,6 +2,7 @@ package com.soywiz.klock.wrapped
 
 import com.soywiz.klock.*
 import com.soywiz.klock.annotations.*
+import com.soywiz.klock.internal.Serializable
 
 @KlockExperimental
 val YearMonth.wrapped get() = WYearMonth(this)
@@ -12,8 +13,11 @@ val YearMonth.wrapped get() = WYearMonth(this)
  * Represents a couple of [year] and [month].
  */
 @KlockExperimental
-class WYearMonth(val value: YearMonth) {
+class WYearMonth(val value: YearMonth) : Serializable {
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** Constructs a new [WYearMonth] from the [year] and [month] components. */
         operator fun invoke(year: WYear, month: WMonth) = YearMonth(year.value, month).wrapped
         /** Constructs a new [WYearMonth] from the [year] and [month] components. */

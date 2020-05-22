@@ -2,6 +2,7 @@ package com.soywiz.klock.wrapped
 
 import com.soywiz.klock.*
 import com.soywiz.klock.annotations.*
+import com.soywiz.klock.internal.Serializable
 
 @KlockExperimental
 val TimezoneOffset.wrapped get() = WTimezoneOffset(this)
@@ -15,7 +16,7 @@ val TimezoneOffset.wrapped get() = WTimezoneOffset(this)
  * This class is inlined so no boxing should be required.
  */
 @KlockExperimental
-class WTimezoneOffset(val value: TimezoneOffset) {
+class WTimezoneOffset(val value: TimezoneOffset) : Serializable {
     /** Returns whether this [WTimezoneOffset] has a positive component */
     val positive: Boolean get() = value.positive
 
@@ -34,6 +35,9 @@ class WTimezoneOffset(val value: TimezoneOffset) {
     override fun toString(): String = value.toString()
 
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+        
         /** Constructs a new [WTimezoneOffset] from a [WTimeSpan]. */
         operator fun invoke(time: WTimeSpan) = TimezoneOffset(time.value).wrapped
 

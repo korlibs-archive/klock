@@ -1,6 +1,7 @@
 package com.soywiz.klock
 
 import com.soywiz.klock.internal.BSearchResult
+import com.soywiz.klock.internal.Serializable
 import com.soywiz.klock.internal.fastForEach
 import com.soywiz.klock.internal.genericBinarySearch
 import com.soywiz.klock.internal.klockLazyOrGet
@@ -9,7 +10,7 @@ import com.soywiz.klock.internal.klockLazyOrGet
 //  - ranges are sorted
 //  - ranges do not overlap/intersect between each other (they are merged and normalized)
 // These properties allows to do some tricks and optimizations like binary search and a lot of O(n) operations.
-data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: List<DateTimeRange>) {
+data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: List<DateTimeRange>) : Serializable {
 
     /** [DateTimeRange] from the beginning of the first element to the end of the last one. */
     val bounds = DateTimeRange(
@@ -42,6 +43,9 @@ data class DateTimeRangeSet private constructor(val dummy: Boolean, val ranges: 
     fun intersection(right: DateTimeRangeSet): DateTimeRangeSet = Fast.intersection(this, right)
 
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         fun toStringLongs(ranges: List<DateTimeRange>): String = "${ranges.map { it.toStringLongs() }}"
     }
 

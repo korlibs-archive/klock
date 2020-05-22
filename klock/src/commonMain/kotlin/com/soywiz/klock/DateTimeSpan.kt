@@ -12,7 +12,12 @@ data class DateTimeSpan(
     val monthSpan: MonthSpan,
     /** The [TimeSpan] part */
     val timeSpan: TimeSpan
-) : Comparable<DateTimeSpan> {
+) : Comparable<DateTimeSpan>, Serializable {
+    companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+    }
+
     constructor(
         years: Int = 0,
         months: Int = 0,

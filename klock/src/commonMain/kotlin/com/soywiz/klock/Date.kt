@@ -1,5 +1,6 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.Serializable
 import kotlin.math.abs
 
 /**
@@ -7,8 +8,11 @@ import kotlin.math.abs
  *
  * It is packed in an inline class wrapping an Int to prevent allocations.
  */
-inline class Date(val encoded: Int) : Comparable<Date> {
+inline class Date(val encoded: Int) : Comparable<Date>, Serializable {
 	companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** Constructs a new [Date] from the [year], [month] and [day] components. */
 		operator fun invoke(year: Int, month: Int, day: Int) = Date((year shl 16) or (month shl 8) or (day shl 0))
         /** Constructs a new [Date] from the [year], [month] and [day] components. */

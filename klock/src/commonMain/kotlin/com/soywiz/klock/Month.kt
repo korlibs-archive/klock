@@ -11,7 +11,7 @@ enum class Month(
     val daysCommon: Int,
     /** Number of days of this month in a leap year */
     val daysLeap: Int = daysCommon
-) {
+) : Serializable {
     January(1, daysCommon = 31),
     February(2, daysCommon = 28, daysLeap = 29),
     March(3, daysCommon = 31),
@@ -66,6 +66,9 @@ enum class Month(
     fun localShortName(locale: KlockLocale) = locale.monthsShort[index0]
 
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /**
          * Number of months in a year (12).
          */

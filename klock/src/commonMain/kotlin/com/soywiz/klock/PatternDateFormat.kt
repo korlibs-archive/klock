@@ -9,12 +9,19 @@ data class PatternDateFormat @JvmOverloads constructor(
     val locale: KlockLocale? = null,
     val tzNames: TimezoneNames = TimezoneNames.DEFAULT,
     val options: Options = Options.DEFAULT
-) : DateFormat {
+) : DateFormat, Serializable {
+    companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+    }
 
     val realLocale get() = locale ?: KlockLocale.default
 
-    data class Options(val optionalSupport: Boolean = false) {
+    data class Options(val optionalSupport: Boolean = false) : Serializable {
         companion object {
+            @Suppress("MayBeConstant", "unused")
+            private const val serialVersionUID = 1L
+
             val DEFAULT = Options(optionalSupport = false)
             val WITH_OPTIONAL = Options(optionalSupport = true)
         }
