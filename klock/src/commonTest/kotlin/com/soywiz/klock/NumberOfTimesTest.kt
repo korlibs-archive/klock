@@ -3,7 +3,7 @@ package com.soywiz.klock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class TimesTest {
+class NumberOfTimesTest {
     @Test
     fun testInfinite() {
         assertEquals(infiniteTimes, infiniteTimes.oneLess)
