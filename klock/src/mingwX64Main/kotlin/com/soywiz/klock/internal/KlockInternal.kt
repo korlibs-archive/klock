@@ -1,6 +1,7 @@
 package com.soywiz.klock.internal
 
 import com.soywiz.klock.*
+import com.soywiz.klock.hr.HRTimeSpan
 import kotlinx.cinterop.*
 import platform.posix.*
 import platform.windows.*
@@ -15,13 +16,13 @@ internal actual object KlockInternal {
             ((sec * 1_000L) + (usec / 1_000L)).toDouble()
         }
 
-    actual val microClock: Double
+    actual val hrNow: HRTimeSpan
         get() = memScoped {
             val timeVal = alloc<timeval>()
             mingw_gettimeofday(timeVal.ptr, null)
             val sec = timeVal.tv_sec
             val usec = timeVal.tv_usec
-            ((sec * 1_000_000L) + usec).toDouble()
+            HRTimeSpan.fromSeconds(sec.toInt()) + HRTimeSpan.fromMicroseconds(usec.toInt())
         }
 
     actual fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan = memScoped {
