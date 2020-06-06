@@ -66,3 +66,4 @@ fun HRTimeSpan.clamp(min: HRTimeSpan, max: HRTimeSpan): HRTimeSpan = when {
     this > max -> max
     else -> this
 }
+inline fun HRTimeSpan.coalesce(block: () -> HRTimeSpan): HRTimeSpan = if (this != HRTimeSpan.NULL) this else block()

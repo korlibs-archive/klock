@@ -203,3 +203,4 @@ fun TimeSpan.clamp(min: TimeSpan, max: TimeSpan): TimeSpan = when {
     this > max -> max
     else -> this
 }
+inline fun TimeSpan.coalesce(block: () -> TimeSpan): TimeSpan = if (this != TimeSpan.NULL) this else block()
