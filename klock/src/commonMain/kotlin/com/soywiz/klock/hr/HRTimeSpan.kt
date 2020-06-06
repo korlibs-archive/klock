@@ -10,7 +10,7 @@ val TimeSpan.hr get() = HRTimeSpan.fromMilliseconds(this.milliseconds)
 /** Converts a [HRTimeSpan] into a low-resolution [TimeSpan] */
 val HRTimeSpan.timeSpan get() = nanosecondsRaw.microseconds
 
-// @TODO: Ensure nanosecondsDouble has no decimals
+// @TODO: Ensure nanosecondsRaw has no decimals
 /** A High-Resolution TimeSpan that stores its values as nanoseconds. Just uses 52-bits and won't store decimals */
 inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRTimeSpan> {
     companion object {
