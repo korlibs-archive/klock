@@ -25,6 +25,7 @@ val Double.hrNanoseconds get() = HRTimeSpan.fromNanoseconds(this)
 inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRTimeSpan> {
     companion object {
         val ZERO = HRTimeSpan(0.0)
+        val NULL = HRTimeSpan(Double.NaN)
 
         fun fromSeconds(value: Double) = HRTimeSpan(round(value * 1_000_000_000))
         fun fromMilliseconds(value: Double) = HRTimeSpan(round(value * 1_000_000))
