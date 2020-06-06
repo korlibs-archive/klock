@@ -14,6 +14,8 @@ val HRTimeSpan.timeSpan get() = nanosecondsRaw.microseconds
 /** A High-Resolution TimeSpan that stores its values as nanoseconds. Just uses 52-bits and won't store decimals */
 inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRTimeSpan> {
     companion object {
+        val ZERO = HRTimeSpan(0.0)
+
         fun fromSeconds(value: Double) = HRTimeSpan(round(value * 1_000_000_000))
         fun fromMilliseconds(value: Double) = HRTimeSpan(round(value * 1_000_000))
         fun fromMicroseconds(value: Double) = HRTimeSpan(round(value * 1_000))
