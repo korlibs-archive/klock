@@ -55,4 +55,14 @@ inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRT
     operator fun times(other: Int): HRTimeSpan = fromNanoseconds(nanosecondsRaw * other)
     operator fun div(other: HRTimeSpan): Double = (nanosecondsRaw / other.nanosecondsRaw)
     override fun compareTo(other: HRTimeSpan): Int = this.nanosecondsRaw.compareTo(other.nanosecondsRaw)
+
+    override fun toString(): String = "$nanosecondsRaw".removeSuffix(".0") + " ns"
+}
+
+fun max(a: HRTimeSpan, b: HRTimeSpan): HRTimeSpan = kotlin.math.max(a.nanosecondsRaw, b.nanosecondsRaw).hrNanoseconds
+fun min(a: HRTimeSpan, b: HRTimeSpan): HRTimeSpan = kotlin.math.min(a.nanosecondsRaw, b.nanosecondsRaw).hrNanoseconds
+fun HRTimeSpan.clamp(min: HRTimeSpan, max: HRTimeSpan): HRTimeSpan = when {
+    this < min -> min
+    this > max -> max
+    else -> this
 }
