@@ -8,7 +8,7 @@ interface HRTimeProvider {
     fun now(): HRTimeSpan
 
     companion object : HRTimeProvider {
-        override fun now(): HRTimeSpan = HRTimeSpan.fromNanoseconds(PerformanceCounter.nanoseconds)
+        override fun now(): HRTimeSpan = PerformanceCounter.hr
 
         /** Constructs a [HRTimeProvider] from a [callback] producing a [HRTimeSpan]. */
         operator fun invoke(callback: () -> HRTimeSpan) = object : HRTimeProvider {

@@ -28,10 +28,12 @@ inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRT
     val nanosecondsDouble get() = (nanosecondsRaw)
     val microsecondsDouble get() = (nanosecondsRaw / 1_000)
     val millisecondsDouble get() = (nanosecondsRaw / 1_000_000)
+    val secondsDouble get() = (nanosecondsRaw / 1_000_000_000)
 
     val nanosecondsInt get() = nanosecondsRaw.toInt()
     val microsecondsInt get() = microsecondsDouble.toInt()
     val millisecondsInt get() = millisecondsDouble.toInt()
+    val secondsInt get() = secondsDouble.toInt()
 
     operator fun plus(other: HRTimeSpan): HRTimeSpan = fromNanoseconds(nanosecondsRaw + other.nanosecondsRaw)
     operator fun minus(other: HRTimeSpan): HRTimeSpan = fromNanoseconds(nanosecondsRaw - other.nanosecondsRaw)
