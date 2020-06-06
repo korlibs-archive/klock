@@ -1,5 +1,7 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.hr.HRTimeSpan
+import com.soywiz.klock.hr.timeSpan
 import com.soywiz.klock.internal.*
 
 /**
@@ -9,20 +11,25 @@ object PerformanceCounter {
     /**
      * Returns a performance counter measure in nanoseconds.
      */
-    val nanoseconds: Double get() = KlockInternal.microClock * 1000.0
+    val nanoseconds: Double get() = KlockInternal.hrNow.nanosecondsDouble
 
     /**
      * Returns a performance counter measure in microseconds.
      */
-    val microseconds: Double get() = KlockInternal.microClock
+    val microseconds: Double get() = KlockInternal.hrNow.microsecondsDouble
 
     /**
      * Returns a performance counter measure in milliseconds.
      */
-    val milliseconds: Double get() = KlockInternal.microClock / 1000.0
+    val milliseconds: Double get() = KlockInternal.hrNow.millisecondsDouble
 
     /**
      * Returns a performance counter as a [TimeSpan].
      */
-    val reference: TimeSpan get() = KlockInternal.microClock.microseconds
+    val reference: TimeSpan get() = KlockInternal.hrNow.timeSpan
+
+    /**
+     * Returns a performance counter as a [TimeSpan].
+     */
+    val hr: HRTimeSpan get() = KlockInternal.hrNow
 }

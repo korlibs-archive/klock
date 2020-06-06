@@ -1,6 +1,7 @@
 package com.soywiz.klock.internal
 
 import com.soywiz.klock.*
+import com.soywiz.klock.hr.HRTimeSpan
 import kotlin.browser.*
 import kotlin.math.*
 
@@ -12,12 +13,13 @@ private val initialHrTime by klockAtomicLazy { process.hrtime() }
 internal actual object KlockInternal {
     actual val currentTime: Double get() = (js("Date.now()").unsafeCast<Double>())
 
-    actual val microClock: Double get() {
-        return if (isNode) {
-            val result = process.hrtime(initialHrTime)
-            (result[0] * 1_000_000 + floor((result[1] / 1_000) as Double)) as Double
-        } else {
-            floor(window.performance.now() * 1000)
+    actual val hrNow: HRTimeSpan get() = when {
+        isNode -> {
+            val result: Array<Double> = process.hrtime(initialHrTime).unsafeCast<Array<Double>>()
+            HRTimeSpan.fromSeconds(result[0]) + HRTimeSpan.fromNanoseconds(result[1])
+        }
+        else -> {
+            HRTimeSpan.fromMilliseconds(window.performance.now())
         }
     }
 
