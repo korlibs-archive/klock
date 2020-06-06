@@ -16,7 +16,7 @@ internal actual object KlockInternal {
     actual val hrNow: HRTimeSpan get() = when {
         isNode -> {
             val result: Array<Double> = process.hrtime(initialHrTime).unsafeCast<Array<Double>>()
-            HRTimeSpan.fromSeconds(result[0]) + HRTimeSpan.fromMicroseconds(result[1])
+            HRTimeSpan.fromSeconds(result[0]) + HRTimeSpan.fromNanoseconds(result[1])
         }
         else -> {
             HRTimeSpan.fromMilliseconds(window.performance.now())
