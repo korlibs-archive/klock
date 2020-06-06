@@ -25,6 +25,7 @@ var CurrentKlockInternalJvm = object : KlockInternalJvm {
 
 interface KlockInternalJvm {
     val currentTime: Double get() = (System.currentTimeMillis()).toDouble()
+    val microClock: Double get() = hrNow.microsecondsDouble
     val hrNow: HRTimeSpan get() = HRTimeSpan.fromNanoseconds(System.nanoTime().toDouble())
     fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan = TimeZone.getDefault().getOffset(time.unixMillisLong).milliseconds
 }
