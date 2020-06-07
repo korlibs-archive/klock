@@ -1,5 +1,6 @@
 package com.soywiz.klock.hr
 
+import com.soywiz.klock.PerformanceCounter
 import com.soywiz.klock.TimeSpan
 import com.soywiz.klock.microseconds
 import com.soywiz.klock.nanoseconds
@@ -27,6 +28,8 @@ inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRT
     companion object {
         val ZERO = HRTimeSpan(0.0)
         val NULL = HRTimeSpan(Double.NaN)
+
+        fun now() = PerformanceCounter.hr
 
         fun fromSeconds(value: Double) = HRTimeSpan(round(value * 1_000_000_000))
         fun fromMilliseconds(value: Double) = HRTimeSpan(round(value * 1_000_000))
