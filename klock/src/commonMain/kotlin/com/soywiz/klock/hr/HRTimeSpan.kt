@@ -2,13 +2,14 @@ package com.soywiz.klock.hr
 
 import com.soywiz.klock.TimeSpan
 import com.soywiz.klock.microseconds
+import com.soywiz.klock.nanoseconds
 import kotlin.math.round
 
 /** Converts a [TimeSpan] into a high-resolution [HRTimeSpan] */
 val TimeSpan.hr get() = HRTimeSpan.fromMilliseconds(this.milliseconds)
 
 /** Converts a [HRTimeSpan] into a low-resolution [TimeSpan] */
-val HRTimeSpan.timeSpan get() = nanosecondsRaw.microseconds
+val HRTimeSpan.timeSpan get() = nanosecondsRaw.nanoseconds
 
 val Int.hrSeconds get() = HRTimeSpan.fromSeconds(this)
 val Int.hrMilliseconds get() = HRTimeSpan.fromMilliseconds(this)
