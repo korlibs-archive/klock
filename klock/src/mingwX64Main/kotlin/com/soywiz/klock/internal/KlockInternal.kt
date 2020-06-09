@@ -40,8 +40,8 @@ internal actual object KlockInternal {
         val micros = time.microsecondsDouble.toLong()
         val s = micros / 1_000_000
         val u = micros % 1_000_000
-        if (s > 0) sleep(s.convert())
-        if (u > 0) usleep(u.convert())
+        if (s > 0) platform.posix.sleep(s.convert())
+        if (u > 0) platform.posix.usleep(u.convert())
     }
 
     fun SYSTEMTIME.toTimezone(tzi: TIME_ZONE_INFORMATION): SYSTEMTIME = memScoped { alloc<SYSTEMTIME>().apply { SystemTimeToTzSpecificLocalTime(tzi.ptr, this@toTimezone.ptr, this.ptr) } }

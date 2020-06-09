@@ -26,8 +26,8 @@ internal actual object KlockInternal {
         val micros = time.microsecondsDouble.toLong()
         val s = micros / 1_000_000
         val u = micros % 1_000_000
-        if (s > 0) sleep(s.convert())
-        if (u > 0) usleep(u.convert())
+        if (s > 0) platform.posix.sleep(s.convert())
+        if (u > 0) platform.posix.usleep(u.convert())
     }
 
     // @TODO: kotlin-native bug: https://github.com/JetBrains/kotlin-native/pull/1901
