@@ -2,6 +2,7 @@ package com.soywiz.klock.hr
 
 import com.soywiz.klock.PerformanceCounter
 import com.soywiz.klock.TimeSpan
+import com.soywiz.klock.internal.KlockInternal
 import com.soywiz.klock.microseconds
 import com.soywiz.klock.nanoseconds
 import kotlin.math.round

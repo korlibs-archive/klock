@@ -28,6 +28,10 @@ internal actual object KlockInternal {
         val rtime = time.unixMillisDouble
         return js("-(new Date(rtime)).getTimezoneOffset()").unsafeCast<Int>().minutes
     }
+
+    actual fun sleep(time: HRTimeSpan) {
+        spinlock(time)
+    }
 }
 
 actual interface Serializable

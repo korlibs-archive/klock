@@ -36,6 +36,14 @@ internal actual object KlockInternal {
         return (localUnix - utcUnix).milliseconds
     }
 
+    actual fun sleep(time: HRTimeSpan) {
+        val micros = time.microsecondsDouble.toLong()
+        val s = micros / 1_000_000
+        val u = micros % 1_000_000
+        if (s > 0) sleep(u)
+        if (u > 0) usleep(u)
+    }
+
     fun SYSTEMTIME.toTimezone(tzi: TIME_ZONE_INFORMATION): SYSTEMTIME = memScoped { alloc<SYSTEMTIME>().apply { SystemTimeToTzSpecificLocalTime(tzi.ptr, this@toTimezone.ptr, this.ptr) } }
     fun SYSTEMTIME.toUtc(tzi: TIME_ZONE_INFORMATION): SYSTEMTIME = memScoped { alloc<SYSTEMTIME>().apply { TzSpecificLocalTimeToSystemTime(tzi.ptr, this@toUtc.ptr, this.ptr) } }
     fun getTimeZoneInformation() = memScoped { alloc<TIME_ZONE_INFORMATION>().apply { GetTimeZoneInformation(this.ptr) } }

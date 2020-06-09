@@ -22,6 +22,14 @@ internal actual object KlockInternal {
         HRTimeSpan.fromSeconds(sec.toInt()) + HRTimeSpan.fromMicroseconds(usec.toInt())
     }
 
+    actual fun sleep(time: HRTimeSpan) {
+        val micros = time.microsecondsDouble.toLong()
+        val s = micros / 1_000_000
+        val u = micros % 1_000_000
+        if (s > 0) sleep(u)
+        if (u > 0) usleep(u)
+    }
+
     // @TODO: kotlin-native bug: https://github.com/JetBrains/kotlin-native/pull/1901
     //private val microStart = kotlin.system.getTimeMicros()
     //actual fun currentTimeMillis(): Long = kotlin.system.getTimeMillis()
