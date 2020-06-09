@@ -10,9 +10,4 @@ internal expect object KlockInternal {
     fun sleep(time: HRTimeSpan)
 }
 
-internal fun spinlock(time: HRTimeSpan) {
-    val start = HRTimeSpan.now()
-    while (HRTimeSpan.now() - start < time) Unit
-}
-
 expect interface Serializable
