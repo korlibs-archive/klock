@@ -40,7 +40,7 @@ internal actual object KlockInternal {
         val micros = time.microsecondsDouble.toLong()
         val s = micros / 1_000_000
         val u = micros % 1_000_000
-        if (s > 0) sleep(u)
+        if (s > 0) sleep(s)
         if (u > 0) usleep(u)
     }
 
