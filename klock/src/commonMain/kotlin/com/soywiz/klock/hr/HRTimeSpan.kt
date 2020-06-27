@@ -13,6 +13,11 @@ val TimeSpan.hr get() = HRTimeSpan.fromMilliseconds(this.milliseconds)
 /** Converts a [HRTimeSpan] into a low-resolution [TimeSpan] */
 val HRTimeSpan.timeSpan get() = nanosecondsRaw.nanoseconds
 
+val Long.hrSeconds get() = HRTimeSpan.fromSeconds(this)
+val Long.hrMilliseconds get() = HRTimeSpan.fromMilliseconds(this)
+val Long.hrMicroseconds get() = HRTimeSpan.fromMicroseconds(this)
+val Long.hrNanoseconds get() = HRTimeSpan.fromNanoseconds(this)
+
 val Int.hrSeconds get() = HRTimeSpan.fromSeconds(this)
 val Int.hrMilliseconds get() = HRTimeSpan.fromMilliseconds(this)
 val Int.hrMicroseconds get() = HRTimeSpan.fromMicroseconds(this)
@@ -41,6 +46,11 @@ inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRT
         fun fromMilliseconds(value: Int) = fromMilliseconds(value.toDouble())
         fun fromMicroseconds(value: Int) = fromMicroseconds(value.toDouble())
         fun fromNanoseconds(value: Int) = fromNanoseconds(value.toDouble())
+
+        fun fromSeconds(value: Long) = fromSeconds(value.toDouble())
+        fun fromMilliseconds(value: Long) = fromMilliseconds(value.toDouble())
+        fun fromMicroseconds(value: Long) = fromMicroseconds(value.toDouble())
+        fun fromNanoseconds(value: Long) = fromNanoseconds(value.toDouble())
     }
 
     val nanosecondsDouble get() = (nanosecondsRaw)

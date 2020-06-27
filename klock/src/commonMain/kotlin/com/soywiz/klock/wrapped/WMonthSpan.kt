@@ -44,11 +44,6 @@ class WMonthSpan(val value: MonthSpan) : Comparable<WMonthSpan>, Serializable {
     operator fun times(times: Int) = this * times.toDouble()
     operator fun div(times: Int) = this / times.toDouble()
 
-    @Deprecated("Boxing on Kotlin/Native", ReplaceWith("this * times.toDouble()"))
-    inline operator fun times(times: Number) = this * times.toDouble()
-    @Deprecated("Boxing on Kotlin/Native", ReplaceWith("this / times.toDouble()"))
-    inline operator fun div(times: Number) = this / times.toDouble()
-
     override fun compareTo(other: WMonthSpan): Int = this.value.compareTo(other.value)
 
     /** Converts this time to String formatting it like "20Y", "20Y 1M", "1M" or "0M". */
