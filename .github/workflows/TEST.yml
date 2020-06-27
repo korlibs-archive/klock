@@ -3,10 +3,8 @@ name: TEST
 on:
   pull_request:
   push:
-    branches-ignore:
-      - 'releases/**'
     tags-ignore:
-      - '*.*'
+      - 'v*'
     paths-ignore:
       - 'README.md'
       - '.github/workflows/DEPLOY.yml'
