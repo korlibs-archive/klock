@@ -3,6 +3,8 @@ name: TEST
 on:
   pull_request:
   push:
+    branches:
+      - '*'
     tags-ignore:
       - 'v*'
     paths-ignore:
