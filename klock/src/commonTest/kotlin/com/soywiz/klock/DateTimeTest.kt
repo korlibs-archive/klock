@@ -410,4 +410,12 @@ class DateTimeTest {
         assertEquals("Sat, 11 Aug -0027 08:00:00 UTC", DateTime.fromUnix(-63000000000000L).toString())
         assertEquals("Sun, 31 Dec 0000 23:59:59 UTC", DateTime.fromUnix(-62135596800000L - 1L).toString())
     }
+
+    @Test
+    fun testBug123() {
+        val str1 = "1989-01-01T10:00:00Z"
+        val str2 = "1989-01-01T10:00:00.000Z"
+        assertEquals(str1, DateTime.parse(str1).format(DateFormat.FORMAT1))
+        assertEquals(str2, DateTime.parse(str2).format(DateFormat.FORMAT2))
+    }
 }
