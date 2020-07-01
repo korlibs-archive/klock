@@ -417,6 +417,5 @@ class DateTimeTest {
         val str2 = "1989-01-01T10:00:00.000Z"
         assertEquals(str1, DateTime.parse(str1).format(DateFormat.FORMAT1))
         assertEquals(str2, DateTime.parse(str2).format(DateFormat.FORMAT2))
-        ISO8601.DATE
     }
 }
