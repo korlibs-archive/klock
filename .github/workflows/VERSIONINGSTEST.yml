@@ -24,15 +24,12 @@ jobs:
         id: get-branch
         uses: ypicard/get-branch-name-github-action@v1
 
-      - name: Write branch to env
-        run: echo "::set-env name=CURRENTBRANCH::${steps.get-branch.outputs.branch}"
-
       - name: Checkout korlibs-versions repo
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.KORGEBOT_TOKEN }}
           repository: korlibs/korlibs-versions
-          ref: ${{ env.CURRENTBRANCH }}
+          ref: ${{ steps.get-branch.outputs.branch }}
 
       - name: Bump version numbers
         run: |
