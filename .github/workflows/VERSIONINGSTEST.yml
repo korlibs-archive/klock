@@ -11,38 +11,6 @@ env:
   BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
 
 jobs:
-  publish-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v1
-      - run: CALL gradlew.bat --no-daemon
-        shell: cmd
-      - run: CALL gradlew.bat --no-daemon assemble check publishMingwX64PublicationToMavenRepository
-        shell: cmd
-        env:
-          DISABLE_JAVASCRIPT_TEST: true
-  publish-mac:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v1
-      - run: ./gradlew
-      - run: ./gradlew assemble check publish -x publishKotlinMultiplatformPublicationToMavenRepository
-        env:
-          DISABLE_JAVASCRIPT_TEST: true
-  publish-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - run: ./gradlew
-      - run: ./gradlew assemble check lint testDebugUnitTest publishKotlinMultiplatformPublicationToMavenRepository publishLinuxX64PublicationToMavenRepository
-
-  publish-finalize:
-    needs: [publish-windows, publish-mac, publish-linux]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - run: ./gradlew actuallyPublishBintray
-
   publishVersionNumbers:
     needs: [publish-finalize]
     runs-on: ubuntu-latest
@@ -53,11 +21,15 @@ jobs:
       - name: Get version
         run:  echo "::set-env name=VERSION::${GITHUB_REF/refs\/tags\/v/}"
 
+      - name: Get current branch
+        run: echo "::set-env name=CURRENTBRANCH :: ${GITHUB_REF#refs/heads/}"
+
       - name: Checkout korlibs-versions repo
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.KORGEBOT_TOKEN }}
           repository: korlibs/korlibs-versions
+          ref: ${{ CURRENTBRANCH }}
 
       - name: Bump version numbers
         run: |
