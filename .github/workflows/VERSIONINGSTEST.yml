@@ -22,9 +22,9 @@ jobs:
 
       - name: Get current branch
         id: get-branch
-        uses: ryolambert/current-branch@v1
+        uses: ypicard/get-branch-name-github-action@v1
 
-      - name: Echo outputs
+      - name: Write branch to env
         run: echo "::set-env name=CURRENTBRANCH::${ steps.get-branch.outputs.branch }"
 
       - name: Checkout korlibs-versions repo
