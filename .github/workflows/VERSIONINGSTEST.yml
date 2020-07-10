@@ -1,4 +1,4 @@
-name: DEPLOY
+name: VERSIONINGTEST
 
 on:
   push:
@@ -12,7 +12,6 @@ env:
 
 jobs:
   publishVersionNumbers:
-    needs: [publish-finalize]
     runs-on: ubuntu-latest
     steps:
       - name: Get repository name
