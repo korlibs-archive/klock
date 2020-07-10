@@ -25,7 +25,7 @@ jobs:
         uses: ypicard/get-branch-name-github-action@v1
 
       - name: Write branch to env
-        run: echo "::set-env name=CURRENTBRANCH::${ steps.get-branch.outputs.branch }"
+        run: echo "::set-env name=CURRENTBRANCH::${steps.get-branch.outputs.branch}"
 
       - name: Checkout korlibs-versions repo
         uses: actions/checkout@v2
