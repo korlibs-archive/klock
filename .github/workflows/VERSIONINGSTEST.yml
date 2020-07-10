@@ -29,7 +29,7 @@ jobs:
         with:
           token: ${{ secrets.KORGEBOT_TOKEN }}
           repository: korlibs/korlibs-versions
-          ref: ${{ CURRENTBRANCH }}
+          ref: ${{ env.CURRENTBRANCH }}
 
       - name: Bump version numbers
         run: |
