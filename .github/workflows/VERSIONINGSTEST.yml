@@ -21,7 +21,7 @@ jobs:
         run:  echo "::set-env name=VERSION::${GITHUB_REF/refs\/tags\/v/}"
 
       - name: Get current branch
-        run:  echo "::set-env name=CURRENTBRANCH::${GITHUB_REF##*/}
+        run:  echo "::set-env name=CURRENTBRANCH::${GITHUB_REF##*/}"
 
       - name: Checkout korlibs-versions repo
         uses: actions/checkout@v2
