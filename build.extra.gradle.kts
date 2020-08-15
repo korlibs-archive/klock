@@ -2,10 +2,11 @@
 
 //apply<com.soywiz.korlibs.KorlibsPlugin>()
 
+/*
 subprojects {
     afterEvaluate {
         tasks {
-            val jsJar by existing(Jar::class)
+            //val jsJar by existing(Jar::class)
             val npmExtract by creating(Copy::class) {
                 afterEvaluate {
                     dependsOn(jsJar)
@@ -34,3 +35,4 @@ subprojects {
         }
     }
 }
+*/
