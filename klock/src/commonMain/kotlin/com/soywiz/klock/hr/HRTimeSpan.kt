@@ -2,8 +2,6 @@ package com.soywiz.klock.hr
 
 import com.soywiz.klock.PerformanceCounter
 import com.soywiz.klock.TimeSpan
-import com.soywiz.klock.internal.KlockInternal
-import com.soywiz.klock.microseconds
 import com.soywiz.klock.nanoseconds
 import kotlin.math.round
 
@@ -33,7 +31,7 @@ val Double.hrNanoseconds get() = HRTimeSpan.fromNanoseconds(this)
 inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRTimeSpan> {
     companion object {
         val ZERO = HRTimeSpan(0.0)
-        val NULL = HRTimeSpan(Double.NaN)
+        val NIL = HRTimeSpan(Double.NaN)
 
         fun now() = PerformanceCounter.hr
 
@@ -81,4 +79,4 @@ fun HRTimeSpan.clamp(min: HRTimeSpan, max: HRTimeSpan): HRTimeSpan = when {
     this > max -> max
     else -> this
 }
-inline fun HRTimeSpan.coalesce(block: () -> HRTimeSpan): HRTimeSpan = if (this != HRTimeSpan.NULL) this else block()
+inline fun HRTimeSpan.coalesce(block: () -> HRTimeSpan): HRTimeSpan = if (this != HRTimeSpan.NIL) this else block()

@@ -8,9 +8,10 @@ interface DateFormat {
     companion object {
         val DEFAULT_FORMAT = DateFormat("EEE, dd MMM yyyy HH:mm:ss z")
         val FORMAT1 = DateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+        val FORMAT2 = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
         val FORMAT_DATE = DateFormat("yyyy-MM-dd")
 
-        val FORMATS = listOf(DEFAULT_FORMAT, FORMAT1)
+        val FORMATS = listOf(DEFAULT_FORMAT, FORMAT1, FORMAT2, FORMAT_DATE)
 
         fun parse(date: String): DateTimeTz {
             var lastError: Throwable? = null

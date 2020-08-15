@@ -28,7 +28,7 @@ data class PatternDateFormat @JvmOverloads constructor(
     }
 
     fun withLocale(locale: KlockLocale?) = this.copy(locale = locale)
-	fun withTimezoneNames(tzNames: TimezoneNames) = this.copy(tzNames = this.tzNames + tzNames)
+    fun withTimezoneNames(tzNames: TimezoneNames) = this.copy(tzNames = this.tzNames + tzNames)
     fun withOptions(options: Options) = this.copy(options = options)
     fun withOptional() = this.copy(options = options.copy(optionalSupport = true))
     fun withNonOptional() = this.copy(options = options.copy(optionalSupport = false))
@@ -36,7 +36,7 @@ data class PatternDateFormat @JvmOverloads constructor(
     private val openOffsets = LinkedHashMap<Int, Int>()
     private val closeOffsets = LinkedHashMap<Int, Int>()
 
-	internal val chunks = arrayListOf<String>().also { chunks ->
+    internal val chunks = arrayListOf<String>().also { chunks ->
         val s = MicroStrReader(format)
         while (s.hasMore) {
             if (s.peekChar() == '\'') {
@@ -66,7 +66,7 @@ data class PatternDateFormat @JvmOverloads constructor(
         }
     }.toList()
 
-	internal val regexChunks = chunks.map {
+    internal val regexChunks = chunks.map {
         when (it) {
             "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> """(\w+)"""
             "z", "zzz" -> """([\w\s\-\+\:]+)"""
@@ -96,6 +96,7 @@ data class PatternDateFormat @JvmOverloads constructor(
             "SSSSSS" -> """(\d{6})"""
             "SSSSSSS" -> """(\d{7})"""
             "SSSSSSSS" -> """(\d{8})"""
+            "SSSSSSSSS" -> """(\d{9})"""
             "X", "XX", "XXX", "x", "xx", "xxx" -> """([\w:\+\-]+)"""
             "a" -> """(\w+)"""
             " " -> """(\s+)"""
@@ -106,8 +107,8 @@ data class PatternDateFormat @JvmOverloads constructor(
         }
     }
 
-	//val escapedFormat = Regex.escape(format)
-	internal val rx2: Regex = Regex("^" + regexChunks.mapIndexed { index, it ->
+    //val escapedFormat = Regex.escape(format)
+    internal val rx2: Regex = Regex("^" + regexChunks.mapIndexed { index, it ->
         if (options.optionalSupport) {
             val opens = openOffsets.getOrElse(index) { 0 }
             val closes = closeOffsets.getOrElse(index) { 0 }
@@ -122,7 +123,7 @@ data class PatternDateFormat @JvmOverloads constructor(
     }.joinToString("") + "$")
 
 
-	// EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
+    // EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
     // YYYY-MM-dd HH:mm:ss
 
     override fun format(dd: DateTimeTz): String {
@@ -154,13 +155,13 @@ data class PatternDateFormat @JvmOverloads constructor(
                 "m", "mm" -> utc.minutes.padded(nlen)
                 "s", "ss" -> utc.seconds.padded(nlen)
 
-                "S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS", "SSSSSSS", "SSSSSSSS" -> {
+                "S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS", "SSSSSSS", "SSSSSSSS", "SSSSSSSSS" -> {
                     val milli = utc.milliseconds
                     val base10length = log10(utc.milliseconds.toDouble()).toInt() + 1
                     if (base10length > name.length) {
                         (milli.toDouble() * 10.0.pow(-1 * (base10length - name.length))).toInt()
                     } else {
-                        "${milli.padded(3)}00000".substr(0, name.length)
+                        "${milli.padded(3)}000000".substr(0, name.length)
                     }
                 }
                 "X", "XX", "XXX", "x", "xx", "xxx" -> {
@@ -181,9 +182,9 @@ data class PatternDateFormat @JvmOverloads constructor(
                 }
                 "a" -> if (utc.hours < 12) "am" else "pm"
                 else -> when {
-					name.startsWith('\'') -> name.substring(1, name.length - 1)
-					else -> name
-				}
+                    name.startsWith('\'') -> name.substring(1, name.length - 1)
+                    else -> name
+                }
             }
         }
         return out
@@ -207,23 +208,23 @@ data class PatternDateFormat @JvmOverloads constructor(
             when (name) {
                 "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> Unit // day of week (Sun | Sunday)
                 "z", "zzz" -> { // timezone (GMT)
-					val tzOffset = tzNames.namesToOffsets[value.toUpperCase()]
-					if (tzOffset != null) {
-						offset = tzOffset
-					} else {
-						var sign = +1
-						val reader = MicroStrReader(value)
-						reader.tryRead("GMT")
-						reader.tryRead("UTC")
-						if (reader.tryRead("+")) sign = +1
-						if (reader.tryRead("-")) sign = -1
-						val part = reader.readRemaining().replace(":", "")
-						val hours = part.substr(0, 2).padStart(2, '0').toIntOrNull() ?: 0
-						val minutes = part.substr(2, 2).padStart(2, '0').toIntOrNull() ?: 0
-						val roffset = hours.hours + minutes.minutes
-						offset = if (sign > 0) +roffset else -roffset
-					}
-				}
+                    val tzOffset = tzNames.namesToOffsets[value.toUpperCase()]
+                    if (tzOffset != null) {
+                        offset = tzOffset
+                    } else {
+                        var sign = +1
+                        val reader = MicroStrReader(value)
+                        reader.tryRead("GMT")
+                        reader.tryRead("UTC")
+                        if (reader.tryRead("+")) sign = +1
+                        if (reader.tryRead("-")) sign = -1
+                        val part = reader.readRemaining().replace(":", "")
+                        val hours = part.substr(0, 2).padStart(2, '0').toIntOrNull() ?: 0
+                        val minutes = part.substr(2, 2).padStart(2, '0').toIntOrNull() ?: 0
+                        val roffset = hours.hours + minutes.minutes
+                        offset = if (sign > 0) +roffset else -roffset
+                    }
+                }
                 "d", "dd" -> day = value.toInt()
                 "M", "MM" -> month = value.toInt()
                 "MMM" -> month = realLocale.monthsShort.indexOf(value.toLowerCase()) + 1
@@ -237,7 +238,7 @@ data class PatternDateFormat @JvmOverloads constructor(
                 }
                 "m", "mm" -> minute = value.toInt()
                 "s", "ss" -> second = value.toInt()
-                "S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS" -> {
+                "S", "SS", "SSS", "SSSS", "SSSSS", "SSSSSS", "SSSSSSS", "SSSSSSSS", "SSSSSSSSS" -> {
                     val base10length = log10(value.toDouble()).toInt() + 1
                     millisecond = if (base10length > 3) {
                         // only precision to millisecond supported, ignore the rest. ex: 9999999 => 999"

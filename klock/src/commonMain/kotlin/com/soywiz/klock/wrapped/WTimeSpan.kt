@@ -15,7 +15,7 @@ val TimeSpan.wrapped get() = WTimeSpan(this)
  * It is an inline class wrapping [Double] instead of [Long] to work on JavaScript without allocations.
  */
 @KlockExperimental
-class WTimeSpan(val value: TimeSpan) : Comparable<WTimeSpan>, Serializable {
+data class WTimeSpan(val value: TimeSpan) : Comparable<WTimeSpan>, Serializable {
     val milliseconds: Double get() = value.milliseconds
     /** Returns the total number of [nanoseconds] for this [WTimeSpan] (1 / 1_000_000_000 [seconds]) */
     val nanoseconds: Double get() = value.nanoseconds
@@ -73,7 +73,7 @@ class WTimeSpan(val value: TimeSpan) : Comparable<WTimeSpan>, Serializable {
          * Useful to represent an alternative "null" time lapse
          * avoiding the boxing of a nullable type.
          */
-        val NULL get() = TimeSpan.NULL.wrapped
+        val NIL get() = TimeSpan.NIL.wrapped
     }
 
     /**
