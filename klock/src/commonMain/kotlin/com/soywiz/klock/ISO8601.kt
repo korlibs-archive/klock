@@ -329,6 +329,8 @@ object ISO8601 {
 
     // Date + Time Variants
     val DATETIME_COMPLETE = IsoDateTimeFormat("YYYYMMDDThhmmss", "YYYY-MM-DDThh:mm:ss")
+    val DATETIME_UTC_COMPLETE = IsoDateTimeFormat("YYYYMMDDThhmmssZ", "YYYY-MM-DDThh:mm:ssZ")
+    val DATETIME_UTC_COMPLETE_FRACTION = ISO8601.IsoDateTimeFormat("YYYYMMDDThhmmss.sssZ", "YYYY-MM-DDThh:mm:ss.sssZ")
 
     // Interval Variants
     val INTERVAL_COMPLETE0 = IsoIntervalFormat("PnnYnnMnnDTnnHnnMnnS")
