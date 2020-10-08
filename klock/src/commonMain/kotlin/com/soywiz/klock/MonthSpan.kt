@@ -36,10 +36,12 @@ inline class MonthSpan(
     operator fun minus(other: DateTimeSpan) = this + -other
 
     operator fun times(times: Double) = MonthSpan((totalMonths * times).toInt())
-    operator fun div(times: Double) = MonthSpan((totalMonths / times).toInt())
-
     operator fun times(times: Int) = this * times.toDouble()
+    operator fun times(times: Float) = this * times.toDouble()
+
+    operator fun div(times: Double) = MonthSpan((totalMonths / times).toInt())
     operator fun div(times: Int) = this / times.toDouble()
+    operator fun div(times: Float) = this / times.toDouble()
 
     override fun compareTo(other: MonthSpan): Int = this.totalMonths.compareTo(other.totalMonths)
 

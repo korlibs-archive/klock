@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.soywiz.korlibs:easy-kotlin-mpp-gradle-plugin:0.10.0") // Kotlin 1.4: https://github.com/korlibs/easy-kotlin-mpp-gradle-plugin
+        classpath("com.soywiz.korlibs:easy-kotlin-mpp-gradle-plugin:0.10.2") // Kotlin 1.4.10: https://github.com/korlibs/easy-kotlin-mpp-gradle-plugin
     }
 }
 

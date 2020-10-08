@@ -2,8 +2,7 @@ package com.soywiz.klock.internal
 
 import com.soywiz.klock.*
 import com.soywiz.klock.hr.HRTimeSpan
-import kotlin.browser.*
-import kotlin.math.*
+import kotlinx.browser.*
 
 private external val process: dynamic
 

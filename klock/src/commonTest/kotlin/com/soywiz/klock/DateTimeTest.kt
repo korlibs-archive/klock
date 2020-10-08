@@ -160,10 +160,10 @@ class DateTimeTest {
         )
     }
 
-    @Test
-    fun testNewParserBug1() {
-        DateFormat("EEE, dd MMMM yyyy HH:mm:ss z").parseLong("Sat, 08 September 2018 04:08:09 UTC")
-    }
+	@Test
+	fun testNewParserBug1() {
+		DateFormat("EEE, dd MMMM yyyy HH:mm:ss z").parseLong("Sat, 08 September 2018 04:08:09 UTC")
+	}
 
     @Test
     fun testParsingDateTimesInCustomStringFormatsWithAmPm() {
@@ -333,35 +333,35 @@ class DateTimeTest {
         assertEquals(c, c.clamp(a, c))
     }
 
-    @Test
-    fun testStartEndDay() {
-        val date = DateTime(1568803601377)
-        val start = date.dateDayStart
-        val end = date.dateDayEnd
-        assertEquals("2019-09-18T00:00:00", ISO8601.DATETIME_COMPLETE.extended.format(start))
-        assertEquals("2019-09-18T23:59:59", ISO8601.DATETIME_COMPLETE.extended.format(end))
-        assertEquals(1568764800000L, start.unixMillisLong)
-        assertEquals(1568851199999L, end.unixMillisLong)
-    }
+	@Test
+	fun testStartEndDay() {
+		val date = DateTime(1568803601377)
+		val start = date.dateDayStart
+		val end = date.dateDayEnd
+		assertEquals("2019-09-18T00:00:00", ISO8601.DATETIME_COMPLETE.extended.format(start))
+		assertEquals("2019-09-18T23:59:59", ISO8601.DATETIME_COMPLETE.extended.format(end))
+		assertEquals(1568764800000L, start.unixMillisLong)
+		assertEquals(1568851199999L, end.unixMillisLong)
+	}
 
-    @Test
-    fun testTimeZones() {
-        "Tue, 19 Sep 2017 00:58:45 GMT-0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
-        "Tue, 19 Sep 2017 00:58:45 GMT+0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
-    }
+	@Test
+	fun testTimeZones() {
+		"Tue, 19 Sep 2017 00:58:45 GMT-0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
+		"Tue, 19 Sep 2017 00:58:45 GMT+0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
+	}
 
-    @Test
-    fun testBug37() {
-        val format = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-        format.parse("2019-04-15T17:28:46.862+0900")
-    }
+	@Test
+	fun testBug37() {
+		val format = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+		format.parse("2019-04-15T17:28:46.862+0900")
+	}
 
-    @Test
-    fun testBug33() {
-        assertEquals("20190412", DateTime(2019, 4, 12).localUnadjusted.format("yyyyMMdd"))
-        assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy年MM月dd日"))
-        assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy'年'MM'月'dd'日'"))
-    }
+	@Test
+	fun testBug33() {
+		assertEquals("20190412", DateTime(2019, 4, 12).localUnadjusted.format("yyyyMMdd"))
+		assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy年MM月dd日"))
+		assertEquals("2019年04月12日", Date(2019, 4, 12).format("yyyy'年'MM'月'dd'日'"))
+	}
 
     @Test
     fun testBug93() {

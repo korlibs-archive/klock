@@ -28,7 +28,7 @@ data class PatternDateFormat @JvmOverloads constructor(
     }
 
     fun withLocale(locale: KlockLocale?) = this.copy(locale = locale)
-    fun withTimezoneNames(tzNames: TimezoneNames) = this.copy(tzNames = this.tzNames + tzNames)
+	fun withTimezoneNames(tzNames: TimezoneNames) = this.copy(tzNames = this.tzNames + tzNames)
     fun withOptions(options: Options) = this.copy(options = options)
     fun withOptional() = this.copy(options = options.copy(optionalSupport = true))
     fun withNonOptional() = this.copy(options = options.copy(optionalSupport = false))
@@ -36,7 +36,7 @@ data class PatternDateFormat @JvmOverloads constructor(
     private val openOffsets = LinkedHashMap<Int, Int>()
     private val closeOffsets = LinkedHashMap<Int, Int>()
 
-    internal val chunks = arrayListOf<String>().also { chunks ->
+	internal val chunks = arrayListOf<String>().also { chunks ->
         val s = MicroStrReader(format)
         while (s.hasMore) {
             if (s.peekChar() == '\'') {
@@ -66,7 +66,7 @@ data class PatternDateFormat @JvmOverloads constructor(
         }
     }.toList()
 
-    internal val regexChunks = chunks.map {
+	internal val regexChunks = chunks.map {
         when (it) {
             "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> """(\w+)"""
             "z", "zzz" -> """([\w\s\-\+\:]+)"""
@@ -107,8 +107,8 @@ data class PatternDateFormat @JvmOverloads constructor(
         }
     }
 
-    //val escapedFormat = Regex.escape(format)
-    internal val rx2: Regex = Regex("^" + regexChunks.mapIndexed { index, it ->
+	//val escapedFormat = Regex.escape(format)
+	internal val rx2: Regex = Regex("^" + regexChunks.mapIndexed { index, it ->
         if (options.optionalSupport) {
             val opens = openOffsets.getOrElse(index) { 0 }
             val closes = closeOffsets.getOrElse(index) { 0 }
@@ -123,7 +123,7 @@ data class PatternDateFormat @JvmOverloads constructor(
     }.joinToString("") + "$")
 
 
-    // EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
+	// EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
     // YYYY-MM-dd HH:mm:ss
 
     override fun format(dd: DateTimeTz): String {
@@ -182,9 +182,9 @@ data class PatternDateFormat @JvmOverloads constructor(
                 }
                 "a" -> if (utc.hours < 12) "am" else "pm"
                 else -> when {
-                    name.startsWith('\'') -> name.substring(1, name.length - 1)
-                    else -> name
-                }
+					name.startsWith('\'') -> name.substring(1, name.length - 1)
+					else -> name
+				}
             }
         }
         return out

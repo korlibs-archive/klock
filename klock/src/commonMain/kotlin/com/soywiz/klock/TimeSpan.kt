@@ -21,6 +21,23 @@ inline val Long.days get() = TimeSpan.fromDays(this.toDouble())
 inline val Long.weeks get() = TimeSpan.fromWeeks(this.toDouble())
 
 /** [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds]. */
+inline val Float.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
+/** [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds]. */
+inline val Float.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
+/** [TimeSpan] representing this number as [milliseconds] or 1 / 1_000 [seconds]. */
+inline val Float.milliseconds get() = TimeSpan.fromMilliseconds(this.toDouble())
+/** [TimeSpan] representing this number as [seconds]. */
+inline val Float.seconds get() = TimeSpan.fromSeconds((this.toDouble()))
+/** [TimeSpan] representing this number as [minutes] or 60 [seconds]. */
+inline val Float.minutes get() = TimeSpan.fromMinutes(this.toDouble())
+/** [TimeSpan] representing this number as [hours] or 3_600 [seconds]. */
+inline val Float.hours get() = TimeSpan.fromHours(this.toDouble())
+/** [TimeSpan] representing this number as [days] or 86_400 [seconds]. */
+inline val Float.days get() = TimeSpan.fromDays(this.toDouble())
+/** [TimeSpan] representing this number as [weeks] or 604_800 [seconds]. */
+inline val Float.weeks get() = TimeSpan.fromWeeks(this.toDouble())
+
+/** [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds]. */
 inline val Int.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
 /** [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds]. */
 inline val Int.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
@@ -66,8 +83,14 @@ inline class TimeSpan(
 ) : Comparable<TimeSpan>, Serializable {
     /** Returns the total number of [nanoseconds] for this [TimeSpan] (1 / 1_000_000_000 [seconds]) */
     val nanoseconds: Double get() = this.milliseconds / MILLIS_PER_NANOSECOND
+    /** Returns the total number of [nanoseconds] for this [TimeSpan] (1 / 1_000_000_000 [seconds]) as Integer */
+    val nanosecondsInt: Int get() = (this.milliseconds / MILLIS_PER_NANOSECOND).toInt()
+
     /** Returns the total number of [microseconds] for this [TimeSpan] (1 / 1_000_000 [seconds]) */
     val microseconds: Double get() = this.milliseconds / MILLIS_PER_MICROSECOND
+    /** Returns the total number of [microseconds] for this [TimeSpan] (1 / 1_000_000 [seconds]) as Integer */
+    val microsecondsInt: Int get() = (this.milliseconds / MILLIS_PER_MICROSECOND).toInt()
+
     /** Returns the total number of [seconds] for this [TimeSpan] */
     val seconds: Double get() = this.milliseconds / MILLIS_PER_SECOND
     /** Returns the total number of [minutes] for this [TimeSpan] (60 [seconds]) */

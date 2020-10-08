@@ -1,8 +1,6 @@
 package com.soywiz.klock.hr
 
-import com.soywiz.klock.PerformanceCounter
-import com.soywiz.klock.TimeSpan
-import com.soywiz.klock.nanoseconds
+import com.soywiz.klock.*
 import kotlin.math.round
 
 /** Converts a [TimeSpan] into a high-resolution [HRTimeSpan] */
@@ -10,21 +8,6 @@ val TimeSpan.hr get() = HRTimeSpan.fromMilliseconds(this.milliseconds)
 
 /** Converts a [HRTimeSpan] into a low-resolution [TimeSpan] */
 val HRTimeSpan.timeSpan get() = nanosecondsRaw.nanoseconds
-
-val Long.hrSeconds get() = HRTimeSpan.fromSeconds(this)
-val Long.hrMilliseconds get() = HRTimeSpan.fromMilliseconds(this)
-val Long.hrMicroseconds get() = HRTimeSpan.fromMicroseconds(this)
-val Long.hrNanoseconds get() = HRTimeSpan.fromNanoseconds(this)
-
-val Int.hrSeconds get() = HRTimeSpan.fromSeconds(this)
-val Int.hrMilliseconds get() = HRTimeSpan.fromMilliseconds(this)
-val Int.hrMicroseconds get() = HRTimeSpan.fromMicroseconds(this)
-val Int.hrNanoseconds get() = HRTimeSpan.fromNanoseconds(this)
-
-val Double.hrSeconds get() = HRTimeSpan.fromSeconds(this)
-val Double.hrMilliseconds get() = HRTimeSpan.fromMilliseconds(this)
-val Double.hrMicroseconds get() = HRTimeSpan.fromMicroseconds(this)
-val Double.hrNanoseconds get() = HRTimeSpan.fromNanoseconds(this)
 
 // @TODO: Ensure nanosecondsRaw has no decimals
 /** A High-Resolution TimeSpan that stores its values as nanoseconds. Just uses 52-bits and won't store decimals */
@@ -44,11 +27,6 @@ inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRT
         fun fromMilliseconds(value: Int) = fromMilliseconds(value.toDouble())
         fun fromMicroseconds(value: Int) = fromMicroseconds(value.toDouble())
         fun fromNanoseconds(value: Int) = fromNanoseconds(value.toDouble())
-
-        fun fromSeconds(value: Long) = fromSeconds(value.toDouble())
-        fun fromMilliseconds(value: Long) = fromMilliseconds(value.toDouble())
-        fun fromMicroseconds(value: Long) = fromMicroseconds(value.toDouble())
-        fun fromNanoseconds(value: Long) = fromNanoseconds(value.toDouble())
     }
 
     val nanosecondsDouble get() = (nanosecondsRaw)
@@ -72,8 +50,8 @@ inline class HRTimeSpan constructor(val nanosecondsRaw: Double) : Comparable<HRT
     override fun toString(): String = "$nanosecondsRaw".removeSuffix(".0") + " ns"
 }
 
-fun max(a: HRTimeSpan, b: HRTimeSpan): HRTimeSpan = kotlin.math.max(a.nanosecondsRaw, b.nanosecondsRaw).hrNanoseconds
-fun min(a: HRTimeSpan, b: HRTimeSpan): HRTimeSpan = kotlin.math.min(a.nanosecondsRaw, b.nanosecondsRaw).hrNanoseconds
+fun max(a: HRTimeSpan, b: HRTimeSpan): HRTimeSpan = HRTimeSpan.fromNanoseconds(kotlin.math.max(a.nanosecondsRaw, b.nanosecondsRaw))
+fun min(a: HRTimeSpan, b: HRTimeSpan): HRTimeSpan = HRTimeSpan.fromNanoseconds(kotlin.math.min(a.nanosecondsRaw, b.nanosecondsRaw))
 fun HRTimeSpan.clamp(min: HRTimeSpan, max: HRTimeSpan): HRTimeSpan = when {
     this < min -> min
     this > max -> max
