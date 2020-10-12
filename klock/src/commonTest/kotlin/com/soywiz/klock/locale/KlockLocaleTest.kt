@@ -219,7 +219,7 @@ class KlockLocaleTest {
 		assertEquals("ср", DayOfWeek.Wednesday.localShortName(KlockLocale.ukrainian))
 
 		assertEquals("воскресенье", DayOfWeek.Sunday.localName(KlockLocale.russian))
-		assertEquals("вск", DayOfWeek.Sunday.localShortName(KlockLocale.russian))
+		assertEquals("вс", DayOfWeek.Sunday.localShortName(KlockLocale.russian))
 	}
 
 	@Test
