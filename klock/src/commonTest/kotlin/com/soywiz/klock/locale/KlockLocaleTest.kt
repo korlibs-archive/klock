@@ -137,10 +137,10 @@ class KlockLocaleTest {
 	fun testRussianLocale() {
 		assertEquals(
 			"""
-			ср, 13 мар 2019 21:36:45 UTC
+			Ср, 13 мар 2019 21:36:45 UTC
 			13 мар 2019 г. 21:36:45
 			13.03.2019 21:36
-			среда, 13 марта 2019 г.
+			Среда, 13 марта 2019 г.
 			13 марта 2019 г.
 			13 мар 2019 г.
 			13.03.2019
@@ -191,10 +191,10 @@ class KlockLocaleTest {
 	fun testUkrainianLocale() {
 		assertEquals(
 			"""
-			ср, 13 бер 2019 21:36:45 UTC
+			Ср, 13 бер 2019 21:36:45 UTC
 			13 бер 2019 р. 21:36:45
 			13.03.2019 21:36
-			середа, 13 березня 2019 р.
+			Середа, 13 березня 2019 р.
 			13 березня 2019 р.
 			13 бер 2019 р.
 			13.03.2019
@@ -233,8 +233,8 @@ class KlockLocaleTest {
 		assertEquals("月曜日", DayOfWeek.Monday.localName(KlockLocale.japanese))
 		assertEquals("月", DayOfWeek.Monday.localShortName(KlockLocale.japanese))
 
-		assertEquals("середа", DayOfWeek.Wednesday.localName(KlockLocale.ukrainian))
-		assertEquals("ср", DayOfWeek.Wednesday.localShortName(KlockLocale.ukrainian))
+		assertEquals("Середа", DayOfWeek.Wednesday.localName(KlockLocale.ukrainian))
+		assertEquals("Ср", DayOfWeek.Wednesday.localShortName(KlockLocale.ukrainian))
 
 		assertEquals("воскресенье", DayOfWeek.Sunday.localName(KlockLocale.russian))
 		assertEquals("вс", DayOfWeek.Sunday.localShortName(KlockLocale.russian))
