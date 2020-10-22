@@ -14,7 +14,7 @@ open class NorwegianKlockLocale : KlockLocale() {
     override val firstDayOfWeek = DayOfWeek.Monday
 
     override val daysOfWeek = listOf(
-        "Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"
+        "søndag", "mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag"
     )
 
     override val months = listOf(

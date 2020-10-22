@@ -65,10 +65,10 @@ class KlockLocaleTest {
     fun testNorwegianLocale() {
         assertEquals(
             """
-			Ons, 13 mar 2019 21:36:45 UTC
+			ons, 13 mar 2019 21:36:45 UTC
 			13.03.2019 21:36:45
 			13.03.19 21:36
-			Onsdag, 13. mars 2019
+			onsdag, 13. mars 2019
 			13. mars 2019
 			13.03.2019
 			13.03.19
