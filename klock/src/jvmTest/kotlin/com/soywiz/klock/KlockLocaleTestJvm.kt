@@ -11,9 +11,9 @@ import kotlin.test.assertEquals
 
 class KlockLocaleTestJvm {
 
-    val outputPattern = "EEEE, d MMMM yyyy HH:mm:ss"
+    private val outputPattern = "EEEE, d MMMM yyyy HH:mm:ss"
 
-    val klockDate = DateTime(
+    private val klockDate = DateTime(
         year = 1995,
         month = Month.January,
         day = 18,
@@ -21,7 +21,7 @@ class KlockLocaleTestJvm {
         minute = 36,
         second = 45
     )
-    val javaDate = LocalDateTime.of(
+    private val javaDate = LocalDateTime.of(
         1995, // year
         java.time.Month.JANUARY, // month
         18, // day of month
@@ -131,7 +131,6 @@ class KlockLocaleTestJvm {
     }
 
     @Test
-    @Ignore("Failing... Awaiting PR feedback")
     fun assertRussianLocalization() {
         val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("ru"))
 

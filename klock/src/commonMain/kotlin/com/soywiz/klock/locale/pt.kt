@@ -15,13 +15,13 @@ open class PortugueseKlockLocale : KlockLocale() {
 	override val firstDayOfWeek: DayOfWeek = DayOfWeek.Monday
 
 	override val daysOfWeek = listOf(
-		"domingo",
-		"segunda-feira",
-		"terça-feira",
-		"quarta-feira",
-		"quinta-feira",
-		"sexta-feira",
-		"sábado"
+		"Domingo",
+		"Segunda-feira",
+		"Terça-feira",
+		"Quarta-feira",
+		"Quinta-feira",
+		"Sexta-feira",
+		"Sábado"
 	)
 	override val months = listOf(
 		"janeiro",
