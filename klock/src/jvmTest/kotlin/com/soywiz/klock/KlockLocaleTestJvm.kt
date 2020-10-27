@@ -1,7 +1,6 @@
 package com.soywiz.klock
 
 import com.soywiz.klock.locale.*
-import org.junit.Ignore
 import org.junit.Test
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -30,152 +29,126 @@ class KlockLocaleTestJvm {
         45 // second
     )
 
-
     @Test
     fun assertDatesAreTheSame() {
-        val klockLong = klockDate.unixMillisLong
         val javaLong = javaDate.toInstant(ZoneOffset.UTC).toEpochMilli()
+        val klockLong = klockDate.unixMillisLong
         assertEquals(javaLong, klockLong)
     }
 
-    private fun LocalDateTime.format(pattern: String, locale: Locale) = this.format(
-        DateTimeFormatter.ofPattern(pattern, locale)
-    )
-
     @Test
     fun assertEnglishLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.ENGLISH)
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.english) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.ENGLISH.getFormattedJavaTestDate(),
+            actual = KlockLocale.english.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertNorwegianLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("no-nb"))
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.norwegian) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.forLanguageTag("no-nb").getFormattedJavaTestDate(),
+            actual = KlockLocale.norwegian.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertSpanishLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("es"))
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.spanish) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.forLanguageTag("es").getFormattedJavaTestDate(),
+            actual = KlockLocale.spanish.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertFrenchLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("fr"))
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.french) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.forLanguageTag("fr").getFormattedJavaTestDate(),
+            actual = KlockLocale.french.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertGermanLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.GERMAN)
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.german) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.GERMAN.getFormattedJavaTestDate(),
+            actual = KlockLocale.german.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertJapaneseLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.JAPAN)
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.japanese) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.JAPAN.getFormattedJavaTestDate(),
+            actual = KlockLocale.japanese.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertDutchLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("nl"))
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.dutch) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.forLanguageTag("nl").getFormattedJavaTestDate(),
+            actual = KlockLocale.dutch.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertPortugueseLocalization() {
         // Java DateTime formats wrong in java 8. Hardcoding expected value instead.
-        // val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("pt"))
+        // val javaOutput = Locale.forLanguageTag("pt").getFormattedJavaTestDate()
         val expectedOutput = "quarta-feira, 18 janeiro 1995 21:36:45"
 
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.portuguese) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(expectedOutput, klockOutput)
+        assertEquals(
+            expected = expectedOutput,
+            actual = KlockLocale.portuguese.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertRussianLocalization() {
         // Java DateTime formats wrong in java 8. Hardcoding expected value instead.
-        // val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("ru"))
+        // val javaOutput = Locale.forLanguageTag("ru").getFormattedJavaTestDate()
         val expectedOutput = "среда, 18 января 1995 21:36:45"
 
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.russian) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(expectedOutput, klockOutput)
+        assertEquals(
+            expected = expectedOutput,
+            actual = KlockLocale.russian.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertKoreanLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.KOREA)
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.korean) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.KOREA.getFormattedJavaTestDate(),
+            actual = KlockLocale.korean.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertChineseLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.CHINA)
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.chinese) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.CHINA.getFormattedJavaTestDate(),
+            actual = KlockLocale.chinese.getFormattedKlockTestDate()
+        )
     }
 
     @Test
     fun assertUkrainianLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("uk"))
-
-        val klockOutput = KlockLocale.setTemporarily(KlockLocale.ukrainian) {
-            DateFormat(outputPattern).format(klockDate)
-        }
-
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(
+            expected = Locale.forLanguageTag("uk").getFormattedJavaTestDate(),
+            actual = KlockLocale.ukrainian.getFormattedKlockTestDate()
+        )
     }
 
+    private fun Locale.getFormattedJavaTestDate(): String {
+        return javaDate.format(
+            DateTimeFormatter.ofPattern(outputPattern, this)
+        )
+    }
+
+    private fun KlockLocale.getFormattedKlockTestDate(): String {
+        return KlockLocale.setTemporarily(this) {
+            DateFormat(outputPattern).format(klockDate)
+        }
+    }
 }
