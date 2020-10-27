@@ -53,6 +53,14 @@ class KlockLocaleTestJvm {
     }
 
     @Test
+    fun assertSwedishLocalization() {
+        assertEquals(
+            expected = Locale.forLanguageTag("sv").getFormattedJavaTestDate(),
+            actual = KlockLocale.swedish.getFormattedKlockTestDate()
+        )
+    }
+
+    @Test
     fun assertSpanishLocalization() {
         assertEquals(
             expected = Locale.forLanguageTag("es").getFormattedJavaTestDate(),
