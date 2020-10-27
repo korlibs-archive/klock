@@ -14,11 +14,11 @@ open class UkrainianKlockLocale : KlockLocale() {
 	override val firstDayOfWeek: DayOfWeek = DayOfWeek.Monday
 
     override val daysOfWeek = listOf(
-        "неділя", "понеділок", "вівторок", "Середа", "четвер", "п'ятниця", "субота"
+        "неділя", "понеділок", "вівторок", "середа", "четвер", "п'ятниця", "субота"
     )
 
     override val daysOfWeekShort = listOf(
-        "нд", "пн", "вт", "Ср", "чт", "пт", "сб"
+        "нд", "пн", "вт", "ср", "чт", "пт", "сб"
     )
 
 	override val months = listOf(
