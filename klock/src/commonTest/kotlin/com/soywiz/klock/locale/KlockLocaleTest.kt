@@ -79,6 +79,24 @@ class KlockLocaleTest {
         )
     }
 
+    @Test
+    fun testSwedishLocale() {
+        assertEquals(
+            """
+			ons, 13 mar 2019 21:36:45 UTC
+			13.03.2019 21:36:45
+			13.03.19 21:36
+			onsdag, 13. mars 2019
+			13. mars 2019
+			13.03.2019
+			13.03.19
+			21:36:45
+			21:36
+			""".trimIndent(),
+            multiFormat(SwedishKlockLocale, KlockLocale.swedish)
+        )
+    }
+
 	@Test
 	fun testJapaneseLocale() {
 		assertEquals(
