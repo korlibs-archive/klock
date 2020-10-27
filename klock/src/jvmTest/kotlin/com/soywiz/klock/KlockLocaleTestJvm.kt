@@ -121,19 +121,21 @@ class KlockLocaleTestJvm {
 
     @Test
     fun assertPortugueseLocalization() {
-        val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("pt"))
+        // Java DateTime formats wrong in java 8. Hardcoding expected value instead.
+        // val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("pt"))
+        val expectedOutput = "quarta-feira, 18 janeiro 1995 21:36:45"
 
         val klockOutput = KlockLocale.setTemporarily(KlockLocale.portuguese) {
             DateFormat(outputPattern).format(klockDate)
         }
 
-        assertEquals(javaOutput, klockOutput)
+        assertEquals(expectedOutput, klockOutput)
     }
 
     @Test
     fun assertRussianLocalization() {
         // Java DateTime formats wrong in java 8. Hardcoding expected value instead.
-//        val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("ru"))
+        // val javaOutput = javaDate.format(outputPattern, Locale.forLanguageTag("ru"))
         val expectedOutput = "среда, 18 января 1995 21:36:45"
 
         val klockOutput = KlockLocale.setTemporarily(KlockLocale.russian) {
