@@ -1,5 +1,7 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.Serializable
+
 /**
  * Creates a [MonthSpan] representing these years.
  */
@@ -16,7 +18,12 @@ inline val Int.months get() = MonthSpan(this)
 inline class MonthSpan(
     /** Total months of this [MonthSpan] as integer */
     val totalMonths: Int
-) : Comparable<MonthSpan> {
+) : Comparable<MonthSpan>, Serializable {
+    companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+    }
+
     operator fun unaryMinus() = MonthSpan(-totalMonths)
     operator fun unaryPlus() = MonthSpan(+totalMonths)
 
@@ -28,11 +35,17 @@ inline class MonthSpan(
     operator fun minus(other: MonthSpan) = this + -other
     operator fun minus(other: DateTimeSpan) = this + -other
 
-    inline operator fun times(times: Number) = MonthSpan((totalMonths * times.toDouble()).toInt())
-    inline operator fun div(times: Number) = MonthSpan((totalMonths / times.toDouble()).toInt())
+    operator fun times(times: Double) = MonthSpan((totalMonths * times).toInt())
+    operator fun times(times: Int) = this * times.toDouble()
+    operator fun times(times: Float) = this * times.toDouble()
+
+    operator fun div(times: Double) = MonthSpan((totalMonths / times).toInt())
+    operator fun div(times: Int) = this / times.toDouble()
+    operator fun div(times: Float) = this / times.toDouble()
 
     override fun compareTo(other: MonthSpan): Int = this.totalMonths.compareTo(other.totalMonths)
 
+    /** Converts this time to String formatting it like "20Y", "20Y 1M", "1M" or "0M". */
     override fun toString(): String {
         val list = arrayListOf<String>()
         if (years != 0) list.add("${years}Y")

@@ -3,7 +3,7 @@ package com.soywiz.klock
 import com.soywiz.klock.internal.*
 import kotlin.math.*
 
-/** Represents one the twelve months of the year. */
+/** Represents one of the twelve months of the year. */
 enum class Month(
     /** 1: [January], 2: [February], 3: [March], 4: [April], 5: [May], 6: [June], 7: [July], 8: [August], 9: [September], 10: [October], 11: [November], 12: [December] */
     val index1: Int,
@@ -11,7 +11,7 @@ enum class Month(
     val daysCommon: Int,
     /** Number of days of this month in a leap year */
     val daysLeap: Int = daysCommon
-) {
+) : Serializable {
     January(1, daysCommon = 31),
     February(2, daysCommon = 28, daysLeap = 29),
     March(3, daysCommon = 31),
@@ -35,14 +35,14 @@ enum class Month(
     /** Number of days in a specific month (28-31) depending whether the [year] or not. */
     fun days(year: Year): Int = days(year.isLeap)
 
-    /** Number of days since the start of the year is [leap] to reach this month. */
+    /** Number of days since the start of the [leap] year to reach this month. */
     fun daysToStart(leap: Boolean): Int = YEAR_DAYS(leap)[index0]
     /** Number of days since the start of the [year] to reach this month. */
     fun daysToStart(year: Int): Int = daysToStart(Year(year).isLeap)
     /** Number of days since the start of the [year] to reach this month. */
     fun daysToStart(year: Year): Int = daysToStart(year.isLeap)
 
-    /** Number of days since the start of the year is [leap] to reach next month. */
+    /** Number of days since the start of the [leap] year to reach next month. */
     fun daysToEnd(leap: Boolean): Int = YEAR_DAYS(leap)[index1]
     /** Number of days since the start of the [year] to reach next month. */
     fun daysToEnd(year: Int): Int = daysToEnd(Year(year).isLeap)
@@ -66,6 +66,9 @@ enum class Month(
     fun localShortName(locale: KlockLocale) = locale.monthsShort[index0]
 
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /**
          * Number of months in a year (12).
          */

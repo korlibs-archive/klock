@@ -1,13 +1,18 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.Serializable
+
 /** [DateTime] with an associated [TimezoneOffset] */
 class DateTimeTz private constructor(
     /** The [adjusted] part */
     private val adjusted: DateTime,
     /** The [offset] part */
     val offset: TimezoneOffset
-) : Comparable<DateTimeTz> {
+) : Comparable<DateTimeTz>, Serializable {
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** Creates a new [DateTimeTz] with the [utc] date and an [offset]. The [utc] components will be the same as this independently on the [offset]. */
         fun local(local: DateTime, offset: TimezoneOffset) = DateTimeTz(local, offset)
 
@@ -20,7 +25,7 @@ class DateTimeTz private constructor(
         fun fromUnixLocal(unix: Double): DateTimeTz = DateTime(unix).localUnadjusted
 
         /** Returns the current local [DateTimeTz] */
-        fun nowLocal(): DateTimeTz = DateTime.fromUnix(DateTime.nowUnix()).localUnadjusted
+        fun nowLocal(): DateTimeTz = DateTime.now().local
     }
 
     /** Returns a new UTC date that will match these components without being the same time */
@@ -69,9 +74,9 @@ class DateTimeTz private constructor(
     /** Constructs this local date with a new [offset] without changing its components */
     fun toOffsetUnadjusted(offset: TimezoneOffset) = DateTimeTz.local(this.local, offset)
 
-    /** Constructs this local date with by adding an additional [offset] without changing its components */
+    /** Constructs this local date by adding an additional [offset] without changing its components */
     fun addOffsetUnadjusted(offset: TimeSpan) = addOffsetUnadjusted(offset.offset)
-    /** Constructs this local date with by adding an additional [offset] without changing its components */
+    /** Constructs this local date by adding an additional [offset] without changing its components */
     fun addOffsetUnadjusted(offset: TimezoneOffset) = DateTimeTz.local(this.local, (this.offset.time + offset.time).offset)
 
     /** Constructs the UTC part of this date with a new [offset] */
@@ -94,6 +99,8 @@ class DateTimeTz private constructor(
     operator fun minus(delta: MonthSpan) = this + (-delta)
     operator fun minus(delta: DateTimeSpan) = this + (-delta)
     operator fun minus(delta: TimeSpan) = this + (-delta)
+
+    operator fun minus(other: DateTimeTz) = (this.utc.unixMillisDouble - other.utc.unixMillisDouble).milliseconds
 
     override fun hashCode(): Int = this.local.hashCode() + offset.totalMinutesInt
     override fun equals(other: Any?): Boolean = other is DateTimeTz && this.utc.unixMillisDouble == other.utc.unixMillisDouble

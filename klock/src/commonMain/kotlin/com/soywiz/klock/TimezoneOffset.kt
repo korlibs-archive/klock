@@ -12,7 +12,7 @@ import kotlin.math.*
 inline class TimezoneOffset(
     /** [TimezoneOffset] in [totalMilliseconds] */
     val totalMilliseconds: Double
-) {
+) : Comparable<TimezoneOffset>, Serializable {
     /** Returns whether this [TimezoneOffset] has a positive component */
     val positive: Boolean get() = totalMilliseconds >= 0.0
 
@@ -41,12 +41,21 @@ inline class TimezoneOffset(
     override fun toString(): String = timeZone
 
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** Constructs a new [TimezoneOffset] from a [TimeSpan]. */
         operator fun invoke(time: TimeSpan) = TimezoneOffset(time.milliseconds)
 
-        /** Returns timezone offset as a [TimeSpan], for a specified [time]. For example, GMT+01 would return 60.minutes. This uses the Operating System to compute daylight offsets when required. */
+        /**
+         * Returns timezone offset as a [TimeSpan], for a specified [time].
+         * For example, GMT+01 would return 60.minutes.
+         * This uses the Operating System to compute daylight offsets when required.
+         */
         fun local(time: DateTime): TimezoneOffset = KlockInternal.localTimezoneOffsetMinutes(time).offset
     }
+
+    override fun compareTo(other: TimezoneOffset): Int = totalMilliseconds.compareTo(other.totalMilliseconds)
 }
 
 /** A [TimeSpan] as a [TimezoneOffset]. */

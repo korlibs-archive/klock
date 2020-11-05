@@ -34,12 +34,39 @@ object ISO8601 {
                     fmtReader.tryRead("DDD") -> append(d.dayOfWeekInt.padded(3))
                     fmtReader.tryRead("ww") -> append(d.weekOfYear1.padded(2))
                     fmtReader.tryRead("D") -> append(d.dayOfWeek.index1Monday)
-                    fmtReader.tryRead("hh,hh") -> append(time.hours.padded(2, 2).replace('.', ','))
-                    fmtReader.tryRead("hh") -> append(d.hours.padded(2))
-                    fmtReader.tryRead("mm,mm") -> append((time.minutes % 60.0).padded(2, 2).replace('.', ','))
-                    fmtReader.tryRead("mm") -> append(d.minutes.padded(2))
-                    fmtReader.tryRead("ss,ss") -> append(time.seconds.padded(2, 2).replace('.', ','))
-                    fmtReader.tryRead("ss") -> append(d.seconds.padded(2))
+                    fmtReader.tryRead("hh") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        val result = if (nextComma || fmtReader.tryRead('.')) {
+                            var decCount = 0
+                            while (fmtReader.tryRead('h')) decCount++
+                            time.hours.padded(2, decCount)
+                        } else {
+                            d.hours.padded(2)
+                        }
+                        append(if (nextComma) result.replace('.', ',') else result)
+                    }
+                    fmtReader.tryRead("mm") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        val result = if (nextComma || fmtReader.tryRead('.')) {
+                            var decCount = 0
+                            while (fmtReader.tryRead('m')) decCount++
+                            (time.minutes % 60.0).padded(2, decCount)
+                        } else {
+                            d.minutes.padded(2)
+                        }
+                        append(if (nextComma) result.replace('.', ',') else result)
+                    }
+                    fmtReader.tryRead("ss") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        val result = if (nextComma || fmtReader.tryRead('.')) {
+                            var decCount = 0
+                            while (fmtReader.tryRead('s')) decCount++
+                            (time.seconds % 60.0).padded(2, decCount)
+                        } else {
+                            d.seconds.padded(2)
+                        }
+                        append(if (nextComma) result.replace('.', ',') else result)
+                    }
                     fmtReader.tryRead("±") -> append(if (d.yearInt < 0) "-" else "+")
                     else -> append(fmtReader.readChar())
                 }
@@ -52,9 +79,14 @@ object ISO8601 {
             }
         }
 
+        private fun reportParse(reason: String): DateTimeTz? {
+            //println("reason: $reason")
+            return null
+        }
+
         private fun tryParse(str: String): DateTimeTz? {
-            var isUtc = false
             var sign = +1
+            var tzOffset: TimeSpan? = null
             var year = twoDigitBaseYear
             var month = 1
             var dayOfMonth = 1
@@ -72,38 +104,61 @@ object ISO8601 {
 
             while (fmtReader.hasMore) {
                 when {
-                    fmtReader.tryRead("Z") -> isUtc = true
-                    fmtReader.tryRead("YYYYYY") -> year = reader.tryReadInt(6) ?: return null
-                    fmtReader.tryRead("YYYY") -> year = reader.tryReadInt(4) ?: return null
+                    fmtReader.tryRead("Z") -> tzOffset = reader.readTimeZoneOffset()
+                    fmtReader.tryRead("YYYYYY") -> year = reader.tryReadInt(6) ?: return reportParse("YYYYYY")
+                    fmtReader.tryRead("YYYY") -> year = reader.tryReadInt(4) ?: return reportParse("YYYY")
                     //fmtReader.tryRead("YY") -> year = twoDigitBaseYear + (reader.tryReadInt(2) ?: return null) // @TODO: Kotlin compiler BUG?
                     fmtReader.tryRead("YY") -> {
-                        val base = reader.tryReadInt(2) ?: return null
+                        val base = reader.tryReadInt(2) ?: return reportParse("YY")
                         year = twoDigitBaseYear + base
                     }
-                    fmtReader.tryRead("MM") -> month = reader.tryReadInt(2) ?: return null
-                    fmtReader.tryRead("DD") -> dayOfMonth = reader.tryReadInt(4) ?: return null
-                    fmtReader.tryRead("DDD") -> dayOfYear = reader.tryReadInt(3) ?: return null
-                    fmtReader.tryRead("ww") -> weekOfYear = reader.tryReadInt(2) ?: return null
-                    fmtReader.tryRead("D") -> dayOfWeek = reader.tryReadInt(1) ?: return null
+                    fmtReader.tryRead("MM") -> month = reader.tryReadInt(2) ?: return reportParse("MM")
+                    fmtReader.tryRead("DD") -> dayOfMonth = reader.tryReadInt(2) ?: return reportParse("DD")
+                    fmtReader.tryRead("DDD") -> dayOfYear = reader.tryReadInt(3) ?: return reportParse("DDD")
+                    fmtReader.tryRead("ww") -> weekOfYear = reader.tryReadInt(2) ?: return reportParse("ww")
+                    fmtReader.tryRead("D") -> dayOfWeek = reader.tryReadInt(1) ?: return reportParse("D")
 
-                    fmtReader.tryRead("hh,hh") -> hours = reader.tryReadDouble(5) ?: return null
-                    fmtReader.tryRead("hh") -> hours = reader.tryReadDouble(2) ?: return null
-                    fmtReader.tryRead("mm,mm") -> minutes = reader.tryReadDouble(5) ?: return null
-                    fmtReader.tryRead("mm") -> minutes = reader.tryReadDouble(2) ?: return null
-                    fmtReader.tryRead("ss,ss") -> seconds = reader.tryReadDouble(5) ?: return null
-                    fmtReader.tryRead("ss") -> seconds = reader.tryReadDouble(2) ?: return null
-
-                    fmtReader.tryRead("±") -> {
-                        when (reader.readChar()) {
-                            '+' -> sign = +1
-                            '-' -> sign = -1
-                            else -> return null
+                    fmtReader.tryRead("hh") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        hours = if (nextComma || fmtReader.tryRead('.')) {
+                            var count = 3
+                            while (fmtReader.tryRead('h')) count++
+                            reader.tryReadDouble(count) ?: return reportParse("incorrect hours")
+                        } else {
+                            reader.tryReadDouble(2) ?: return reportParse("incorrect hours")
                         }
                     }
-                    else -> if (fmtReader.readChar() != reader.readChar()) return null
+                    fmtReader.tryRead("mm") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        minutes = if (nextComma || fmtReader.tryRead('.')) {
+                            var count = 3
+                            while (fmtReader.tryRead('m')) count++
+                            reader.tryReadDouble(count) ?: return reportParse("incorrect minutes")
+                        } else {
+                            reader.tryReadDouble(2) ?: return reportParse("incorrect seconds")
+                        }
+                    }
+                    fmtReader.tryRead("ss") -> {
+                        val nextComma = fmtReader.tryRead(',')
+                        seconds = if (nextComma || fmtReader.tryRead('.')) {
+                            var count = 3
+                            while (fmtReader.tryRead('s')) count++
+                            reader.tryReadDouble(count) ?: return reportParse("incorrect seconds")
+                        } else {
+                            reader.tryReadDouble(2) ?: return reportParse("incorrect seconds")
+                        }
+                    }
+                    fmtReader.tryRead("±") -> {
+                        sign = when (reader.readChar()) {
+                            '+' -> +1
+                            '-' -> -1
+                            else -> return reportParse("±")
+                        }
+                    }
+                    else -> if (fmtReader.readChar() != reader.readChar()) return reportParse("separator")
                 }
             }
-            if (reader.hasMore) return null
+            if (reader.hasMore) return reportParse("uncomplete")
 
             val dateTime = when {
                 dayOfYear >= 0 -> DateTime(year, 1, 1) + (dayOfYear - 1).days
@@ -114,7 +169,9 @@ object ISO8601 {
                 }
                 else -> DateTime(year, month, dayOfMonth)
             }
-            return (dateTime + hours.hours + minutes.minutes + seconds.seconds).local
+
+            val baseDateTime = dateTime + hours.hours + minutes.minutes + seconds.seconds
+            return if (tzOffset != null) DateTimeTz.utc(baseDateTime, TimezoneOffset(tzOffset)) else baseDateTime.local
         }
 
         fun withTwoDigitBaseYear(twoDigitBaseYear: Int = 1900) = BaseIsoDateTimeFormat(format, twoDigitBaseYear)
@@ -202,8 +259,9 @@ object ISO8601 {
         val extended = BaseIsoDateTimeFormat(extendedFormat ?: basicFormat ?: TODO())
 
         override fun format(dd: DateTimeTz): String = extended.format(dd)
-        override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? =
-            basic.tryParse(str, false) ?: extended.tryParse(str, false)
+        override fun tryParse(str: String, doThrow: Boolean): DateTimeTz? = null
+            ?: basic.tryParse(str, false)
+            ?: extended.tryParse(str, false)
             ?: (if (doThrow) throw DateException("Invalid format $str") else null)
     }
 
@@ -227,14 +285,12 @@ object ISO8601 {
     val DATE_WEEK_EXPANDED0 = IsoDateTimeFormat("±YYYYYYWwwD", "±YYYYYY-Www-D")
     val DATE_WEEK_EXPANDED1 = IsoDateTimeFormat("±YYYYYYWww", "±YYYYYY-Www")
 
-    val DATE_ALL by lazy {
-        listOf(
-            DATE_CALENDAR_COMPLETE, DATE_CALENDAR_REDUCED0, DATE_CALENDAR_REDUCED1, DATE_CALENDAR_REDUCED2,
-            DATE_CALENDAR_EXPANDED0, DATE_CALENDAR_EXPANDED1, DATE_CALENDAR_EXPANDED2, DATE_CALENDAR_EXPANDED3,
-            DATE_ORDINAL_COMPLETE, DATE_ORDINAL_EXPANDED,
-            DATE_WEEK_COMPLETE, DATE_WEEK_REDUCED, DATE_WEEK_EXPANDED0, DATE_WEEK_EXPANDED1
-        )
-    }
+    val DATE_ALL = listOf(
+        DATE_CALENDAR_COMPLETE, DATE_CALENDAR_REDUCED0, DATE_CALENDAR_REDUCED1, DATE_CALENDAR_REDUCED2,
+        DATE_CALENDAR_EXPANDED0, DATE_CALENDAR_EXPANDED1, DATE_CALENDAR_EXPANDED2, DATE_CALENDAR_EXPANDED3,
+        DATE_ORDINAL_COMPLETE, DATE_ORDINAL_EXPANDED,
+        DATE_WEEK_COMPLETE, DATE_WEEK_REDUCED, DATE_WEEK_EXPANDED0, DATE_WEEK_EXPANDED1
+    )
 
     // Time Variants
     val TIME_LOCAL_COMPLETE = IsoTimeFormat("hhmmss", "hh:mm:ss")
@@ -256,27 +312,27 @@ object ISO8601 {
     val TIME_RELATIVE0 = IsoTimeFormat("±hhmm", "±hh:mm")
     val TIME_RELATIVE1 = IsoTimeFormat("±hh", null)
 
-    val TIME_ALL by lazy {
-        listOf(
-            TIME_LOCAL_COMPLETE,
-            TIME_LOCAL_REDUCED0,
-            TIME_LOCAL_REDUCED1,
-            TIME_LOCAL_FRACTION0,
-            TIME_LOCAL_FRACTION1,
-            TIME_LOCAL_FRACTION2,
-            TIME_UTC_COMPLETE,
-            TIME_UTC_REDUCED0,
-            TIME_UTC_REDUCED1,
-            TIME_UTC_FRACTION0,
-            TIME_UTC_FRACTION1,
-            TIME_UTC_FRACTION2,
-            TIME_RELATIVE0,
-            TIME_RELATIVE1
-        )
-    }
+    val TIME_ALL = listOf(
+        TIME_LOCAL_COMPLETE,
+        TIME_LOCAL_REDUCED0,
+        TIME_LOCAL_REDUCED1,
+        TIME_LOCAL_FRACTION0,
+        TIME_LOCAL_FRACTION1,
+        TIME_LOCAL_FRACTION2,
+        TIME_UTC_COMPLETE,
+        TIME_UTC_REDUCED0,
+        TIME_UTC_REDUCED1,
+        TIME_UTC_FRACTION0,
+        TIME_UTC_FRACTION1,
+        TIME_UTC_FRACTION2,
+        TIME_RELATIVE0,
+        TIME_RELATIVE1
+    )
 
     // Date + Time Variants
-    val DATETIME_COMPLETE = IsoDateTimeFormat("YYYYMMDDTHHMMSS", "YYYY-MM-DDTHH:MM:SS")
+    val DATETIME_COMPLETE = IsoDateTimeFormat("YYYYMMDDThhmmss", "YYYY-MM-DDThh:mm:ss")
+    val DATETIME_UTC_COMPLETE = IsoDateTimeFormat("YYYYMMDDThhmmssZ", "YYYY-MM-DDThh:mm:ssZ")
+    val DATETIME_UTC_COMPLETE_FRACTION = IsoDateTimeFormat("YYYYMMDDThhmmss.sssZ", "YYYY-MM-DDThh:mm:ss.sssZ")
 
     // Interval Variants
     val INTERVAL_COMPLETE0 = IsoIntervalFormat("PnnYnnMnnDTnnHnnMnnS")
@@ -301,15 +357,13 @@ object ISO8601 {
     val INTERVAL_ZERO_OMIT2 = IsoIntervalFormat("PnnYnnDTnnH")
     val INTERVAL_ZERO_OMIT3 = IsoIntervalFormat("PnnYnnD")
 
-    val INTERVAL_ALL by lazy {
-        listOf(
-            INTERVAL_COMPLETE0, INTERVAL_COMPLETE1,
-            INTERVAL_REDUCED0, INTERVAL_REDUCED1, INTERVAL_REDUCED2, INTERVAL_REDUCED3, INTERVAL_REDUCED4,
-            INTERVAL_DECIMAL0, INTERVAL_DECIMAL1, INTERVAL_DECIMAL2, INTERVAL_DECIMAL3, INTERVAL_DECIMAL4,
-            INTERVAL_DECIMAL5, INTERVAL_DECIMAL6,
-            INTERVAL_ZERO_OMIT0, INTERVAL_ZERO_OMIT1, INTERVAL_ZERO_OMIT2, INTERVAL_ZERO_OMIT3
-        )
-    }
+    val INTERVAL_ALL = listOf(
+        INTERVAL_COMPLETE0, INTERVAL_COMPLETE1,
+        INTERVAL_REDUCED0, INTERVAL_REDUCED1, INTERVAL_REDUCED2, INTERVAL_REDUCED3, INTERVAL_REDUCED4,
+        INTERVAL_DECIMAL0, INTERVAL_DECIMAL1, INTERVAL_DECIMAL2, INTERVAL_DECIMAL3, INTERVAL_DECIMAL4,
+        INTERVAL_DECIMAL5, INTERVAL_DECIMAL6,
+        INTERVAL_ZERO_OMIT0, INTERVAL_ZERO_OMIT1, INTERVAL_ZERO_OMIT2, INTERVAL_ZERO_OMIT3
+    )
 
     // Detects and parses all the variants
     val DATE = object : DateFormat {

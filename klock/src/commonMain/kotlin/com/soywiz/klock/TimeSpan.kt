@@ -4,36 +4,93 @@ import com.soywiz.klock.internal.*
 import kotlin.math.*
 
 /** [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds]. */
-inline val Number.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
+inline val Long.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
 /** [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds]. */
-inline val Number.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
+inline val Long.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
 /** [TimeSpan] representing this number as [milliseconds] or 1 / 1_000 [seconds]. */
-inline val Number.milliseconds get() = TimeSpan.fromMilliseconds(this.toDouble())
+inline val Long.milliseconds get() = TimeSpan.fromMilliseconds(this.toDouble())
 /** [TimeSpan] representing this number as [seconds]. */
-inline val Number.seconds get() = TimeSpan.fromSeconds((this.toDouble()))
+inline val Long.seconds get() = TimeSpan.fromSeconds((this.toDouble()))
 /** [TimeSpan] representing this number as [minutes] or 60 [seconds]. */
-inline val Number.minutes get() = TimeSpan.fromMinutes(this.toDouble())
+inline val Long.minutes get() = TimeSpan.fromMinutes(this.toDouble())
 /** [TimeSpan] representing this number as [hours] or 3_600 [seconds]. */
-inline val Number.hours get() = TimeSpan.fromHours(this.toDouble())
+inline val Long.hours get() = TimeSpan.fromHours(this.toDouble())
 /** [TimeSpan] representing this number as [days] or 86_400 [seconds]. */
-inline val Number.days get() = TimeSpan.fromDays(this.toDouble())
+inline val Long.days get() = TimeSpan.fromDays(this.toDouble())
 /** [TimeSpan] representing this number as [weeks] or 604_800 [seconds]. */
-inline val Number.weeks get() = TimeSpan.fromWeeks(this.toDouble())
+inline val Long.weeks get() = TimeSpan.fromWeeks(this.toDouble())
+
+/** [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds]. */
+inline val Float.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
+/** [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds]. */
+inline val Float.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
+/** [TimeSpan] representing this number as [milliseconds] or 1 / 1_000 [seconds]. */
+inline val Float.milliseconds get() = TimeSpan.fromMilliseconds(this.toDouble())
+/** [TimeSpan] representing this number as [seconds]. */
+inline val Float.seconds get() = TimeSpan.fromSeconds((this.toDouble()))
+/** [TimeSpan] representing this number as [minutes] or 60 [seconds]. */
+inline val Float.minutes get() = TimeSpan.fromMinutes(this.toDouble())
+/** [TimeSpan] representing this number as [hours] or 3_600 [seconds]. */
+inline val Float.hours get() = TimeSpan.fromHours(this.toDouble())
+/** [TimeSpan] representing this number as [days] or 86_400 [seconds]. */
+inline val Float.days get() = TimeSpan.fromDays(this.toDouble())
+/** [TimeSpan] representing this number as [weeks] or 604_800 [seconds]. */
+inline val Float.weeks get() = TimeSpan.fromWeeks(this.toDouble())
+
+/** [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds]. */
+inline val Int.nanoseconds get() = TimeSpan.fromNanoseconds(this.toDouble())
+/** [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds]. */
+inline val Int.microseconds get() = TimeSpan.fromMicroseconds(this.toDouble())
+/** [TimeSpan] representing this number as [milliseconds] or 1 / 1_000 [seconds]. */
+inline val Int.milliseconds get() = TimeSpan.fromMilliseconds(this.toDouble())
+/** [TimeSpan] representing this number as [seconds]. */
+inline val Int.seconds get() = TimeSpan.fromSeconds((this.toDouble()))
+/** [TimeSpan] representing this number as [minutes] or 60 [seconds]. */
+inline val Int.minutes get() = TimeSpan.fromMinutes(this.toDouble())
+/** [TimeSpan] representing this number as [hours] or 3_600 [seconds]. */
+inline val Int.hours get() = TimeSpan.fromHours(this.toDouble())
+/** [TimeSpan] representing this number as [days] or 86_400 [seconds]. */
+inline val Int.days get() = TimeSpan.fromDays(this.toDouble())
+/** [TimeSpan] representing this number as [weeks] or 604_800 [seconds]. */
+inline val Int.weeks get() = TimeSpan.fromWeeks(this.toDouble())
+
+/** [TimeSpan] representing this number as [nanoseconds] or 1 / 1_000_000_000 [seconds]. */
+inline val Double.nanoseconds get() = TimeSpan.fromNanoseconds(this)
+/** [TimeSpan] representing this number as [microseconds] or 1 / 1_000_000 [seconds]. */
+inline val Double.microseconds get() = TimeSpan.fromMicroseconds(this)
+/** [TimeSpan] representing this number as [milliseconds] or 1 / 1_000 [seconds]. */
+inline val Double.milliseconds get() = TimeSpan.fromMilliseconds(this)
+/** [TimeSpan] representing this number as [seconds]. */
+inline val Double.seconds get() = TimeSpan.fromSeconds((this))
+/** [TimeSpan] representing this number as [minutes] or 60 [seconds]. */
+inline val Double.minutes get() = TimeSpan.fromMinutes(this)
+/** [TimeSpan] representing this number as [hours] or 3_600 [seconds]. */
+inline val Double.hours get() = TimeSpan.fromHours(this)
+/** [TimeSpan] representing this number as [days] or 86_400 [seconds]. */
+inline val Double.days get() = TimeSpan.fromDays(this)
+/** [TimeSpan] representing this number as [weeks] or 604_800 [seconds]. */
+inline val Double.weeks get() = TimeSpan.fromWeeks(this)
+
 
 /**
  * Represents a span of time, with [milliseconds] precision.
  *
  * It is an inline class wrapping [Double] instead of [Long] to work on JavaScript without allocations.
  */
-@Suppress("DataClassPrivateConstructor")
 inline class TimeSpan(
-    /** Returns the total number of [seconds] for this [TimeSpan] (1 / 1_000 [seconds]) */
+    /** Returns the total number of [milliseconds] for this [TimeSpan] (1 / 1_000 [seconds]) */
     val milliseconds: Double
-) : Comparable<TimeSpan> {
+) : Comparable<TimeSpan>, Serializable {
     /** Returns the total number of [nanoseconds] for this [TimeSpan] (1 / 1_000_000_000 [seconds]) */
     val nanoseconds: Double get() = this.milliseconds / MILLIS_PER_NANOSECOND
+    /** Returns the total number of [nanoseconds] for this [TimeSpan] (1 / 1_000_000_000 [seconds]) as Integer */
+    val nanosecondsInt: Int get() = (this.milliseconds / MILLIS_PER_NANOSECOND).toInt()
+
     /** Returns the total number of [microseconds] for this [TimeSpan] (1 / 1_000_000 [seconds]) */
     val microseconds: Double get() = this.milliseconds / MILLIS_PER_MICROSECOND
+    /** Returns the total number of [microseconds] for this [TimeSpan] (1 / 1_000_000 [seconds]) as Integer */
+    val microsecondsInt: Int get() = (this.milliseconds / MILLIS_PER_MICROSECOND).toInt()
+
     /** Returns the total number of [seconds] for this [TimeSpan] */
     val seconds: Double get() = this.milliseconds / MILLIS_PER_SECOND
     /** Returns the total number of [minutes] for this [TimeSpan] (60 [seconds]) */
@@ -66,10 +123,16 @@ inline class TimeSpan(
     operator fun times(scale: Int): TimeSpan = TimeSpan(this.milliseconds * scale)
     operator fun times(scale: Double): TimeSpan = TimeSpan((this.milliseconds * scale))
 
+    operator fun div(scale: Int): TimeSpan = TimeSpan(this.milliseconds / scale)
+    operator fun div(scale: Double): TimeSpan = TimeSpan((this.milliseconds / scale))
+
     operator fun div(other: TimeSpan): Double = this.milliseconds / other.milliseconds
     operator fun rem(other: TimeSpan): TimeSpan = (this.milliseconds % other.milliseconds).milliseconds
 
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         private const val MILLIS_PER_MICROSECOND = 1.0 / 1000.0
         private const val MILLIS_PER_NANOSECOND = MILLIS_PER_MICROSECOND / 1000.0
 
@@ -83,7 +146,7 @@ inline class TimeSpan(
          * Useful to represent an alternative "null" time lapse
          * avoiding the boxing of a nullable type.
          */
-        val NULL = TimeSpan(Double.NaN)
+        val NIL = TimeSpan(Double.NaN)
 
         @PublishedApi
         internal fun fromMilliseconds(ms: Double) = when (ms) {
@@ -152,3 +215,4 @@ fun TimeSpan.clamp(min: TimeSpan, max: TimeSpan): TimeSpan = when {
     this > max -> max
     else -> this
 }
+inline fun TimeSpan.coalesce(block: () -> TimeSpan): TimeSpan = if (this != TimeSpan.NIL) this else block()

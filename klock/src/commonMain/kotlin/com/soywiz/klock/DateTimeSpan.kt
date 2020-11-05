@@ -12,7 +12,12 @@ data class DateTimeSpan(
     val monthSpan: MonthSpan,
     /** The [TimeSpan] part */
     val timeSpan: TimeSpan
-) : Comparable<DateTimeSpan> {
+) : Comparable<DateTimeSpan>, Serializable {
+    companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+    }
+
     constructor(
         years: Int = 0,
         months: Int = 0,
@@ -38,10 +43,13 @@ data class DateTimeSpan(
     operator fun minus(other: MonthSpan) = this + -other
     operator fun minus(other: DateTimeSpan) = this + -other
 
-    inline operator fun times(times: Number) = times(times.toDouble())
-    inline operator fun div(times: Number) = times(1.0 / times.toDouble())
-
     operator fun times(times: Double) = DateTimeSpan((monthSpan * times), (timeSpan * times))
+    operator fun times(times: Int) = this * times.toDouble()
+    operator fun times(times: Float) = this * times.toDouble()
+
+    operator fun div(times: Double) = times(1.0 / times)
+    operator fun div(times: Int) = this / times.toDouble()
+    operator fun div(times: Float) = this / times.toDouble()
 
     /** From the date part, all months represented as a [totalYears] [Double] */
     val totalYears: Double get() = monthSpan.totalYears
@@ -94,7 +102,7 @@ data class DateTimeSpan(
     }
 
     /**
-     * Represents this [DateTimeSpan] as a string like `50Y 10M 3W 6D 5H 30m 15s`.
+     * Represents this [DateTimeSpan] as a string like `50Y 10M 3W 6DH 30m 15s`.
      * Parts that are zero, won't be included. You can omit weeks and represent them
      * as days by adjusting the [includeWeeks] parameter.
      */
@@ -125,5 +133,5 @@ data class DateTimeSpan(
         }
     }
 
-    private val computed by lazy { ComputedTime(timeSpan) }
+    private val computed by klockLazyOrGet { ComputedTime(timeSpan) }
 }

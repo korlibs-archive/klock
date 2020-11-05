@@ -1,6 +1,7 @@
 package com.soywiz.klock.internal
 
 import com.soywiz.klock.*
+import com.soywiz.klock.hr.HRTimeSpan
 import kotlinx.cinterop.*
 import platform.posix.*
 
@@ -13,12 +14,20 @@ internal actual object KlockInternal {
         ((sec * 1_000L) + (usec / 1_000L)).toDouble()
     }
 
-    actual val microClock: Double get() = memScoped {
+    actual val hrNow: HRTimeSpan get() = memScoped {
         val timeVal = alloc<timeval>()
         gettimeofday(timeVal.ptr, null)
         val sec = timeVal.tv_sec
         val usec = timeVal.tv_usec
-        ((sec * 1_000_000L) + usec).toDouble()
+        HRTimeSpan.fromSeconds(sec.toInt()) + HRTimeSpan.fromMicroseconds(usec.toInt())
+    }
+
+    actual fun sleep(time: HRTimeSpan) {
+        val micros = time.microsecondsDouble.toLong()
+        val s = micros / 1_000_000
+        val u = micros % 1_000_000
+        if (s > 0) platform.posix.sleep(s.convert())
+        if (u > 0) platform.posix.usleep(u.convert())
     }
 
     // @TODO: kotlin-native bug: https://github.com/JetBrains/kotlin-native/pull/1901

@@ -1,6 +1,7 @@
 package com.soywiz.klock.internal
 
 import com.soywiz.klock.*
+import com.soywiz.klock.hr.HRTimeSpan
 import kotlinx.cinterop.*
 import platform.posix.*
 import platform.windows.*
@@ -15,13 +16,13 @@ internal actual object KlockInternal {
             ((sec * 1_000L) + (usec / 1_000L)).toDouble()
         }
 
-    actual val microClock: Double
+    actual val hrNow: HRTimeSpan
         get() = memScoped {
             val timeVal = alloc<timeval>()
             mingw_gettimeofday(timeVal.ptr, null)
             val sec = timeVal.tv_sec
             val usec = timeVal.tv_usec
-            ((sec * 1_000_000L) + usec).toDouble()
+            HRTimeSpan.fromSeconds(sec.toInt()) + HRTimeSpan.fromMicroseconds(usec.toInt())
         }
 
     actual fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan = memScoped {
@@ -33,6 +34,14 @@ internal actual object KlockInternal {
         val localUnix = localStime.toFiletime().toUnix()
         val utcUnix = utcStime.toFiletime().toUnix()
         return (localUnix - utcUnix).milliseconds
+    }
+
+    actual fun sleep(time: HRTimeSpan) {
+        val micros = time.microsecondsDouble.toLong()
+        val s = micros / 1_000_000
+        val u = micros % 1_000_000
+        if (s > 0) platform.posix.sleep(s.convert())
+        if (u > 0) platform.posix.usleep(u.convert())
     }
 
     fun SYSTEMTIME.toTimezone(tzi: TIME_ZONE_INFORMATION): SYSTEMTIME = memScoped { alloc<SYSTEMTIME>().apply { SystemTimeToTzSpecificLocalTime(tzi.ptr, this@toTimezone.ptr, this.ptr) } }

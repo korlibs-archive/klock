@@ -1,2 +1,3 @@
 #!/bin/bash
-WINEDEBUG=-all wine cmd /c gradlew.bat $*
+ unset ANDROID_HOME
+ WINEDEBUG=-all wine64 cmd /c gradlew.bat $*

@@ -86,4 +86,73 @@ class ISO8601Test {
         assertEquals(44, DateTime(2007, Month.November, 3).weekOfYear1)
         assertEquals(6, DateTime(2007, Month.November, 3).dayOfWeek.index1Monday)
     }
+
+    @Test
+    fun testDateTimeComplete() {
+        assertEquals("20190917T114805", ISO8601.DATETIME_COMPLETE.basic.format(1568720885000))
+        assertEquals("2019-09-17T11:48:05", ISO8601.DATETIME_COMPLETE.extended.format(1568720885000))
+
+        assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_COMPLETE.parse("20190917T114805").utc.toString())
+        assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_COMPLETE.parse("2019-09-17T11:48:05").utc.toString())
+    }
+
+    @Test
+    fun testDateTimeUtcComplete() {
+        assertEquals("20190917T114805Z", ISO8601.DATETIME_UTC_COMPLETE.basic.format(1568720885000))
+        assertEquals("2019-09-17T11:48:05Z", ISO8601.DATETIME_UTC_COMPLETE.extended.format(1568720885000))
+
+        assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_UTC_COMPLETE.parse("20190917T114805Z").utc.toString())
+        assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_UTC_COMPLETE.parse("2019-09-17T11:48:05Z").utc.toString())
+    }
+
+    @Test
+    fun testDateTimeUtcCompleteFraction() {
+        assertEquals("20190917T114805.000Z", ISO8601.DATETIME_UTC_COMPLETE_FRACTION.basic.format(1568720885000))
+        assertEquals("2019-09-17T11:48:05.000Z", ISO8601.DATETIME_UTC_COMPLETE_FRACTION.extended.format(1568720885000))
+
+        assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_UTC_COMPLETE_FRACTION.parse("20190917T114805.000Z").utc.toString())
+        assertEquals("Tue, 17 Sep 2019 11:48:05 UTC", ISO8601.DATETIME_UTC_COMPLETE_FRACTION.parse("2019-09-17T11:48:05.000Z").utc.toString())
+    }
+
+    @Test
+    fun testIssue84() {
+        val badUtc = DateTime(
+            date = Date(2020, 1, 4),
+            time = Time(2, 42, 55, millisecond = 500)
+        )
+        assertEquals(
+            "2020-01-04T02:42:55,50",
+            badUtc.format(ISO8601.IsoDateTimeFormat("YYYYMMDDThhmmss,ss", "YYYY-MM-DDThh:mm:ss,ss"))
+        )
+    }
+
+    @Test
+    fun testIssue102() {
+        val time = 15.hours + 30.minutes + 12.seconds + 160.milliseconds
+
+        assertEquals("15:30:12", ISO8601.IsoTimeFormat("hhmmss", "hh:mm:ss").format(time))
+        assertEquals("153012", ISO8601.IsoTimeFormat("hhmmss", "hh:mm:ss").basic.format(time))
+
+        assertEquals("15:30:12.2", ISO8601.IsoTimeFormat("hhmmss.s", "hh:mm:ss.s").format(time))
+        assertEquals("15:30:12,2", ISO8601.IsoTimeFormat("hhmmss,s", "hh:mm:ss,s").format(time))
+        assertEquals("15:30:12.16", ISO8601.IsoTimeFormat("hhmmss.ss", "hh:mm:ss.ss").format(time))
+        assertEquals("15:30:12,16", ISO8601.IsoTimeFormat("hhmmss,ss", "hh:mm:ss,ss").format(time))
+        assertEquals("15:30:12.160", ISO8601.IsoTimeFormat("hhmmss.sss", "hh:mm:ss.sss").format(time))
+        assertEquals("15:30:12,160", ISO8601.IsoTimeFormat("hhmmss,sss", "hh:mm:ss,sss").format(time))
+
+        assertEquals("15:30.2", ISO8601.IsoTimeFormat("hhmm.m", "hh:mm.m").format(time))
+        assertEquals("15:30,2", ISO8601.IsoTimeFormat("hhmm,m", "hh:mm,m").format(time))
+        assertEquals("15:30.20", ISO8601.IsoTimeFormat("hhmm.mm", "hh:mm.mm").format(time))
+        assertEquals("15:30,20", ISO8601.IsoTimeFormat("hhmm,mm", "hh:mm,mm").format(time))
+
+        assertEquals("15.5", ISO8601.IsoTimeFormat("hh.h", "hh.h").format(time))
+        assertEquals("15,5", ISO8601.IsoTimeFormat("hh,h", "hh,h").format(time))
+        assertEquals("15.50", ISO8601.IsoTimeFormat("hh.hh", "hh.hh").format(time))
+        assertEquals("15,50", ISO8601.IsoTimeFormat("hh,hh", "hh,hh").format(time))
+
+        assertEquals("15,5Z", ISO8601.IsoTimeFormat("hh,hZ", null).format(time))
+
+        assertEquals(time, ISO8601.IsoTimeFormat("hhmmss,ss", "hh:mm:ss,ss").parse("15:30:12,16"))
+        assertEquals(time, ISO8601.IsoTimeFormat("hhmmss.sss", "hh:mm:ss.sss").parse("15:30:12.160"))
+    }
 }

@@ -8,7 +8,11 @@ internal const val MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60 // 3600_000
 internal const val MILLIS_PER_DAY = MILLIS_PER_HOUR * 24 // 86400_000
 internal const val MILLIS_PER_WEEK = MILLIS_PER_DAY * 7 // 604800_000
 
-internal fun Int.padded(count: Int) = this.toString().padStart(count, '0')
+internal fun Int.padded(count: Int): String {
+    // @TODO: Handle edge case Int.MIN_VALUE that could not be represented as abs
+    val res = this.absoluteValue.toString().padStart(count, '0')
+    return if (this < 0) return "-$res" else res
+}
 internal fun Double.padded(intCount: Int, decCount: Int): String {
     val intPart = floor(this).toInt()
     val decPart = round((this - intPart) * 10.0.pow(decCount)).toInt()
@@ -51,6 +55,22 @@ internal infix fun Int.umod(that: Int): Int {
     }
 }
 
+internal infix fun Double.umod(that: Double): Double {
+    val remainder = this % that
+    return when {
+        remainder < 0 -> remainder + that
+        else -> remainder
+    }
+}
+
+internal fun Double.toInt2(): Int = if (this < 0.0) floor(this).toInt() else this.toInt()
+internal fun Double.toIntMod(mod: Int): Int = (this umod mod.toDouble()).toInt2()
+
+internal infix fun Int.div2(other: Int): Int = when {
+    this < 0 || this % other == 0 -> this / other
+    else -> (this / other) - 1
+}
+
 internal class Moduler(val value: Double) {
     private var avalue = abs(value)
     private val sign = sign(value)
@@ -60,9 +80,12 @@ internal class Moduler(val value: Double) {
         avalue %= count
         return floor(ret) * sign
     }
+    fun double(count: Int): Double = double(count.toDouble())
+    fun double(count: Float): Double = double(count.toDouble())
 
-    inline fun double(count: Number): Double = double(count.toDouble())
-    inline fun int(count: Number): Int = double(count.toDouble()).toInt()
+    fun int(count: Double): Int = double(count).toInt()
+    fun int(count: Int): Int = int(count.toDouble())
+    fun int(count: Float): Int = int(count.toDouble())
 }
 
 internal infix fun Double.intDiv(other: Double) = floor(this / other)

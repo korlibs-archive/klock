@@ -1,12 +1,17 @@
 package com.soywiz.klock
 
+import com.soywiz.klock.internal.Serializable
+
 /**
  * Represents a couple of [year] and [month].
  *
  * It is packed in an inline class wrapping an Int to prevent allocations.
  */
-inline class YearMonth(internal val internalPackedInfo: Int) {
+inline class YearMonth(internal val internalPackedInfo: Int) : Serializable {
     companion object {
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
         /** Constructs a new [YearMonth] from the [year] and [month] components. */
         operator fun invoke(year: Year, month: Month) = YearMonth(year.year, month.index1)
         /** Constructs a new [YearMonth] from the [year] and [month] components. */
@@ -47,5 +52,12 @@ inline class YearMonth(internal val internalPackedInfo: Int) {
     override fun toString(): String = "$month $yearInt"
 }
 
+/**
+ * Creates a [YearMonth] representing [this] year and this [month].
+ */
 fun Year.withMonth(month: Month) = YearMonth(this, month)
+
+/**
+ * Creates a [YearMonth] representing this [year] and [this] month.
+ */
 fun Month.withYear(year: Year) = YearMonth(year, this)

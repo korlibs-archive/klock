@@ -14,9 +14,12 @@ import kotlin.math.*
 inline class DateTime(
     /** Number of milliseconds since UNIX [EPOCH] */
     val unixMillis: Double
-) : Comparable<DateTime> {
+) : Comparable<DateTime>, Serializable {
     companion object {
-        /** It is the that have elapsed since 00:00:00 UTC, Thursday, 1 January 1970, minus leap seconds. */
+        @Suppress("MayBeConstant", "unused")
+        private const val serialVersionUID = 1L
+
+        /** It is a [DateTime] instance representing 00:00:00 UTC, Thursday, 1 January 1970. */
         val EPOCH = DateTime(0.0)
 
         /**
@@ -37,6 +40,19 @@ inline class DateTime(
         )
 
         /**
+         * Constructs a new [DateTime] from date and time information.
+         *
+         * This might throw a [DateException] on invalid dates.
+         */
+		operator fun invoke(
+			date: Date,
+			time: Time = Time(0.milliseconds)
+		): DateTime = DateTime(
+			date.year, date.month1, date.day,
+			time.hour, time.minute, time.second, time.millisecond
+		)
+
+		/**
          * Constructs a new [DateTime] from date and time information.
          *
          * This might throw a [DateException] on invalid dates.
@@ -69,7 +85,6 @@ inline class DateTime(
         ): DateTime = DateTime(
             DateTime.dateToMillis(year, month, day) + DateTime.timeToMillis(hour, minute, second) + milliseconds
         )
-
 
         /**
          * Constructs a new [DateTime] from date and time information.
@@ -128,7 +143,7 @@ inline class DateTime(
                 dm += dd.cycleSteps(1, dup); dd = dd.cycle(1, dup) // Adjust days, adding months
                 dy += dm.cycleSteps(1, 12); dm = dm.cycle(1, 12) // Adjust months, adding years
 
-                // We already have found a day that is valid for the adjusted month!
+                // We have already found a day that is valid for the adjusted month!
                 if (dd.cycle(1, Month(dm).days(dy)) == dd) {
                     break
                 }
@@ -140,7 +155,7 @@ inline class DateTime(
         /**
          * Constructs a new [DateTime] from date and time information.
          *
-         * On invalid dates, will have an undefined behaviour.
+         * On invalid dates, this function will have an undefined behaviour.
          */
         fun createUnchecked(
             year: Int,
@@ -156,14 +171,14 @@ inline class DateTime(
             )
         }
 
-        /** Constructs a new [DateTime] from a [unix] timestamp. */
+        /** Constructs a new [DateTime] from a [unix] timestamp in milliseconds. */
         operator fun invoke(unix: Long) = fromUnix(unix)
-        /** Constructs a new [DateTime] from a [unix] timestamp. */
+        /** Constructs a new [DateTime] from a [unix] timestamp in milliseconds. */
         operator fun invoke(unix: Double) = fromUnix(unix)
 
-        /** Constructs a new [DateTime] from a [unix] timestamp. */
+        /** Constructs a new [DateTime] from a [unix] timestamp in milliseconds. */
         fun fromUnix(unix: Double): DateTime = DateTime(unix)
-        /** Constructs a new [DateTime] from a [unix] timestamp. */
+        /** Constructs a new [DateTime] from a [unix] timestamp in milliseconds. */
         fun fromUnix(unix: Long): DateTime = fromUnix(unix.toDouble())
 
         /** Constructs a new [DateTime] by parsing the [str] using standard date formats. */
@@ -183,7 +198,7 @@ inline class DateTime(
 
         internal const val EPOCH_INTERNAL_MILLIS = 62135596800000.0 // Millis since 00-00-0000 00:00 UTC to UNIX EPOCH
 
-        internal enum class DatePart { Year, DayOfYear, Month, Day}
+        internal enum class DatePart { Year, DayOfYear, Month, Day }
 
         internal fun dateToMillisUnchecked(year: Int, month: Int, day: Int): Double =
             (Year(year).daysSinceOne + Month(month).daysToStart(year) + day - 1) * MILLIS_PER_DAY.toDouble() - EPOCH_INTERNAL_MILLIS
@@ -207,7 +222,7 @@ inline class DateTime(
 
         // millis are 00-00-0000 based.
         internal fun getDatePart(millis: Double, part: DatePart): Int {
-            val totalDays = (millis / MILLIS_PER_DAY).toInt()
+            val totalDays = (millis / MILLIS_PER_DAY).toInt2()
 
             // Year
             val year = Year.fromDays(totalDays)
@@ -216,7 +231,7 @@ inline class DateTime(
             // Day of Year
             val isLeap = year.isLeap
             val startYearDays = year.daysSinceOne
-            val dayOfYear = 1 + (totalDays - startYearDays)
+            val dayOfYear = 1 + ((totalDays - startYearDays) umod year.days)
             if (part == DatePart.DayOfYear) return dayOfYear
 
             // Month
@@ -264,21 +279,21 @@ inline class DateTime(
     /** The [dayOfWeek] part */
     val dayOfWeek: DayOfWeek get() = DayOfWeek[dayOfWeekInt]
     /** The [dayOfWeek] part as [Int] */
-    val dayOfWeekInt: Int get() = ((yearOneMillis / MILLIS_PER_DAY + 1) % 7).toInt()
+    val dayOfWeekInt: Int get() = (yearOneMillis / MILLIS_PER_DAY + 1).toIntMod(7)
 
     /** The [dayOfYear] part */
     val dayOfYear: Int get() = getDatePart(yearOneMillis, DatePart.DayOfYear)
 
     /** The [hours] part */
-    val hours: Int get() = (((yearOneMillis / MILLIS_PER_HOUR) % 24).toInt())
+    val hours: Int get() = (yearOneMillis / MILLIS_PER_HOUR).toIntMod(24)
     /** The [minutes] part */
-    val minutes: Int get() = ((yearOneMillis / MILLIS_PER_MINUTE) % 60).toInt()
+    val minutes: Int get() = (yearOneMillis / MILLIS_PER_MINUTE).toIntMod(60)
     /** The [seconds] part */
-    val seconds: Int get() = ((yearOneMillis / MILLIS_PER_SECOND) % 60).toInt()
+    val seconds: Int get() = (yearOneMillis / MILLIS_PER_SECOND).toIntMod(60)
     /** The [milliseconds] part */
-    val milliseconds: Int get() = ((yearOneMillis) % 1000).toInt()
+    val milliseconds: Int get() = (yearOneMillis).toIntMod(1000)
 
-    /** Returns a new local date that will match these components but with a different offset. */
+    /** Returns a new local date that will match these components. */
     val localUnadjusted: DateTimeTz get() = DateTimeTz.local(this, localOffset)
     /** Returns a new local date that will match these components but with a different [offset]. */
     fun toOffsetUnadjusted(offset: TimeSpan) = toOffsetUnadjusted(offset.offset)
@@ -291,6 +306,57 @@ inline class DateTime(
     fun toOffset(offset: TimeSpan) = toOffset(offset.offset)
     /** Returns this date with a local offset. Components might change because of the [offset]. */
     fun toOffset(offset: TimezoneOffset) = DateTimeTz.utc(this, offset)
+    /** Returns this date with a 0 offset. Components are equal. */
+    val utc: DateTimeTz get() = DateTimeTz.utc(this, TimezoneOffset(0.minutes))
+
+	/** Returns a [DateTime] of [this] day with the hour at 00:00:00 */
+	val dateDayStart get() = DateTime(year, month, dayOfMonth, 0, 0, 0, 0)
+	/** Returns a [DateTime] of [this] day with the hour at 23:59:59.999 */
+	val dateDayEnd get() = DateTime(year, month, dayOfMonth, 23, 59, 59, 999)
+
+    /** Returns the quarter 1, 2, 3 or 4 */
+    val quarter get() = (month0 / 3) + 1
+
+    // startOf
+
+    val startOfYear get() = DateTime(year, Month.January, 1)
+    val startOfMonth get() = DateTime(year, month, 1)
+    val startOfQuarter get() = DateTime(year, Month[(quarter - 1) * 3 + 1], 1)
+    fun startOfDayOfWeek(day: DayOfWeek): DateTime {
+        for (n in 0 until 7) {
+            val date = (this - n.days)
+            if (date.dayOfWeek == day) return date.startOfDay
+        }
+        error("Shouldn't happen")
+    }
+    val startOfWeek: DateTime get() = startOfDayOfWeek(DayOfWeek.Sunday)
+    val startOfIsoWeek: DateTime get() = startOfDayOfWeek(DayOfWeek.Monday)
+    val startOfDay get() = DateTime(year, month, dayOfMonth)
+    val startOfHour get() = DateTime(year, month, dayOfMonth, hours)
+    val startOfMinute get() = DateTime(year, month, dayOfMonth, hours, minutes)
+    val startOfSecond get() = DateTime(year, month, dayOfMonth, hours, minutes, seconds)
+
+    // endOf
+
+    val endOfYear get() = DateTime(year, Month.December, 31, 23, 59, 59, 999)
+    val endOfMonth get() = DateTime(year, month, month.days(year), 23, 59, 59, 999)
+    val endOfQuarter get() = DateTime(year, Month[(quarter - 1) * 3 + 3], month.days(year), 23, 59, 59, 999)
+    fun endOfDayOfWeek(day: DayOfWeek): DateTime {
+        for (n in 0 until 7) {
+            val date = (this + n.days)
+            if (date.dayOfWeek == day) return date.endOfDay
+        }
+        error("Shouldn't happen")
+    }
+    val endOfWeek: DateTime get() = endOfDayOfWeek(DayOfWeek.Monday)
+    val endOfIsoWeek: DateTime get() = endOfDayOfWeek(DayOfWeek.Sunday)
+    val endOfDay get() = DateTime(year, month, dayOfMonth, 23, 59, 59, 999)
+    val endOfHour get() = DateTime(year, month, dayOfMonth, hours, 59, 59, 999)
+    val endOfMinute get() = DateTime(year, month, dayOfMonth, hours, minutes, 59, 999)
+    val endOfSecond get() = DateTime(year, month, dayOfMonth, hours, minutes, seconds, 999)
+
+    val date get() = Date(yearInt, month1, dayOfMonth)
+	val time get() = Time(hours, minutes, seconds, milliseconds)
 
     operator fun plus(delta: MonthSpan): DateTime = this.add(delta.totalMonths, 0.0)
     operator fun plus(delta: DateTimeSpan): DateTime = this.add(delta.totalMonths, delta.totalMilliseconds)
