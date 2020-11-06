@@ -64,7 +64,7 @@ data class WDate(val value: Date) : Comparable<WDate>, Serializable {
     operator fun plus(time: WTime) = (this.value + time.value).wrapped
 
     operator fun minus(time: WTimeSpan) = (this.value - time.value).wrapped
-    operator fun minus(time:WMonthSpan) = (this.value - time.value).wrapped
+    operator fun minus(time: WMonthSpan) = (this.value - time.value).wrapped
     operator fun minus(time: WDateTimeSpan) = (this.value - time.value).wrapped
     operator fun minus(time: WTime) = (this.value - time.value).wrapped
 
