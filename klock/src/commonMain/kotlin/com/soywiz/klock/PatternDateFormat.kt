@@ -60,7 +60,7 @@ data class PatternDateFormat @JvmOverloads constructor(
             }
             val chunk = s.readChunk {
                 val c = s.readChar()
-                while (s.hasMore && s.tryRead(c)) Unit
+                while (s.hasMore && (s.tryRead(c) || s.tryReadDaySuffix(c))) Unit
             }
             chunks.add(chunk)
         }
@@ -70,6 +70,7 @@ data class PatternDateFormat @JvmOverloads constructor(
         when (it) {
             "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> """(\w+)"""
             "z", "zzz" -> """([\w\s\-\+\:]+)"""
+            "do" -> """(\d{1,2}\w+)"""
             "d" -> """(\d{1,2})"""
             "dd" -> """(\d{2})"""
             "M" -> """(\d{1,5})"""
@@ -126,6 +127,11 @@ data class PatternDateFormat @JvmOverloads constructor(
 	// EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
     // YYYY-MM-dd HH:mm:ss
 
+    val suffixes = listOf("0th",  "1st",  "2nd",  "3rd",  "4th",  "5th",  "6th",  "7th",  "8th",  "9th",
+        "10th", "11th", "12th", "13th", "14th", "15th", "16th", "17th", "18th", "19th",
+        "20th", "21st", "22nd", "23rd", "24th", "25th", "26th", "27th", "28th", "29th",
+        "30th", "31st")
+
     override fun format(dd: DateTimeTz): String {
         val utc = dd.local
         var out = ""
@@ -136,6 +142,7 @@ data class PatternDateFormat @JvmOverloads constructor(
                 "EEEE", "EEEEE", "EEEEEE" -> DayOfWeek[utc.dayOfWeek.index0].localName(realLocale)
                 "z", "zzz" -> dd.offset.timeZone
                 "d", "dd" -> utc.dayOfMonth.padded(nlen)
+                "do" -> suffixes[utc.dayOfMonth]
                 "M", "MM" -> utc.month1.padded(nlen)
                 "MMM" -> Month[utc.month1].localName(realLocale).substr(0, 3)
                 "MMMM" -> Month[utc.month1].localName(realLocale)
@@ -211,6 +218,7 @@ data class PatternDateFormat @JvmOverloads constructor(
                     offset = MicroStrReader(value).readTimeZoneOffset(tzNames)
                 }
                 "d", "dd" -> day = value.toInt()
+                "do" -> day = suffixes.indexOf(value)
                 "M", "MM" -> month = value.toInt()
                 "MMM" -> month = realLocale.monthsShort.indexOf(value) + 1
                 "y", "yyyy", "YYYY" -> fullYear = value.toInt()
