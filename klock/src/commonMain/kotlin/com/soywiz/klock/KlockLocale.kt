@@ -18,11 +18,15 @@ abstract class KlockLocale {
     open val daysOfWeekShort: List<String> by klockLazyOrGet { daysOfWeek.map { it.substr(0, 3) } }
 
     open val ordinals = Array(32) {
-        when (it % 10) {
-            1 -> "${it}st"
-            2 -> "${it}nd"
-            3 -> "${it}rd"
-            else -> "${it}th"
+        if (it in 11..13) {
+            "${it}th"
+        } else {
+            when (it % 10) {
+                1 -> "${it}st"
+                2 -> "${it}nd"
+                3 -> "${it}rd"
+                else -> "${it}th"
+            }
         }
     }
 
