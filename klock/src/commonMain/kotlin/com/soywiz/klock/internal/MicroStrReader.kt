@@ -21,12 +21,8 @@ internal class MicroStrReader(val str: String, var offset: Int = 0) {
 		readChar()
 		return true
 	}
-    fun tryReadDaySuffix(current: Char): Boolean {
-        if (current == 'd' && peekChar() == 'o') {
-            readChar()
-            return true
-        }
-        return false
+    fun tryReadOrNull(expected: String): String? {
+        return if (tryRead(expected)) expected else null
     }
     fun tryRead(expected: String): Boolean {
         if (expected.length > available) return false

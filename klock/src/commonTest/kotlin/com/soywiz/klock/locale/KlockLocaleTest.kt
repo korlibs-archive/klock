@@ -276,4 +276,17 @@ class KlockLocaleTest {
 			HttpDate.withTimezoneNames(ExtendedTimezoneNames).parse("Tue, 19 Sep 2017 00:58:45 MSK").toString()
 		)
 	}
+
+    @Test
+    fun testOrdinalsEnglish() {
+        assertEquals("1st", KlockLocale.english.getOrdinalByDay(1))
+        assertEquals("2nd", KlockLocale.english.getOrdinalByDay(2))
+        assertEquals("3rd", KlockLocale.english.getOrdinalByDay(3))
+        assertEquals("10th", KlockLocale.english.getOrdinalByDay(10))
+
+        assertEquals(1, KlockLocale.english.getDayByOrdinal("1st"))
+        assertEquals(2, KlockLocale.english.getDayByOrdinal("2nd"))
+        assertEquals(3, KlockLocale.english.getDayByOrdinal("3rd"))
+        assertEquals(10, KlockLocale.english.getDayByOrdinal("10th"))
+    }
 }
