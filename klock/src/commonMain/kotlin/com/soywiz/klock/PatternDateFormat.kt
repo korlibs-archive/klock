@@ -65,7 +65,7 @@ data class PatternDateFormat @JvmOverloads constructor(
 	internal val regexChunks = chunks.map {
         when (it) {
             "E", "EE", "EEE", "EEEE", "EEEEE", "EEEEEE" -> """(\w+)"""
-            "z", "zzz" -> """([\w\s\-\+\:]+)"""
+            "z", "zzz" -> """([\w\s\-+:]+)"""
             "do" -> """(\d{1,2}\w+)"""
             "d" -> """(\d{1,2})"""
             "dd" -> """(\d{2})"""
@@ -98,8 +98,8 @@ data class PatternDateFormat @JvmOverloads constructor(
             "a" -> """(\w+)"""
             " " -> """(\s+)"""
             else -> when {
-                it.startsWith('\'') -> "(" + Regex.escapeReplacement(it.substr(1, it.length - 2)) + ")"
-                else -> "(" + Regex.escapeReplacement(it) + ")"
+                it.startsWith('\'') -> "(" + Regex.escape(it.substr(1, it.length - 2)) + ")"
+                else -> "(" + Regex.escape(it) + ")"
             }
         }
     }
