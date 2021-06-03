@@ -36,7 +36,7 @@ val daysInNextMonth = (now.yearMonth + 1.months).days
 ### Usage with gradle:
 
 ```groovy
-def klockVersion = "2.1.2"
+def klockVersion = "..." // Find latest version in https://search.maven.org/artifact/com.soywiz.korlibs.klock/klock
 
 repositories {
     mavenCentral()
