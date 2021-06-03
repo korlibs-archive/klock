@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-    Klock is a Date & Time library for Multiplatform Kotlin 1.3.
+    Klock is a Date & Time library for Multiplatform Kotlin.
 </p>
 
 <p align="center">
@@ -15,21 +15,10 @@
 <!-- BADGES -->
 <p align="center">
 	<a href="https://github.com/korlibs/klock/actions"><img alt="Build Status" src="https://github.com/korlibs/klock/workflows/CI/badge.svg" /></a>
-	<a href="https://bintray.com/korlibs/korlibs/klock"><img alt="Maven Version" src="https://img.shields.io/bintray/v/korlibs/korlibs/klock.svg?style=flat&label=maven" /></a>
+    <a href="https://search.maven.org/artifact/com.soywiz.korlibs.klock/klock"><img alt="Maven Central" src="https://img.shields.io/maven-central/v/com.soywiz.korlibs.klock/klock"></a>
 	<a href="https://discord.korge.org/"><img alt="Discord" src="https://img.shields.io/discord/728582275884908604?logo=discord" /></a>
 </p>
 <!-- /BADGES -->
-
-<!-- SUPPORT -->
-
-<h2 align="center">Support klock</h2>
-
-<p align="center">
-If you like klock, or want your company logo here, please consider <a href="https://github.com/sponsors/soywiz">becoming a sponsor ★</a>,<br />
-in addition to ensure the continuity of the project, you will get exclusive content.
-</p>
-
-<!-- /SUPPORT -->
 
 ### Full Documentation: <https://korlibs.soywiz.com/klock/>
 
@@ -46,17 +35,14 @@ val daysInNextMonth = (now.yearMonth + 1.months).days
 
 ### Usage with gradle:
 
-(Compiled and tested with Gradle 5.4.1, JVM 12.0.1 and Kotlin 1.3.31).
-Starting with Klock 2.0.7, the library is available at mavenCentral. Versions from 2.0.6 down to 1.4.0 are available at jcenter. 
-
 ```groovy
-def klockVersion = "2.0.7"
+def klockVersion = "2.1.2"
 
 repositories {
     mavenCentral()
-    //Versions older than 2.0.7 are available on jcenter()
 }
 
+// For multiplatform Kotlin
 kotlin {
     sourceSets {
         commonMain {
@@ -66,42 +52,12 @@ kotlin {
         }
     }
 }
-```
 
-#### `settings.gradle`
-
-```groovy
-enableFeaturePreview('GRADLE_METADATA')
-```
-
-### Use with Kotlin-JVM
-
-```groovy
-def klockVersion = "2.0.7"
-
-repositories {
-    mavenCentral()
-    //Versions older than 2.0.7 are available on jcenter()
-}
-
+// For JVM
 dependencies {
     implementation "com.soywiz.korlibs.klock:klock-jvm:$klockVersion"
 }
 ```
-
-### Versions
-
-| Klock       | Kotlin | Gradle Metadata  | JVM version |
-|-------------|--------|------------------|-------------|
-| 2.0.0-alpha | 1.4.10 | 1.0              | 1.8         |
-| 1.12.0      | 1.4.0  | 1.0              | 1.8         |
-| 1.11.14       | 1.3.72 | 1.0              | 1.8         |
-| 1.8.4       | 1.3.61 | 1.0              | 1.8         |
-| 1.8.0       | 1.3.60 | 1.0              | 1.8         |
-| 1.7.0       | 1.3.50 | 1.0              | 1.6         |
-| 1.6.0       | 1.3.50 | 1.0              | 1.6         |
-| 1.5.0       | 1.3.40 | 1.0              | 1.6         |
-| 1.4.0       | 1.3.21 | 1.0              | 1.6         |
 
 ### Testing & Kotest
 
