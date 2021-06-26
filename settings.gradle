@@ -9,5 +9,3 @@ for (file in rootDir.listFiles()) {
 		include(":${file.name}")
     }
 }
-
-enableFeaturePreview('GRADLE_METADATA')
