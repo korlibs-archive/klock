@@ -104,8 +104,7 @@ data class PatternDateFormat @JvmOverloads constructor(
         }
     }
 
-    //val escapedFormat = Regex.escape(format)
-    internal val rx2: Regex = Regex("^" + regexChunks.mapIndexed { index, it ->
+    fun matchingRegexString() = regexChunks.mapIndexed { index, it ->
         if (options.optionalSupport) {
             val opens = openOffsets.getOrElse(index) { 0 }
             val closes = closeOffsets.getOrElse(index) { 0 }
@@ -117,7 +116,10 @@ data class PatternDateFormat @JvmOverloads constructor(
         } else {
             it
         }
-    }.joinToString("") + "$")
+    }.joinToString("")
+
+    //val escapedFormat = Regex.escape(format)
+    internal val rx2: Regex = Regex("^" + matchingRegexString() + "$")
 
 
     // EEE, dd MMM yyyy HH:mm:ss z -- > Sun, 06 Nov 1994 08:49:37 GMT
