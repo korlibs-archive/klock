@@ -104,6 +104,9 @@ data class PatternDateFormat @JvmOverloads constructor(
         }
     }
 
+    /**
+     * @return the regular expression string used for matching this format, able to be composed into another regex
+     */
     fun matchingRegexString() = regexChunks.mapIndexed { index, it ->
         if (options.optionalSupport) {
             val opens = openOffsets.getOrElse(index) { 0 }
