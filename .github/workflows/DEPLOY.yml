@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v1
       - run: sudo apt-get install xvfb
       - run: xvfb-run --auto-servernum ./gradlew --no-daemon
-      - run: xvfb-run --auto-servernum ./gradlew --no-daemon  assemble check lint testDebugUnitTest publishKotlinMultiplatformPublicationToMavenRepository publishLinuxX64PublicationToMavenRepository
+      - run: xvfb-run --auto-servernum ./gradlew --no-daemon  assemble check lint testDebugUnitTest publishKotlinMultiplatformPublicationToMavenRepository publishLinuxX64PublicationToMavenRepository publishLinuxArm64PublicationToMavenRepository publishLinuxArm32HfpPublicationToMavenRepository
 
   publish-finalize:
     needs: [publish-windows, publish-mac, publish-linux]
