@@ -263,14 +263,14 @@ data class PatternDateFormat @JvmOverloads constructor(
                 }
                 "MMMM" -> month = realLocale.months.indexOf(value) + 1
                 "MMMMM" -> if (doThrow) throw RuntimeException("Not possible to get the month from one letter.") else return null
-                "a" -> isPm = value == "pm"
+                "a" -> isPm = value.lowercase() == "pm"
                 else -> {
                     // ...
                 }
             }
         }
         //return DateTime.createClamped(fullYear, month, day, hour, minute, second)
-        if (is12HourFormat && isPm) {
+        if (is12HourFormat && isPm && hour < 12) {
             hour += 12
         }
         val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second, millisecond)

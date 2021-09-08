@@ -280,6 +280,14 @@ class DateTimeTest {
     }
 
     @Test
+    fun testParseAmPmFormat() {
+        val format = DateFormat("MMM d, yyyy h:mm:ss a")
+
+        assertEquals("Tue, 07 Sep 2021 12:50:08 UTC", format.parse("Sep 7, 2021 12:50:08 pm").toString())
+        assertEquals("Tue, 07 Sep 2021 13:50:08 UTC", format.parse("Sep 7, 2021 1:50:08 PM").toString())
+    }
+
+    @Test
     fun testCheckedCreation() {
         assertEquals("Mon, 18 Sep 2017 23:58:45 UTC", HttpDate.format(DateTime(2017, 9, 18, 23, 58, 45)))
     }
