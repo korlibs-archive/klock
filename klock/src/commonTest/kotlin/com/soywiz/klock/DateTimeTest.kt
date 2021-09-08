@@ -285,6 +285,9 @@ class DateTimeTest {
 
         assertEquals("Tue, 07 Sep 2021 12:50:08 UTC", format.parse("Sep 7, 2021 12:50:08 pm").toString())
         assertEquals("Tue, 07 Sep 2021 13:50:08 UTC", format.parse("Sep 7, 2021 1:50:08 PM").toString())
+        assertEquals("Tue, 07 Sep 2021 00:50:08 UTC", format.parse("Sep 7, 2021 12:50:08 am").toString())
+        assertEquals("Tue, 07 Sep 2021 00:00:00 UTC", format.parse("Sep 7, 2021 12:00:00 am").toString())
+        assertEquals("Tue, 07 Sep 2021 12:00:00 UTC", format.parse("Sep 7, 2021 12:00:00 pm").toString())
     }
 
     @Test

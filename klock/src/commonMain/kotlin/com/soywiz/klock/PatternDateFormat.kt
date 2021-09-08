@@ -270,8 +270,16 @@ data class PatternDateFormat @JvmOverloads constructor(
             }
         }
         //return DateTime.createClamped(fullYear, month, day, hour, minute, second)
-        if (is12HourFormat && isPm && hour < 12) {
-            hour += 12
+        if (is12HourFormat) {
+            if (isPm) {
+                if (hour != 12) {
+                    hour += 12
+                }
+            } else {
+                if (hour == 12) {
+                    hour = 0
+                }
+            }
         }
         val dateTime = DateTime.createAdjusted(fullYear, month, day, hour, minute, second, millisecond)
         return dateTime.toOffsetUnadjusted(offset ?: 0.hours)
