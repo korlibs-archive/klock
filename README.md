@@ -20,6 +20,8 @@
 </p>
 <!-- /BADGES -->
 
+📓 The code has been moved to [korlibs/korge-next](https://github.com/korlibs/korge-next), so please check it for the latest code.
+
 ### Full Documentation: <https://korlibs.soywiz.com/klock/>
 
 ### Some samples:
