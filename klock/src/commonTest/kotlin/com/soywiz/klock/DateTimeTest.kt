@@ -8,7 +8,7 @@ class DateTimeTest {
 
     @Test
     fun testFromString() {
-        assertEquals("Mon, 04 Dec 2017 04:35:37 UTC", DateTime.fromString("2017-12-04T04:35:37Z").toString())
+        assertEquals("Mon, 04 Dec 2017 04:35:37 UTC", DateTime.fromString("2017-12-04T04:35:37Z").toStringDefault())
     }
 
     @Test
@@ -280,6 +280,17 @@ class DateTimeTest {
     }
 
     @Test
+    fun testParseAmPmFormat() {
+        val format = DateFormat("MMM d, yyyy h:mm:ss a")
+
+        assertEquals("Tue, 07 Sep 2021 12:50:08 UTC", HttpDate.format(format.parse("Sep 7, 2021 12:50:08 pm")))
+        assertEquals("Tue, 07 Sep 2021 13:50:08 UTC", HttpDate.format(format.parse("Sep 7, 2021 1:50:08 PM")))
+        assertEquals("Tue, 07 Sep 2021 00:50:08 UTC", HttpDate.format(format.parse("Sep 7, 2021 12:50:08 am")))
+        assertEquals("Tue, 07 Sep 2021 00:00:00 UTC", HttpDate.format(format.parse("Sep 7, 2021 12:00:00 am")))
+        assertEquals("Tue, 07 Sep 2021 12:00:00 UTC", HttpDate.format(format.parse("Sep 7, 2021 12:00:00 pm")))
+    }
+
+    @Test
     fun testCheckedCreation() {
         assertEquals("Mon, 18 Sep 2017 23:58:45 UTC", HttpDate.format(DateTime(2017, 9, 18, 23, 58, 45)))
     }
@@ -316,8 +327,8 @@ class DateTimeTest {
     fun testBaseAdjust() {
         val date = DateTime(Year(2018), Month.November, 4, 5, 54, 30)
 
-        assertEquals("Sun, 04 Nov 2018 05:54:30 GMT+0100", date.toOffsetUnadjusted((+60).minutes).toString())
-        assertEquals("Sun, 04 Nov 2018 06:54:30 GMT+0100", date.toOffset((+60).minutes).toString())
+        assertEquals("Sun, 04 Nov 2018 05:54:30 GMT+0100", date.toOffsetUnadjusted((+60).minutes).toStringDefault())
+        assertEquals("Sun, 04 Nov 2018 06:54:30 GMT+0100", date.toOffset((+60).minutes).toStringDefault())
     }
 
     @Test
@@ -346,8 +357,8 @@ class DateTimeTest {
 
 	@Test
 	fun testTimeZones() {
-		"Tue, 19 Sep 2017 00:58:45 GMT-0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
-		"Tue, 19 Sep 2017 00:58:45 GMT+0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toString()) }
+		"Tue, 19 Sep 2017 00:58:45 GMT-0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toStringDefault()) }
+		"Tue, 19 Sep 2017 00:58:45 GMT+0800".let { STR -> assertEquals(STR, HttpDate.parse(STR).toStringDefault()) }
 	}
 
 	@Test
@@ -405,10 +416,10 @@ class DateTimeTest {
 
     @Test
     fun testBug103() {
-        assertEquals("Fri, 15 Oct -0249 19:33:20 UTC", DateTime.fromUnix(-70000000000000L).toString())
-        assertEquals("Mon, 01 Jan 0001 00:00:00 UTC", DateTime.fromUnix(-62135596800000L).toString())
-        assertEquals("Sat, 11 Aug -0027 08:00:00 UTC", DateTime.fromUnix(-63000000000000L).toString())
-        assertEquals("Sun, 31 Dec 0000 23:59:59 UTC", DateTime.fromUnix(-62135596800000L - 1L).toString())
+        assertEquals("Fri, 15 Oct -0249 19:33:20 UTC", DateTime.fromUnix(-70000000000000L).toStringDefault())
+        assertEquals("Mon, 01 Jan 0001 00:00:00 UTC", DateTime.fromUnix(-62135596800000L).toStringDefault())
+        assertEquals("Sat, 11 Aug -0027 08:00:00 UTC", DateTime.fromUnix(-63000000000000L).toStringDefault())
+        assertEquals("Sun, 31 Dec 0000 23:59:59 UTC", DateTime.fromUnix(-62135596800000L - 1L).toStringDefault())
     }
 
     @Test
