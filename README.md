@@ -65,6 +65,6 @@ dependencies {
 
 Kotest is a flexible and comprehensive testing tool for Kotlin with multiplatform support.
 It supports Klock adding additional matchers. For a full list of Klock Kotest matchers, check this link:
-<https://github.com/kotest/kotest/blob/master/doc/matchers.md>
+<https://kotest.io/docs/assertions/matchers.html>
 
 And you can find a sample here: <https://github.com/kotest/kotest/tree/master/kotest-assertions/kotest-assertions-klock>
